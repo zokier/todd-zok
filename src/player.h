@@ -7,6 +7,7 @@ typedef struct Player Player;
 struct Player {
 	char *name;
 	Location *location;
+	// TODO add more stats 
 };
 
 #endif //PLAYER_H

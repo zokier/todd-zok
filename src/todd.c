@@ -17,7 +17,7 @@
 int playing;
 
 /*
-	Create a new player
+	Creates a new player
 */
 int create_player(Player *dst)
 {
@@ -54,6 +54,9 @@ int get_player(Player *dst)
 	}
 }
 
+/*
+	Prints descriptions at current player position
+*/
 void print_location_info(Player *player)
 {
 	puts(player->location->description);
@@ -63,8 +66,12 @@ void print_location_info(Player *player)
 	}
 }
 
+/*
+	Tries to find and call the action user requested
+*/
 void execute_action(Player *player, char cmd_char)
 {
+	//convert upper case to lower case
 	if (cmd_char < 'a')
 	{
 		cmd_char += 'a' - 'A';
@@ -86,6 +93,9 @@ void execute_action(Player *player, char cmd_char)
 	}
 }
 
+/*
+	Main gameloop here
+*/
 void enter_game(Player *player)
 {
 	print_location_info(player);

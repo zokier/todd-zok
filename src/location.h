@@ -6,7 +6,7 @@
 typedef struct Location Location;
 struct Location {
 	char *description;
-	size_t action_count;
+	size_t action_count; //number of items in actions array
 	Action actions[];
 };
 

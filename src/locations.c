@@ -3,10 +3,11 @@
 #include "actions.h"
 #include "location.h"
 
+// ansi control code for underlining, and reverting back to normal
 #define UNDERLINE(x) "\033[4m" x "\033[0m"
 
 Location loc_town = {
-	"You begin to wonder why you even bothered coming here when as you wander around the desolate town.",
+	"You begin to wonder why you even bothered coming here as you wander around the desolate town.",
 	6,
 	{
 		{
