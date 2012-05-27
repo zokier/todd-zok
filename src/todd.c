@@ -105,9 +105,15 @@ void enter_game(Player *player)
 	while (playing)
 	{
 		ssize_t len = getline(&line, &line_len, stdin);
-		if (len < 0) break;
+		if (len < 0)
+		{
+			//eof or other read error
+			playing = false;
+			break;
+		}
 		execute_action(player, line[0]);
 	}
+	free(line);
 }
 
 /*
