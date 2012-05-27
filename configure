@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Default settings
+prefix=/usr/local
+
+# Parse variables
+for a in "$@"; do
+case "$a" in
+  --prefix=*)
+    prefix="${a#--prefix=}"
+  ;;
+esac  
+done
+
+# Write configuration file
+echo 'PREFIX = '"$prefix" > Makefile.config
+echo 'Using prefix = '"$prefix"
+
+echo 'All OK.'
+
+# EOF
