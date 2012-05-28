@@ -8,10 +8,10 @@ struct Player {
 	char *name;
 	Location *location;
 	unsigned int action_points;
-	unsigned int money;
 	unsigned int experience;
-	unsigned int health;
 	unsigned int max_health;
+	int health;
+	int money;
 	// TODO add more stats 
 };
 

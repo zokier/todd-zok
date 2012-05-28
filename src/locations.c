@@ -51,7 +51,7 @@ Location loc_dungeons = {
 	"\t| Beware of bugs |\n"
 	"\t+----------------+\n"
 	"\n"
-	"As you ponder how large bugs must be to threaten grown men, you notice faint, strangely compelling, reddish glow emanating from nearby ruins."
+	"As you ponder how large bugs must be to threaten grown men, you notice faint, strangely compelling, reddish glow emanating from nearby ruins.",
 	3,
 	{
 		{
@@ -107,7 +107,7 @@ Location loc_shop = {
 };
 
 Location loc_fight = {
-	"You encounter an enemy!",
+	"",
 	2,
 	{
 		{
@@ -129,7 +129,7 @@ Location loc_shrine = {
 	{
 		{
 			'i',
-			UNDERLINE("I")"insert a coin",
+			UNDERLINE("I")"nsert a coin",
 			&ac_shrine_heal_1
 		},
 		{

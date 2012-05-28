@@ -22,6 +22,11 @@ int playing;
 int create_player(Player *dst)
 {
 	dst->location = &loc_town;
+	dst->action_points = 10;
+	dst->experience = 0;
+	dst->max_health = 20;
+	dst->health = dst->max_health;
+	dst->money = 10;
 	fputs(WELCOME_NEW, stdout);
 	puts(dst->name);
 	return true;

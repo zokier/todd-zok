@@ -4,7 +4,7 @@
 typedef struct Enemy Enemy;
 struct Enemy {
 	char *name;
-	unsigned int health;
+	int health;
 };
 
 #endif //ENEMY_H
