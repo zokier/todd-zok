@@ -6,7 +6,7 @@ SRCS     = $(wildcard $(SRCDIR)/*.c)
 _SRCS    = $(notdir $(SRCS))
 _OBJS    = $(_SRCS:.c=.o)
 OBJS     = $(addprefix $(OBJDIR)/, $(_OBJS))
-LIBS	 = -lzmq -ltpl
+LIBS	 = -lzmq
 
 CC      ?= gcc
 CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -g -std=gnu99

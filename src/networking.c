@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 #include <zmq.h>
-#include <tpl.h>
 
 #include "networking.h"
 
