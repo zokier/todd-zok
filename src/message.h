@@ -1,6 +1,8 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
+#include <stdint.h>
+
 typedef enum Message_type Message_type;
 enum Message_type
 {
@@ -8,6 +10,7 @@ enum Message_type
 };
 
 #define CHATMSG_FMT "S(ss)"
+#define CHATMSG_PREFIX "chat"
 typedef struct Chatmsg Chatmsg;
 struct Chatmsg
 {

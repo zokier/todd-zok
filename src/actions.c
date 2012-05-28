@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "player.h"
 #include "locations.h"
 #include "enemy.h"
@@ -146,7 +147,7 @@ void ac_tavern_shout(void *data)
 	char *line = NULL;
 	size_t line_len = 0;
 	ssize_t len = getline(&line, &line_len, stdin);
-	send_chatmsg(player->name, line);
+	send_chatmsg(line, line_len);
 }
 
 void ac_tavern_sit(void *data)
@@ -160,7 +161,8 @@ void ac_tavern_sit(void *data)
 	else
 	{
 		puts("Suddenly you hear a voice appear from thin air, saying:");
-		puts(msg);
+		puts(msg+sizeof(CHATMSG_PREFIX));
+		free(msg);
 	}
 }
 

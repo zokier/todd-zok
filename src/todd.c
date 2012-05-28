@@ -10,6 +10,7 @@
 #include "location.h"
 #include "player.h"
 #include "locations.h"
+#include "networking.h"
 
 #define NAME_QUERY "What's your name, adventurer?  "
 #define WELCOME_NEW "The bards have not heard of you before.\r\nWelcome to Tales of Deep Dungeons, "
@@ -18,7 +19,7 @@
 
 int playing;
 void *push_socket;
-void *sub_socket;
+void *chat_socket;
 
 /*
 	Creates a new player
@@ -137,9 +138,9 @@ int main(int argc, char *argv[])
 	void *zmq_context = zmq_init(1);
 	push_socket = zmq_socket(zmq_context, ZMQ_PUSH);
 	zmq_connect(push_socket, "tcp://localhost:5558");
-	sub_socket = zmq_socket(zmq_context, ZMQ_SUB);
-	zmq_connect(sub_socket, "tcp://localhost:5559");
-	zmq_setsockopt(sub_socket, ZMQ_SUBSCRIBE, "todd", 4);
+	chat_socket = zmq_socket(zmq_context, ZMQ_SUB);
+	zmq_connect(chat_socket, "tcp://localhost:5559");
+	zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)-1);
 
 	char *name = NULL;
 	size_t name_len = 0;
@@ -168,7 +169,7 @@ int main(int argc, char *argv[])
 	enter_game(&player);
 
 cleanup:
-	zmq_close(sub_socket);
+	zmq_close(chat_socket);
 	zmq_close(push_socket);
 	zmq_term(zmq_context);
 	closelog();
