@@ -13,6 +13,7 @@ void ac_list_players(void *);
 void ac_view_stats(void *);
 void ac_tavern(void *);
 void ac_tavern_shout(void *);
+void ac_tavern_sit(void *);
 void ac_shop(void *);
 void ac_shop_buy(void *);
 void ac_shop_sell(void *);

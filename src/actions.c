@@ -142,11 +142,26 @@ void ac_tavern(void *data)
 void ac_tavern_shout(void *data)
 {
 	Player *player = (Player *)data;
-	puts("What do you want to shout?");
+	puts("What do you want to yell?");
 	char *line = NULL;
 	size_t line_len = 0;
 	ssize_t len = getline(&line, &line_len, stdin);
 	send_chatmsg(player->name, line);
+}
+
+void ac_tavern_sit(void *data)
+{
+	puts("You sit down for a minute to relax.");
+	char *msg = try_recv_chatmsg();
+	if (msg == NULL)
+	{
+		puts("That was nice and quiet.");
+	}
+	else
+	{
+		puts("Suddenly you hear a voice appear from thin air, saying:");
+		puts(msg);
+	}
 }
 
 void ac_shop(void *data)

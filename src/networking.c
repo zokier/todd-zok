@@ -8,6 +8,7 @@
 #include "message.h"
 
 extern void *push_socket;
+extern void *sub_socket;
 
 void send_blob(void *addr, size_t len)
 {
@@ -46,4 +47,19 @@ void send_chatmsg(const char *from, const char *body)
 	send_message(msg);
 	free(addr);
 	tpl_free(tn);
+}
+
+char *try_recv_chatmsg()
+{
+	// TODO
+    zmq_msg_t message;
+    zmq_msg_init (&message);
+    if (zmq_recv (sub_socket, &message, ZMQ_NOBLOCK))
+        return (NULL);
+    int size = zmq_msg_size (&message);
+    char *string = malloc (size + 1);
+    memcpy (string, zmq_msg_data (&message), size);
+    zmq_msg_close (&message);
+    string [size] = 0;
+    return (string+5);
 }

@@ -18,6 +18,7 @@
 
 int playing;
 void *push_socket;
+void *sub_socket;
 
 /*
 	Creates a new player
@@ -136,6 +137,9 @@ int main(int argc, char *argv[])
 	void *zmq_context = zmq_init(1);
 	push_socket = zmq_socket(zmq_context, ZMQ_PUSH);
 	zmq_connect(push_socket, "tcp://localhost:5558");
+	sub_socket = zmq_socket(zmq_context, ZMQ_SUB);
+	zmq_connect(sub_socket, "tcp://localhost:5559");
+	zmq_setsockopt(sub_socket, ZMQ_SUBSCRIBE, "todd", 4);
 
 	char *name = NULL;
 	size_t name_len = 0;
@@ -164,6 +168,7 @@ int main(int argc, char *argv[])
 	enter_game(&player);
 
 cleanup:
+	zmq_close(sub_socket);
 	zmq_close(push_socket);
 	zmq_term(zmq_context);
 	closelog();
