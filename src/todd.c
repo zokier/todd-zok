@@ -4,6 +4,8 @@
 #include <syslog.h>
 #include <stdbool.h>
 
+#include <zmq.h>
+
 #include "action.h"
 #include "location.h"
 #include "player.h"
@@ -15,6 +17,7 @@
 
 
 int playing;
+void *push_socket;
 
 /*
 	Creates a new player
@@ -130,6 +133,10 @@ int main(int argc, char *argv[])
 	int return_code = EXIT_SUCCESS;
 	openlog("ToDD", LOG_PID, LOG_USER);
 
+	void *zmq_context = zmq_init(1);
+	push_socket = zmq_socket(zmq_context, ZMQ_PUSH);
+	zmq_connect(push_socket, "tcp://localhost:5558");
+
 	char *name = NULL;
 	size_t name_len = 0;
 	fputs(NAME_QUERY, stdout);
@@ -157,6 +164,8 @@ int main(int argc, char *argv[])
 	enter_game(&player);
 
 cleanup:
+	zmq_close(push_socket);
+	zmq_term(zmq_context);
 	closelog();
 	free(name);
 	return return_code;

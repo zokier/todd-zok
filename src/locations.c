@@ -74,8 +74,13 @@ Location loc_dungeons = {
 
 Location loc_tavern = {
 	"The tavern is eerlily quiet. You thought you saw something move in the shadows, but found nothing. What sort of madness leads man to build a fine tavern like this, and then abadon it?",
-	1,
+	2,
 	{
+		{
+			's',
+			UNDERLINE("S")"hout",
+			&ac_tavern_shout
+		},
 		{
 			'r',
 			UNDERLINE("R")"eturn to town",

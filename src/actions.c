@@ -3,6 +3,7 @@
 #include "player.h"
 #include "locations.h"
 #include "enemy.h"
+#include "networking.h"
 
 extern int playing;
 
@@ -136,6 +137,16 @@ void ac_view_stats(void *data)
 void ac_tavern(void *data)
 {
 	set_player_location(data, &loc_tavern);
+}
+
+void ac_tavern_shout(void *data)
+{
+	Player *player = (Player *)data;
+	puts("What do you want to shout?");
+	char *line = NULL;
+	size_t line_len = 0;
+	ssize_t len = getline(&line, &line_len, stdin);
+	send_chatmsg(player->name, line);
 }
 
 void ac_shop(void *data)

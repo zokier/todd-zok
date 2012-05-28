@@ -6,6 +6,7 @@ SRCS     = $(wildcard $(SRCDIR)/*.c)
 _SRCS    = $(notdir $(SRCS))
 _OBJS    = $(_SRCS:.c=.o)
 OBJS     = $(addprefix $(OBJDIR)/, $(_OBJS))
+LIBS	 = -lzmq -ltpl
 
 CC      ?= gcc
 CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -g -std=gnu99
@@ -23,7 +24,7 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ 
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/*.h Makefile
 	$(CC) $(CFLAGS) -o $@ -c $<
