@@ -47,12 +47,23 @@ Location loc_town = {
 Location loc_dungeons = {
 	"You follow a road that is supposed to lead to dungeons. At the end of the road you find a barred gateway with a sign:\n"
 	"\n"
-	"\t+--------------+\n"
-	"\t| Out of order |\n"
-	"\t+--------------+\n"
-	"\n",
-	1,
+	"\t+----------------+\n"
+	"\t| Beware of bugs |\n"
+	"\t+----------------+\n"
+	"\n"
+	"As you ponder how large bugs must be to threaten grown men, you notice faint, strangely compelling, reddish glow emanating from nearby ruins."
+	3,
 	{
+		{
+			'a',
+			"Look for "UNDERLINE("a")"ction",
+			&ac_dungeons_action
+		},
+		{
+			'g',
+			"Examine the "UNDERLINE("g")"low",
+			&ac_dungeons_glow
+		},
 		{
 			'r',
 			UNDERLINE("R")"eturn to town",
@@ -95,3 +106,41 @@ Location loc_shop = {
 	}
 };
 
+Location loc_fight = {
+	"You encounter an enemy!",
+	2,
+	{
+		{
+			'f',
+			UNDERLINE("F")"ight",
+			&ac_fight_fight
+		},
+		{
+			'r',
+			UNDERLINE("R")"un",
+			&ac_return_to_town
+		}
+	}
+};
+
+Location loc_shrine = {
+	"Inside the ruins you find a peaceful shrine. In the middle of it you see a largish crystal faintly glowing red. Curiously the crystal has a neat slot in it, perfectly sized for a coin.",
+	3,
+	{
+		{
+			'i',
+			UNDERLINE("I")"insert a coin",
+			&ac_shrine_heal_1
+		},
+		{
+			'a',
+			"Insert "UNDERLINE("a")"ll the coins",
+			&ac_shrine_heal_all
+		},
+		{
+			'r',
+			UNDERLINE("R")"eturn to town",
+			&ac_return_to_town
+		}
+	}
+};

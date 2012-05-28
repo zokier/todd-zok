@@ -4,6 +4,11 @@
 #include "player.h"
 
 void ac_dungeons(void *);
+void ac_dungeons_action(void *);
+void ac_dungeons_glow(void *);
+void ac_shrine_heal_1(void *);
+void ac_shrine_heal_all(void *);
+void ac_fight_fight(void *);
 void ac_list_players(void *);
 void ac_view_stats(void *);
 void ac_tavern(void *);
