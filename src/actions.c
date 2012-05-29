@@ -147,7 +147,8 @@ void ac_tavern_shout(void *data)
 	char *line = NULL;
 	size_t line_len = 0;
 	ssize_t len = getline(&line, &line_len, stdin);
-	send_chatmsg(line, line_len);
+	send_chatmsg(line, len-1); // strip trailing newline
+	free(line);
 }
 
 void ac_tavern_sit(void *data)
@@ -161,7 +162,7 @@ void ac_tavern_sit(void *data)
 	else
 	{
 		puts("Suddenly you hear a voice appear from thin air, saying:");
-		puts(msg+sizeof(CHATMSG_PREFIX));
+		puts(msg+(sizeof(CHATMSG_PREFIX)-1));
 		free(msg);
 	}
 }

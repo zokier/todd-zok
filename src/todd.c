@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 	zmq_connect(push_socket, "tcp://localhost:5558");
 	chat_socket = zmq_socket(zmq_context, ZMQ_SUB);
 	zmq_connect(chat_socket, "tcp://localhost:5559");
-	zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)-1);
+	zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)-2); // strip trailing space
 
 	char *name = NULL;
 	size_t name_len = 0;

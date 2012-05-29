@@ -12,11 +12,11 @@ extern void *chat_socket;
 
 void send_chatmsg(char *msg, size_t len)
 {
-	size_t blob_len = sizeof(CHATMSG_PREFIX) + len;
+	size_t blob_len = sizeof(CHATMSG_PREFIX)-1 + len;
 	int rc;
 	zmq_msg_t zmq_message;
 	zmq_msg_init_size (&zmq_message, blob_len);
-	memcpy(mempcpy(zmq_msg_data(&zmq_message), CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)), msg, len);
+	memcpy(mempcpy(zmq_msg_data(&zmq_message), CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)-1), msg, len);
 	rc = zmq_send (push_socket, &zmq_message, 0);
 	zmq_msg_close (&zmq_message);
 }
