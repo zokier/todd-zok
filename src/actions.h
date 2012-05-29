@@ -3,21 +3,21 @@
 
 #include "player.h"
 
-void ac_dungeons(void *);
-void ac_dungeons_action(void *);
-void ac_dungeons_glow(void *);
-void ac_shrine_heal_1(void *);
-void ac_shrine_heal_all(void *);
-void ac_fight_fight(void *);
-void ac_list_players(void *);
-void ac_view_stats(void *);
-void ac_tavern(void *);
-void ac_tavern_shout(void *);
-void ac_tavern_sit(void *);
-void ac_shop(void *);
-void ac_shop_buy(void *);
-void ac_shop_sell(void *);
-void ac_return_to_town(void *);
-void ac_quit(void *);
+void ac_dungeons();
+void ac_dungeons_action();
+void ac_dungeons_glow();
+void ac_shrine_heal_1();
+void ac_shrine_heal_all();
+void ac_fight_fight();
+void ac_list_players();
+void ac_view_stats();
+void ac_tavern();
+void ac_tavern_shout();
+void ac_tavern_sit();
+void ac_shop();
+void ac_shop_buy();
+void ac_shop_sell();
+void ac_return_to_town();
+void ac_quit();
 
 #endif //ACTIONS_H
