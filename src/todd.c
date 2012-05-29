@@ -11,6 +11,7 @@
 #include "player.h"
 #include "locations.h"
 #include "networking.h"
+#include "input.h"
 
 #define NAME_QUERY "What's your name, adventurer?  "
 #define WELCOME_NEW "The bards have not heard of you before.\nWelcome to Tales of Deep Dungeons, "
@@ -112,21 +113,19 @@ void execute_action(char cmd_char)
 void enter_game()
 {
 	print_location_info();
-	char *line = NULL;
-	size_t line_len = 0;
 	playing = true;
 	while (playing)
 	{
-		ssize_t len = getline(&line, &line_len, stdin);
-		if (len < 0)
+		bool ok;
+		char cmd_char = todd_getchar(&ok);
+		if (!ok)
 		{
 			//eof or other read error
 			playing = false;
 			break;
 		}
-		execute_action(line[0]);
+		execute_action(cmd_char);
 	}
-	free(line);
 }
 
 /*
@@ -216,7 +215,9 @@ int main(int argc, char *argv[])
 	}
 	get_player();
 
+	set_terminal_mode();
 	enter_game();
+	reset_terminal_mode();
 
 	return_code = EXIT_SUCCESS; // returned from game, success
 

@@ -5,9 +5,8 @@
 #include "locations.h"
 #include "enemy.h"
 #include "networking.h"
+#include "globals.h"
 
-extern int playing;
-extern Player player;
 // globals are nasty?
 Enemy enemy;
 
@@ -142,22 +141,6 @@ void ac_tavern_shout()
 	ssize_t len = getline(&line, &line_len, stdin);
 	send_chatmsg(line, len-1); // strip trailing newline
 	free(line);
-}
-
-void ac_tavern_sit()
-{
-	puts("You sit down for a minute to relax.");
-	char *msg = try_recv_chatmsg();
-	if (msg == NULL)
-	{
-		puts("That was nice and quiet.");
-	}
-	else
-	{
-		puts("Suddenly you hear a voice appear from thin air, saying:");
-		puts(msg+(sizeof(CHATMSG_PREFIX)-1));
-		free(msg);
-	}
 }
 
 void ac_shop()

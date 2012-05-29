@@ -6,9 +6,7 @@
 #include <zmq.h>
 
 #include "networking.h"
-
-extern void *push_socket;
-extern void *chat_socket;
+#include "globals.h"
 
 void send_chatmsg(char *msg, size_t len)
 {
