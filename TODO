@@ -1,0 +1,41 @@
+* Multiplayer communication
+	* party
+	* pvp combat
+	* privmsg
+	* partymsg/channels
+	* verify reliability
+* Combat
+	* Enemy generation
+	* Random numbers
+		* dSFMT
+	* Special skills
+	* Items
+* Persistance
+	* SQL
+		* ODBC(unixodbc), libpq..
+		* sqlite?
+	* Characters
+	* Messageboard
+	* Configuration data?
+		* Vendor items/prices
+		* Enemy types
+		* ...
+* Vendors
+	* Buy/sell stuff
+	* Items
+		* Armor
+		* Weapons
+		* Potions?
+		* ...
+* Configurable/translatable strings
+	* gettext
+* UI
+	* ncurses
+	* linebased
+	* other?
+* Recovery
+	* stamina/ap:
+		* recovery faster in inn/tavern
+		* recovery slows down over time
+	* health:
+		* cheaper in larger blocks
