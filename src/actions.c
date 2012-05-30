@@ -6,6 +6,7 @@
 #include "enemy.h"
 #include "networking.h"
 #include "globals.h"
+#include "input.h"
 
 // globals are nasty?
 Enemy enemy;
@@ -137,9 +138,11 @@ void ac_tavern_shout()
 {
 	puts("What do you want to yell?");
 	char *line = NULL;
-	size_t line_len = 0;
-	ssize_t len = getline(&line, &line_len, stdin);
-	send_chatmsg(line, len-1); // strip trailing newline
+	size_t len;
+	if (todd_getline(&line, &len))
+	{
+		send_chatmsg(line, len-1); // strip trailing newline
+	}
 	free(line);
 }
 

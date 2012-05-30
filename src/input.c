@@ -59,3 +59,17 @@ void set_terminal_mode()
 	new_termios.c_lflag &= ~ECHO;
     tcsetattr(0, TCSANOW, &new_termios);
 }
+
+bool todd_getline(char **line, size_t *len)
+{
+	// TODO poll network (see todd_getchar)
+	reset_terminal_mode();
+	ssize_t line_len = getline(line, len, stdin);
+	set_terminal_mode();
+	if (line_len < 0)
+	{
+		return false;
+	}
+	*len = line_len;
+	return true;
+}
