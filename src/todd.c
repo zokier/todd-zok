@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include <zmq.h>
+#include <libpq-fe.h>
 
 #include "action.h"
 #include "location.h"
@@ -24,11 +25,12 @@ void *push_socket = NULL;
 void *chat_socket = NULL;
 void *zmq_context = NULL;
 Player player;
+PGconn *conn;
 
 /*
 	Creates a new player
 */
-int create_player()
+int create_player(char *passwd)
 {
 	player.location = &loc_town;
 	player.action_points = 10;
@@ -44,12 +46,29 @@ int create_player()
 /*
 	Loads player from disk
 */
-int load_player()
+bool load_player(char *passwd)
 {
-	// TODO implementation
-	return false;
-	fputs(WELCOME_OLD, stdout);
-	puts(player.name);
+	bool ret = false;
+	char *params[2] = {player.name, passwd};
+	PGresult *res;
+	res = PQexecPrepared(conn, "get_login_id", 2, params, NULL, NULL, 0);
+	if (PQresultStatus(res) == PGRES_TUPLES_OK)
+	{
+		if (PQntuples(res) != 0)
+		{
+			fputs(WELCOME_OLD, stdout);
+			puts(player.name);
+			player.location = &loc_town;
+			player.action_points = 10;
+			player.experience = 0;
+			player.max_health = 20;
+			player.health = player.max_health;
+			player.money = 10;
+			ret = true;
+		}
+	}
+	PQclear(res);
+	return ret;
 }
 
 /*
@@ -57,15 +76,21 @@ int load_player()
 */
 int get_player()
 {
-	if (load_player())
+	char *passwd = NULL;
+	size_t passwd_len = 0;
+	fputs("password: ", stdout);
+	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
+	passwd[line_len-1] = '\0'; // strip newline
+	if (load_player(passwd))
 	{
 		// Old player found, returning
 		return true;
 	}
 	else
 	{
-		return create_player();
+		return create_player(passwd);
 	}
+	free(passwd);
 }
 
 /*
@@ -128,6 +153,33 @@ void enter_game()
 }
 
 /*
+	Asks the player for name
+*/
+bool get_name()
+{
+	char *name = NULL;
+	size_t name_len = 0;
+	fputs(NAME_QUERY, stdout);
+	ssize_t line_len = getline(&name, &name_len, stdin);
+	if (line_len < 0)
+	{
+		syslog(LOG_ERR, "Read error: %s (%s:%d)", strerror(errno), __FILE__, __LINE__);
+		return false;
+	}
+	name_len = line_len;
+	name[name_len - 1] = 0; // strip trailing newline
+	if (strnlen(name, name_len) < name_len - 1)
+	{
+		// null bytes in name
+		syslog(LOG_ERR, "Player name contains \\0");
+		return false;
+	}
+
+	player.name = name;
+	return true;
+}
+
+/*
 	Initializes ZeroMQ context and sockets
 */
 bool init_zmq()
@@ -166,31 +218,37 @@ bool init_zmq()
 	return true;
 }
 
-/*
-	Asks the player for name
-*/
-bool get_name()
+void cleanup_zmq()
 {
-	char *name = NULL;
-	size_t name_len = 0;
-	fputs(NAME_QUERY, stdout);
-	ssize_t line_len = getline(&name, &name_len, stdin);
-	if (line_len < 0)
-	{
-		syslog(LOG_ERR, "Read error: %s (%s:%d)", strerror(errno), __FILE__, __LINE__);
-		return false;
-	}
-	name_len = line_len;
-	name[name_len - 1] = 0; // strip trailing newline
-	if (strnlen(name, name_len) < name_len - 1)
-	{
-		// null bytes in name
-		syslog(LOG_ERR, "Player name contains \\0");
-		return false;
-	}
+	zmq_close(chat_socket);
+	zmq_close(push_socket);
+	zmq_term(zmq_context);
+}
 
-	player.name = name;
+bool init_pq()
+{
+	PGresult *res;
+    conn = PQconnectdb("dbname=todd user=todd");
+    if (PQstatus(conn) != CONNECTION_OK)
+	{
+		goto pq_cleanup;
+	}
+	res = PQprepare(conn, "get_login_id", "select id from player_logins where name = $1 and passwd = $2;", 2, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
 	return true;
+
+pq_cleanup:
+	syslog(LOG_ERR, "Postgres init error: %s", PQerrorMessage(conn));
+	PQclear(res);
+	return false;
+}
+
+void cleanup_pq()
+{
+    PQfinish(conn);
 }
 
 /*
@@ -201,6 +259,11 @@ int main(int argc, char *argv[])
 {
 	int return_code = EXIT_FAILURE;
 	openlog("ToDD", LOG_PID|LOG_PERROR, LOG_USER);
+
+	if (!init_pq())
+	{
+		goto cleanup;
+	}
 
 	if (!init_zmq())
 	{
@@ -221,9 +284,8 @@ int main(int argc, char *argv[])
 	return_code = EXIT_SUCCESS; // returned from game, success
 
 cleanup:
-	zmq_close(chat_socket);
-	zmq_close(push_socket);
-	zmq_term(zmq_context);
+	cleanup_zmq();
+	cleanup_pq();
 	free(player.name);
 	closelog();
 	return return_code;

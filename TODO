@@ -10,6 +10,7 @@
 		* dSFMT
 	* Special skills
 	* Items
+	* Dungeon levels
 * Persistance
 	* SQL
 		* ODBC(unixodbc), libpq..
@@ -39,3 +40,6 @@
 		* recovery slows down over time
 	* health:
 		* cheaper in larger blocks
+* Loot
+	* Creeps drop stuff to sell to vendors
+		* need skills to recover

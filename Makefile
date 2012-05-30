@@ -6,7 +6,8 @@ SRCS     = $(wildcard $(SRCDIR)/*.c)
 _SRCS    = $(notdir $(SRCS))
 _OBJS    = $(_SRCS:.c=.o)
 OBJS     = $(addprefix $(OBJDIR)/, $(_OBJS))
-LIBS	 = -lzmq
+LIBS	 = -lzmq -lpq
+INCPATHS = -I/usr/include/postgresql
 
 CC      ?= gcc
 CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -g -std=gnu99
@@ -27,7 +28,7 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/*.h Makefile
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) $(INCPATHS) -o $@ -c $<
 
 clean:
 	rm $(OBJS) $(TARGET) || true
