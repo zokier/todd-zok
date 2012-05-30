@@ -116,9 +116,8 @@ void enter_game()
 	playing = true;
 	while (playing)
 	{
-		bool ok;
-		char cmd_char = todd_getchar(&ok);
-		if (!ok)
+		char cmd_char;
+		if (!todd_getchar(&cmd_char))
 		{
 			//eof or other read error
 			playing = false;

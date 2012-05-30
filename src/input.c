@@ -8,9 +8,8 @@
 #include "networking.h"
 #include "globals.h"
 
-char todd_getchar(bool *ok)
+bool todd_getchar(char *c)
 {
-	*ok = true;
 	zmq_pollitem_t items [2];
 	items[0].socket = chat_socket;
 	items[0].events = ZMQ_POLLIN;
@@ -23,8 +22,7 @@ char todd_getchar(bool *ok)
 		int rc = zmq_poll (items, 2, -1);
 		if (rc < 0)
 		{
-			*ok = false;
-			return 0;
+			return false;
 		}
 		if (items[0].revents & ZMQ_POLLIN)
 		{
@@ -34,9 +32,7 @@ char todd_getchar(bool *ok)
 			free(msg);
 		}
 	} while (!(items[1].revents & ZMQ_POLLIN));
-	char c;
-	*ok = (read(fileno(stdin), &c, sizeof(c)) > 0);
-	return c;
+	return (read(fileno(stdin), c, sizeof(char)) > 0);
 }
 
 struct termios orig_termios;
