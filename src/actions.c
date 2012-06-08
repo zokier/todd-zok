@@ -11,6 +11,11 @@
 // globals are nasty?
 Enemy enemy;
 
+int check_rnd_events() {
+printf("TODO: random events\n");
+return 1;
+}
+
 void create_enemy()
 {
 	//enemy = { "Feeble goblin", 10 };
@@ -33,9 +38,12 @@ void ac_dungeons_action()
 {
 	if (player.action_points > 0)
 	{
+		if (check_rnd_events() != 1) {/* return 1 => a random event occurred, don't fight */
+
 		create_enemy();
 		printf("You encounter %s!", enemy.name);
 		set_player_location(&loc_fight);
+		}
 	}
 	else
 	{
