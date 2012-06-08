@@ -1,0 +1,37 @@
+dependencies:
+zeromq python bindings
+PostgreSQL
+libpqxx
+
+
+postgreSQL installation:
+
+# yum group install "PostgreSQL Database"
+...
+# postgresql-setup initdb
+Initializing database ... OK
+# service postgresql start
+# sudo -u postgres createuser todd
+Shall the new role be a superuser? (y/n) n
+Shall the new role be allowed to create databases? (y/n) n
+Shall the new role be allowed to create more new roles? (y/n) n
+# sudo -u postgres createdb -O todd todd
+# vi /var/lib/pgsql/data/pg_hba.conf
+...
+local sameuser todd trust
+...
+# service postgresql restart
+$ psql todd todd
+psql (9.1.3)
+Type "help" for help.
+
+todd=>  create table player_logins (id serial primary key , name varchar not null unique, passwd varchar not null);
+NOTICE: CREATE TABLE will create implicit sequence "player_logins_id_seq" for serial column "player_logins.id"
+NOTICE: CREATE TABLE / PRIMARY KEY will create implicit index "player_logins_pkey" for table "player_logins"
+NOTICE: CREATE TABLE / UNIQUE will create implicit index "player_logins_name_key" for table "player_logins"
+CREATE TABLE
+todd=> alter table player_logins add check (name <> '');
+ALTER TABLE
+todd=> \q
+$
+
