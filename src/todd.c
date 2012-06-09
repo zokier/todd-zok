@@ -33,15 +33,24 @@ PGconn *conn;
 */
 int create_player(char *passwd)
 {
-	player.location = &loc_town;
-	player.action_points = 10;
-	player.experience = 0;
-	player.max_health = 20;
-	player.health = player.max_health;
-	player.money = 10;
-	fputs(WELCOME_NEW, stdout);
-	puts(player.name);
-	return true;
+	bool ret = false;
+	char *params[2] = {player.name, passwd};
+	PGresult *res;
+	res = PQexecPrepared(conn, "new_login", 2, params, NULL, NULL, 0);
+	if (PQresultStatus(res) == PGRES_COMMAND_OK)
+	{
+		fputs(WELCOME_NEW, stdout);
+		puts(player.name);
+		player.location = &loc_town;
+		player.action_points = 10;
+		player.experience = 0;
+		player.max_health = 20;
+		player.health = player.max_health;
+		player.money = 10;
+		ret = true;
+	}
+	PQclear(res);
+	return ret;
 }
 
 /*
@@ -234,11 +243,18 @@ bool init_pq()
 	{
 		goto pq_cleanup;
 	}
-	res = PQprepare(conn, "get_login_id", "select id from player_logins where name = $1 and passwd = $2;", 2, NULL);
+	res = PQprepare(conn, "get_login_id", "select id from player_logins where name = $1 and pwhash = crypt(cast($2 as text), pwhash);", 2, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;
 	}
+	PQclear(res);
+	res = PQprepare(conn, "new_login", "insert into player_logins (name, pwhash) values ($1, crypt(cast($2 as text), gen_salt('bf')));", 2, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear(res);
 	return true;
 
 pq_cleanup:
