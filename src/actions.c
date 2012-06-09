@@ -7,6 +7,7 @@
 #include "networking.h"
 #include "globals.h"
 #include "input.h"
+#include "events.h"
 
 // globals are nasty?
 Enemy enemy;
@@ -18,7 +19,13 @@ int check_rnd_events() {
 
 	/* TODO: check what dungeon level this is. go through list of random events and act */
 	/* return 1 would mean there's no fight, but a random event instead */
-	return 0; 
+	switch (i)
+	{
+		case 0:
+			return ev_old_man();
+		default:
+			return 0;
+	}
 }
 
 void create_enemy()
