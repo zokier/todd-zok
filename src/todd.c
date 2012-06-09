@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <stdbool.h>
+#include <time.h> /* for random number generator */
 
 #include <zmq.h>
 #include <libpq-fe.h>
@@ -270,6 +271,7 @@ int main(int argc, char *argv[])
 		syslog(LOG_ERR, "ZeroMQ init failure: %s", zmq_strerror(errno));
 		goto cleanup;
 	}
+	srand((unsigned int)time(NULL));
 
 	if (!get_name())
 	{

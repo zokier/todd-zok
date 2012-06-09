@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <time.h> /* for random number generator */
 #include "player.h"
 #include "locations.h"
 #include "enemy.h"
@@ -13,15 +12,13 @@
 Enemy enemy;
 
 int check_rnd_events() {
-unsigned int seed = (unsigned int)time(NULL);
-srand(seed);
 
-int i = rand() % 100;
-printf("TODO: random number between 0 and 100: %d\n",i);
+	int i = rand() % 100;
+	printf("TODO: random number between 0 and 100: %d\n",i);
 
-/* TODO: check what dungeon level this is. go through list of random events and act */
-/* return 1 would mean there's no fight, but a random event instead */
-return 0; 
+	/* TODO: check what dungeon level this is. go through list of random events and act */
+	/* return 1 would mean there's no fight, but a random event instead */
+	return 0; 
 }
 
 void create_enemy()
