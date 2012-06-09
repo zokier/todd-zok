@@ -23,10 +23,15 @@ int check_rnd_events() {
 
 void create_enemy()
 {
-	//enemy = { "Feeble goblin", 10 };
-	//enemy = { "Fierce goblin", 20 };
-	enemy.name = "Feeble goblin";
-	enemy.health = 10;
+	enemy.health = (rand() % 15) + 5;
+	if (enemy.health < 15)
+	{
+		enemy.name = "Feeble goblin";
+	}
+	else
+	{
+		enemy.name = "Fierce goblin";
+	}
 }
 
 void set_player_location(Location* loc)
@@ -43,13 +48,13 @@ void ac_dungeons_action()
 {
 	if (player.action_points > 0)
 	{
+		player.action_points--;
 		printf("!!!\n");
 
 		if (check_rnd_events() != 1) {/* return 1 => a random event occurred, don't fight */
-
-		create_enemy();
-		printf("You encounter %s!", enemy.name);
-		set_player_location(&loc_fight);
+			create_enemy();
+			printf("You encounter %s!", enemy.name);
+			set_player_location(&loc_fight);
 		}
 	}
 	else
