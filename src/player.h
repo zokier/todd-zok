@@ -5,6 +5,7 @@
 
 typedef struct Player Player;
 struct Player {
+	int id;
 	char *name;
 	Location *location;
 	unsigned int action_points;
