@@ -33,7 +33,7 @@ $ psql todd todd
 psql (9.1.3)
 Type "help" for help.
 
-todd=>  create table player_logins (id serial primary key , name varchar not null unique, pwhash text not null);
+todd=>  create table player_logins (id serial primary key , name varchar not null unique, passwd text not null);
 NOTICE: CREATE TABLE will create implicit sequence "player_logins_id_seq" for serial column "player_logins.id"
 NOTICE: CREATE TABLE / PRIMARY KEY will create implicit index "player_logins_pkey" for table "player_logins"
 NOTICE: CREATE TABLE / UNIQUE will create implicit index "player_logins_name_key" for table "player_logins"

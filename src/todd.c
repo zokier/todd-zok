@@ -286,13 +286,13 @@ bool init_pq()
 		goto pq_cleanup;
 	}
 	PQclear(res);
-	res = PQprepare(conn, "check_passwd", "select true from player_logins where id = $1 and pwhash = crypt(cast($2 as text), pwhash);", 2, NULL);
+	res = PQprepare(conn, "check_passwd", "select true from player_logins where id = $1 and passwd = crypt(cast($2 as text), passwd);", 2, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;
 	}
 	PQclear(res);
-	res = PQprepare(conn, "new_login", "insert into player_logins (name, pwhash) values ($1, crypt(cast($2 as text), gen_salt('bf')));", 2, NULL);
+	res = PQprepare(conn, "new_login", "insert into player_logins (name, passwd) values ($1, crypt(cast($2 as text), gen_salt('bf')));", 2, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;
