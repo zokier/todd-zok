@@ -162,13 +162,7 @@ void ac_list_players()
 
 void ac_view_stats()
 {
-	// TODO prettify
-	printf("name:\t%s\n", player.name);
-	printf("action_points:\t%d\n", player.action_points);
-	printf("experience:\t%d\n", player.experience);
-	printf("max_health:\t%d\n", player.max_health);
-	printf("health:\t%d\n", player.health);
-	printf("money:\t%d\n", player.money);
+	ncurs_stats(player);
 }
 
 void ac_tavern()

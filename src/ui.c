@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <string.h>
 #include "ui.h"
 #include "player.h"
 
@@ -66,14 +67,13 @@ wrefresh(mainbw);
 
 commandw = subwin(mainbw,18,20,1,1);
 wborder(commandw,1,0,0,1,1,1,1,1);
-mvwprintw(commandw,1,1,"Commands here");
 
 gamebw = subwin(mainbw,18,60,1,20); 
 wattron(gamebw,A_UNDERLINE);
 mvwprintw(gamebw,0,2,"TODO: Location info here");
 wattroff(gamebw,A_UNDERLINE);
 wrefresh(gamebw);
-gamew = subwin(gamebw,16,58,2,21);
+gamew = subwin(gamebw,16,58,2,22);
 wrefresh(mainbw);
 wrefresh(commandw);
 wrefresh(gamew);
@@ -93,7 +93,31 @@ wclear(commandw);
 for (size_t i = 0; i < player.location->action_count; i++)
 	{
 //	printf("\t* %s\n", player.location->actions[i].description);
-	mvwprintw(commandw,i,0,player.location->actions[i].description);
+	wprintw(commandw,"%s\n",player.location->actions[i].description);
 	}
 wrefresh(commandw);
+}
+
+void ncurs_stats(Player player) {
+	werase(gamew);
+	wrefresh(gamew);
+	wprintw(gamew, "name:         %s\n", player.name);
+	wprintw(gamew,"stamina / AP: %d\n", player.action_points);
+	wprintw(gamew,"XP:           %d\n", player.experience);
+	wprintw(gamew,"Health:       %d/%d\n",player.max_health,player.health);
+	wprintw(gamew,"Money:        %d\n",player.money);
+	wrefresh(gamew);
+	getch();
+/* 
+BUG: the getch above loses the keypress. After pressing V for view stats the next keypress is wasted
+without the getch the stats won't get displayed.
+
+Probable cause:
+"Stats" is not a location. After finishing this function, the code displays the main town screen and overwrites the stats
+
+Possible fixes:
+1. Make stats a location
+2. Change the game loop to only check for location info etc if it changes
+ */
+
 }
