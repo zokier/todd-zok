@@ -17,24 +17,26 @@ int check_rnd_events() {
 	int i = rand() % 1000;
 	printf("TODO: random number between 0 and 999: %d\n",i);
 
-/* calculate probabilities to random events and then switch to the proper function */
-/* this part is only meant to make switching 
+	/* calculate probabilities to random events and then switch to the proper function */
+	/* this part is only meant to make switching */
 
-// TODO: write the rest of the events, adjust probabilities
-	if (i >= 0 && i <= 10) /* ==> chance is 10 out of 1000 */
+#define PROB(x) (i < (prob_max += x))
+    int prob_max = 0;
+    // TODO: write the rest of the events, adjust probabilities
+	if (PROB(10)) /* ==> chance is 10 out of 1000 */
 		return ev_old_man();
 
-	if (i >= 11 && i <= 20) /* ==> chance is 10 out of 1000 */
+	if (PROB(10)) /* ==> chance is 10 out of 1000 */
 		return ev_old_man();
 
-	if (i >= 21 && i <= 30) /* ==> chance is 10 out of 1000 */
+	if (PROB(10)) /* ==> chance is 10 out of 1000 */
 		return ev_old_man();
 
-	if (i >= 31 && i <= 32) /* ==> chance is 2 out of 1000 */
+	if (PROB(2)) /* ==> chance is 2 out of 1000 */
 		return ev_old_man();
-
-/* if there's no random event, return 0. All random events should return 1;
-return 0;
+#undef PROB
+	/* if there's no random event, return 0. All random events should return 1; */
+	return 0;
 }
 
 void create_enemy()
