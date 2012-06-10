@@ -67,7 +67,6 @@ void ac_dungeons_action()
 	if (player.action_points > 0)
 	{
 		player.action_points--;
-		printf("!!!\n");
 
 		if (check_rnd_events() != 1) {/* return 1 => a random event occurred, don't fight */
 			create_enemy();
