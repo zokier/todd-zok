@@ -1,3 +1,18 @@
+* Validate user input
+	* Names
+		* A-Z, a-z, space, and dash
+	* Messges
+		* Printable characters only 
+* Configuration
+	* Config files
+		* Parsing (library)?
+	* Compile time (defines)
+	* In database
+		* Database login info etc needs to be somewhere too
+* Configurable/translatable strings
+	* gettext
+	* most strings need replacement to fit game theme
+		* Objective is to have everything seem like ingame
 * Multiplayer communication
 	* party
 	* pvp combat
@@ -7,20 +22,31 @@
 * Combat
 	* Enemy generation
 	* Random numbers
-		* dSFMT
+		* dSFMT (is rand()%n good enough?)
+		* seeding
+			* time(0)
+				* predictable
+				* multiple users could get same seed
+			* /dev/random
 	* Special skills
 	* Items
 	* Dungeon levels
+	* Mechanism
+		* Element based?
 * Persistance
-	* SQL
-		* ODBC(unixodbc), libpq..
-		* sqlite?
-	* Characters
+	* Character data
+		* stats
 	* Messageboard
-	* Configuration data?
+	* Configuration data
 		* Vendor items/prices
 		* Enemy types
 		* ...
+* Recovery
+	* stamina/ap:
+		* recovery faster in inn/tavern
+		* recovery slows down over time
+	* health:
+		* cheaper in larger blocks
 * Vendors
 	* Buy/sell stuff
 	* Items
@@ -28,18 +54,10 @@
 		* Weapons
 		* Potions?
 		* ...
-* Configurable/translatable strings
-	* gettext
 * UI
 	* ncurses
 	* linebased
 	* other?
-* Recovery
-	* stamina/ap:
-		* recovery faster in inn/tavern
-		* recovery slows down over time
-	* health:
-		* cheaper in larger blocks
 * Loot
 	* Creeps drop stuff to sell to vendors
 		* need skills to recover

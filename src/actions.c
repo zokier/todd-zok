@@ -69,7 +69,7 @@ void ac_dungeons_action()
 
 		if (check_rnd_events() != 1) {/* return 1 => a random event occurred, don't fight */
 			create_enemy();
-			printf("You encounter %s!", enemy.name);
+			printf("You encounter %s!\n%s has %d hitpoints\n", enemy.name, enemy.name, enemy.health);
 			set_player_location(&loc_fight);
 		}
 	}
@@ -86,7 +86,7 @@ void ac_fight_fight()
 	enemy.health -= damage;
 	if (enemy.health <= 0)
 	{
-		puts("The enemy is slain!");
+		printf("%s is slain!\n", enemy.name);
 		int money = 7;
 		int exp = 10;
 		printf("You find %d coins on the corpse, and gain %d experience\n", money, exp);
@@ -104,6 +104,10 @@ void ac_fight_fight()
 			puts("The world fades around you as you fall to the ground bleeding");
 			puts("You are dead.");
 			playing = false;
+		}
+		else
+		{
+			printf("%s has %d hitpoints remaining\nYou have %d hitpoints.\n", enemy.name, enemy.health, player.health);
 		}
 	}
 }

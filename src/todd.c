@@ -4,6 +4,7 @@
 #include <syslog.h>
 #include <stdbool.h>
 #include <time.h> /* for random number generator */
+#include <unistd.h>
 
 #include <zmq.h>
 #include <libpq-fe.h>
@@ -19,6 +20,7 @@
 #define NAME_QUERY "What's your name, adventurer?  "
 #define WELCOME_NEW "The bards have not heard of you before.\nWelcome to Tales of Deep Dungeons, "
 #define WELCOME_OLD "Welcome back to Tales of Deep Dungeons, "
+#define RETRY_LIMIT 3
 
 
 // ugly globals go here
@@ -29,43 +31,52 @@ void *zmq_context = NULL;
 Player player;
 PGconn *conn;
 
-/*
-	Creates a new player
-*/
-int create_player(char *passwd)
+char *itoa(int i)
 {
-	player.location = &loc_town;
-	player.action_points = 10;
-	player.experience = 0;
-	player.max_health = 20;
-	player.health = player.max_health;
-	player.money = 10;
-	fputs(WELCOME_NEW, stdout);
-	puts(player.name);
-	return true;
+	char *str = malloc(20); // should be enough?
+	snprintf(str, 20, "%d", i);
+	return str;
 }
 
 /*
-	Loads player from disk
+	Asks the player for name
 */
-bool load_player(char *passwd)
+bool get_name()
+{
+	char *name = NULL;
+	size_t name_len = 0;
+	fputs(NAME_QUERY, stdout);
+	ssize_t line_len = getline(&name, &name_len, stdin);
+	if (line_len < 0)
+	{
+		syslog(LOG_ERR, "Read error: %s (%s:%d)", strerror(errno), __FILE__, __LINE__);
+		return false;
+	}
+	name_len = line_len;
+	name[name_len - 1] = 0; // strip trailing newline
+	if (strnlen(name, name_len) < name_len - 1)
+	{
+		// null bytes in name
+		syslog(LOG_ERR, "Player name contains \\0");
+		return false;
+	}
+
+	player.name = name;
+	return true;
+}
+
+bool get_id()
 {
 	bool ret = false;
-	char *params[2] = {player.name, passwd};
+	char *params[1] = {player.name};
 	PGresult *res;
-	res = PQexecPrepared(conn, "get_login_id", 2, params, NULL, NULL, 0);
+	res = PQexecPrepared(conn, "get_login_id", 1, params, NULL, NULL, 0);
 	if (PQresultStatus(res) == PGRES_TUPLES_OK)
 	{
-		if (PQntuples(res) != 0)
+		if (PQntuples(res) == 1)
 		{
-			fputs(WELCOME_OLD, stdout);
-			puts(player.name);
-			player.location = &loc_town;
-			player.action_points = 10;
-			player.experience = 0;
-			player.max_health = 20;
-			player.health = player.max_health;
-			player.money = 10;
+			// TODO get integers directly without atoi
+			player.id = atoi(PQgetvalue(res, 0, 0));  
 			ret = true;
 		}
 	}
@@ -73,26 +84,88 @@ bool load_player(char *passwd)
 	return ret;
 }
 
+bool check_passwd()
+{
+	bool ret = false;
+	char *passwd = NULL;
+	size_t passwd_len = 0;
+	printf("Welcome number %d, enter password: ", player.id);
+	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
+	passwd[line_len-1] = '\0'; // strip newline
+	char *params[2] = {itoa(player.id), passwd};
+	PGresult *res;
+	res = PQexecPrepared(conn, "check_passwd", 2, params, NULL, NULL, 0);
+	if (PQresultStatus(res) == PGRES_TUPLES_OK)
+	{
+		if (PQntuples(res) != 0)
+		{
+			ret = true;
+		}
+	}
+	PQclear(res);
+	free(passwd);
+	free(params[0]);
+	return ret;
+}
+
+void load_player_data()
+{
+	// TODO fetch data from DB
+	player.location = &loc_town;
+	player.action_points = 10;
+	player.experience = 0;
+	player.max_health = 20;
+	player.health = player.max_health;
+	player.money = 10;
+}
+
+bool create_player()
+{
+	bool ret = false;
+	char *passwd = NULL;
+	size_t passwd_len = 0;
+	printf("Welcome new player, enter password: ");
+	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
+	passwd[line_len-1] = '\0'; // strip newline
+	// TODO ask password for a second time to avoid typos
+	char *params[2] = {player.name, passwd};
+	PGresult *res;
+	res = PQexecPrepared(conn, "new_login", 2, params, NULL, NULL, 0);
+	if (PQresultStatus(res) == PGRES_COMMAND_OK)
+	{
+		ret = true;
+	}
+	PQclear(res);
+	free(passwd);
+	return ret;
+}
+
 /*
 	Loads player from disk or if player is not found, creates a new player.
 */
-int get_player()
+bool get_player()
 {
-	char *passwd = NULL;
-	size_t passwd_len = 0;
-	fputs("password: ", stdout);
-	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
-	passwd[line_len-1] = '\0'; // strip newline
-	if (load_player(passwd))
+	if (!get_name())
 	{
-		// Old player found, returning
-		return true;
+		return false;
+	}
+	if (get_id())
+	{
+		for (int retries = 0; retries < RETRY_LIMIT; retries++)
+		{
+			if (check_passwd())
+			{
+				return true;
+			}
+			puts("Incorrect password.");
+			sleep(1);
+		}
+		return false;
 	}
 	else
 	{
-		return create_player(passwd);
+		return create_player();
 	}
-	free(passwd);
 }
 
 /*
@@ -166,33 +239,6 @@ void enter_game()
 }
 
 /*
-	Asks the player for name
-*/
-bool get_name()
-{
-	char *name = NULL;
-	size_t name_len = 0;
-	fputs(NAME_QUERY, stdout);
-	ssize_t line_len = getline(&name, &name_len, stdin);
-	if (line_len < 0)
-	{
-		syslog(LOG_ERR, "Read error: %s (%s:%d)", strerror(errno), __FILE__, __LINE__);
-		return false;
-	}
-	name_len = line_len;
-	name[name_len - 1] = 0; // strip trailing newline
-	if (strnlen(name, name_len) < name_len - 1)
-	{
-		// null bytes in name
-		syslog(LOG_ERR, "Player name contains \\0");
-		return false;
-	}
-
-	player.name = name;
-	return true;
-}
-
-/*
 	Initializes ZeroMQ context and sockets
 */
 bool init_zmq()
@@ -246,11 +292,24 @@ bool init_pq()
 	{
 		goto pq_cleanup;
 	}
-	res = PQprepare(conn, "get_login_id", "select id from player_logins where name = $1 and passwd = $2;", 2, NULL);
+	res = PQprepare(conn, "get_login_id", "select id from player_logins where name = $1;", 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;
 	}
+	PQclear(res);
+	res = PQprepare(conn, "check_passwd", "select true from player_logins where id = $1 and passwd = crypt(cast($2 as text), passwd);", 2, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear(res);
+	res = PQprepare(conn, "new_login", "insert into player_logins (name, passwd) values ($1, crypt(cast($2 as text), gen_salt('bf')));", 2, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear(res);
 	return true;
 
 pq_cleanup:
@@ -285,11 +344,12 @@ int main(int argc, char *argv[])
 	}
 	srand((unsigned int)time(NULL));
 
-	if (!get_name())
+	if (!get_player())
 	{
+		syslog(LOG_ERR, "Player auth failure");
 		goto cleanup;
 	}
-	get_player();
+	load_player_data();
 
 	set_terminal_mode();
 	init_ncurses();
