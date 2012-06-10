@@ -6,7 +6,7 @@ SRCS     = $(wildcard $(SRCDIR)/*.c)
 _SRCS    = $(notdir $(SRCS))
 _OBJS    = $(_SRCS:.c=.o)
 OBJS     = $(addprefix $(OBJDIR)/, $(_OBJS))
-LIBS	 = -lzmq -lpq
+LIBS	 = -lzmq -lpq -lncurses
 INCPATHS = -I/usr/include/postgresql
 
 CC      ?= gcc
