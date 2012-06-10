@@ -15,6 +15,7 @@
 #include "locations.h"
 #include "networking.h"
 #include "input.h"
+#include "ui.h"
 
 #define NAME_QUERY "What's your name, adventurer?  "
 #define WELCOME_NEW "The bards have not heard of you before.\nWelcome to Tales of Deep Dungeons, "
@@ -172,11 +173,16 @@ bool get_player()
 */
 void print_location_info()
 {
+	ncurs_location(player);
+	ncurs_commands(player);
+/*
+ORIGINAL METHOD COMMENTED OUT, NOW USING NCURSES
 	puts(player.location->description);
 	for (size_t i = 0; i < player.location->action_count; i++)
 	{
 		printf("\t* %s\n", player.location->actions[i].description);
 	}
+*/
 }
 
 /*
@@ -209,6 +215,12 @@ void execute_action(char cmd_char)
 /*
 	Main gameloop here
 */
+
+void init_ncurses() {
+init_ui();
+}
+
+
 void enter_game()
 {
 	print_location_info();
@@ -340,6 +352,7 @@ int main(int argc, char *argv[])
 	load_player_data();
 
 	set_terminal_mode();
+	init_ncurses();
 	enter_game();
 	reset_terminal_mode();
 
@@ -350,5 +363,6 @@ cleanup:
 	cleanup_pq();
 	free(player.name);
 	closelog();
+	endwin(); /* for curses */
 	return return_code;
 }
