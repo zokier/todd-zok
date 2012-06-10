@@ -14,18 +14,29 @@ Enemy enemy;
 
 int check_rnd_events() {
 
-	int i = rand() % 100;
-	printf("TODO: random number between 0 and 100: %d\n",i);
+	int i = rand() % 1000;
+	printf("TODO: random number between 0 and 999: %d\n",i);
 
-	/* TODO: check what dungeon level this is. go through list of random events and act */
-	/* return 1 would mean there's no fight, but a random event instead */
-	switch (i)
-	{
-		case 0:
-			return ev_old_man();
-		default:
-			return 0;
-	}
+	/* calculate probabilities to random events and then switch to the proper function */
+	/* this part is only meant to make switching */
+
+#define PROB(x) (i < (prob_max += x))
+    int prob_max = 0;
+    // TODO: write the rest of the events, adjust probabilities
+	if (PROB(10)) /* ==> chance is 10 out of 1000 */
+		return ev_old_man();
+
+	if (PROB(10)) /* ==> chance is 10 out of 1000 */
+		return ev_old_man();
+
+	if (PROB(10)) /* ==> chance is 10 out of 1000 */
+		return ev_old_man();
+
+	if (PROB(2)) /* ==> chance is 2 out of 1000 */
+		return ev_old_man();
+#undef PROB
+	/* if there's no random event, return 0. All random events should return 1; */
+	return 0;
 }
 
 void create_enemy()
