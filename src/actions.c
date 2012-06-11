@@ -18,8 +18,6 @@ Enemy enemy;
 int check_rnd_events() {
 
 	int i = rand() % 1000;
-	printf("TODO: random number between 0 and 999: %d\n",i);
-
 	/* calculate probabilities to random events and then switch to the proper function */
 	/* this part is only meant to make switching */
 
@@ -177,7 +175,8 @@ void ac_shrine_heal_all()
 
 void ac_list_players()
 {
-	puts("The wind is howling in the empty streets of this god forsaken town. You are all alone here.");
+	ncurs_msg("\nThe wind is howling in the empty streets of this god forsaken town. You are all alone here.");
+
 }
 
 void ac_view_stats()
@@ -209,12 +208,13 @@ void ac_shop()
 
 void ac_shop_buy()
 {
-	puts("The poor man has nothing to sell to you.");
+	ncurs_msg("The poor man has nothing to sell to you.");
 }
 
 void ac_shop_sell()
 {
-	puts("The poor man has no coins to buy anything with.");
+	ncurs_msg("The poor man has no coins to buy anything from you.");
+
 }
 
 void ac_return_to_town()
@@ -224,7 +224,7 @@ void ac_return_to_town()
 
 void ac_quit()
 {
-	puts("Bye.");
+	ncurs_msg("Bye.");
 	playing = false;
 }
 

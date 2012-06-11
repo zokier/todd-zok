@@ -66,7 +66,7 @@ mvwprintw(mainbw,0,2,"Tales of Deep Dungeons");
 wattroff(mainbw,A_BOLD);
 wrefresh(mainbw);
 
-commandw = subwin(mainbw,18,20,1,1);
+commandw = subwin(mainbw,18,20,3,1);
 wborder(commandw,1,0,0,1,1,1,1,1);
 
 gamebw = subwin(mainbw,18,58,1,20); 
@@ -74,7 +74,7 @@ wattron(gamebw,A_UNDERLINE);
 mvwprintw(gamebw,0,2,"TODO: Location info here");
 wattroff(gamebw,A_UNDERLINE);
 wrefresh(gamebw);
-gamew = subwin(gamebw,16,56,2,22);
+gamew = subwin(gamebw,16,56,3,22);
 wrefresh(mainbw);
 wrefresh(commandw);
 wrefresh(gamew);
@@ -111,3 +111,9 @@ void ncurs_stats(Player player) {
 
 }
 
+ncurs_msg(char *buffer) {
+        wclear(gamew);
+        wprintw(gamew,"\n");
+        wprintw(gamew,buffer);
+        wrefresh(gamew);
+}
