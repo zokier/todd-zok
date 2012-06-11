@@ -205,11 +205,12 @@ void execute_action(char cmd_char)
 			break;
 		}
 	}
-
+/*
 	if (playing)
 	{
 		print_location_info();
 	}
+*/
 }
 
 /*

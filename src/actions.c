@@ -8,6 +8,9 @@
 #include "globals.h"
 #include "input.h"
 #include "events.h"
+#include "ui.h"
+
+extern WINDOW *gamew;
 
 // globals are nasty?
 Enemy enemy;
@@ -55,6 +58,7 @@ void create_enemy()
 void set_player_location(Location* loc)
 {
 	player.location = loc;
+	print_location_info();
 }
 
 void ac_dungeons()
@@ -69,48 +73,65 @@ void ac_dungeons_action()
 		player.action_points--;
 
 		if (check_rnd_events() != 1) {/* return 1 => a random event occurred, don't fight */
-			create_enemy();
-			printf("You encounter %s!\n%s has %d hitpoints\n", enemy.name, enemy.name, enemy.health);
 			set_player_location(&loc_fight);
+			create_enemy();
+			werase(gamew);
+			wprintw(gamew,"You encounter a %s!\n\n", enemy.name);
+			mvwprintw(gamew,2,0,"Your hitpoints: %d/%d\n",player.health,player.max_health);
+			mvwprintw(gamew,3,0,"Hitpoints for %s: %d\n",enemy.name,enemy.health);
+			wrefresh(gamew);
 		}
 	}
 	else
 	{
-		puts("You feel too tired to do anything.");
+			werase(gamew);
+			wprintw(gamew,"You feel too tired to fight\n");
+			wrefresh(gamew);
 	}
 }
-
 void ac_fight_fight()
 {
+	/* player hits */
 	int damage = 3; // chosen by fair dice roll
-	printf("You hit %s with %d points of damage\n", enemy.name, damage);
+
+	mvwprintw(gamew,5,0,"You hit %s with %d points of damage\n", enemy.name, damage);
+
 	enemy.health -= damage;
+
+	/* update current hitpoints */
+	mvwprintw(gamew,3,0,"Hitpoints for %s: %d\n",enemy.name,enemy.health);
+
 	if (enemy.health <= 0)
 	{
-		printf("%s is slain!\n", enemy.name);
+		mvwprintw(gamew,8,0,"%s is slain!\n", enemy.name);
 		int money = 7;
 		int exp = 10;
-		printf("You find %d coins on the corpse, and gain %d experience\n", money, exp);
+		wprintw(gamew,"You find %d coins on the corpse, and gain %d experience\n", money, exp);
 		player.money += money;
 		player.experience += exp;
+		mvwprintw(gamew,12,0,"<MORE>");
+		wrefresh(gamew);
+		getch(),
 		set_player_location(&loc_dungeons);
 	}
 	else
 	{
 		damage = 2; // goblins are bit weaker than you
-		printf("%s hits you with %d points of damage\n", enemy.name, damage);
+		mvwprintw(gamew,6,0,"%s hits you with %d points of damage\n", enemy.name, damage);
 		player.health -= damage;
+		mvwprintw(gamew,2,0,"Your hitpoints: %d/%d\n",player.health,player.max_health);
 		if (player.health <= 0)
 		{
-			puts("The world fades around you as you fall to the ground bleeding");
-			puts("You are dead.");
+			mvwprintw(gamew,8,0,"The world fades around you as you fall to the ground,\nbleeding.");
+			wattron(gamew,A_BOLD);
+			wattron(gamew,A_UNDERLINE);
+			mvwprintw(gamew,11,0,"You are dead.");
+			wattroff(gamew,A_BOLD);
+			wattroff(gamew,A_UNDERLINE);
 			playing = false;
 		}
-		else
-		{
-			printf("%s has %d hitpoints remaining\nYou have %d hitpoints.\n", enemy.name, enemy.health, player.health);
-		}
 	}
+wrefresh(gamew);
 }
 
 void ac_dungeons_glow()

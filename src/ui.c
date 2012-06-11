@@ -4,6 +4,7 @@
 #include "player.h"
 
 extern Player player;
+extern Enemy enemy;
 void init_ui()
 {
 /* ncurses init stuff */
@@ -107,17 +108,6 @@ void ncurs_stats(Player player) {
 	wprintw(gamew,"Health:       %d/%d\n",player.max_health,player.health);
 	wprintw(gamew,"Money:        %d\n",player.money);
 	wrefresh(gamew);
-	getch();
-/* 
-BUG: the getch above loses the keypress. After pressing V for view stats the next keypress is wasted
-without the getch the stats won't get displayed.
-
-Probable cause:
-"Stats" is not a location. After finishing this function, the code displays the main town screen and overwrites the stats
-
-Possible fixes:
-1. Make stats a location
-2. Change the game loop to only check for location info etc if it changes
- */
 
 }
+
