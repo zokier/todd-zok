@@ -2,7 +2,8 @@ dependencies:
 zeromq python bindings
 PostgreSQL
 libpqxx
-
+pgcrypto module for PostgreSQL
+ncurses
 
 postgreSQL installation:
 
