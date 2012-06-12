@@ -264,7 +264,7 @@ void cleanup_zmq()
 
 bool init_pq()
 {
-	PGresult *res;
+	PGresult *res = NULL;
     conn = PQconnectdb("dbname=todd user=todd");
     if (PQstatus(conn) != CONNECTION_OK)
 	{
@@ -292,7 +292,8 @@ bool init_pq()
 
 pq_cleanup:
 	syslog(LOG_ERR, "Postgres init error: %s", PQerrorMessage(conn));
-	PQclear(res);
+	if (res != NULL)
+		PQclear(res);
 	return false;
 }
 
