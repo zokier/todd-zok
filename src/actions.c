@@ -1,16 +1,14 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "player.h"
 #include "locations.h"
 #include "enemy.h"
 #include "networking.h"
 #include "globals.h"
-#include "input.h"
 #include "events.h"
 #include "ui.h"
-
-extern WINDOW *gamew;
 
 // globals are nasty?
 Enemy enemy;
@@ -56,7 +54,7 @@ void create_enemy()
 void set_player_location(Location* loc)
 {
 	player.location = loc;
-	print_location_info();
+	ncurs_location();
 }
 
 void ac_dungeons()
@@ -192,11 +190,11 @@ void ac_tavern()
 void ac_tavern_shout()
 {
 	puts("What do you want to yell?");
-	char *line = NULL;
-	size_t len;
-	if (todd_getline(&line, &len))
+	int len = 80;
+	char *line = malloc(len); // more dynamic memory allocation would be nice
+	if (getnstr(line, len) != ERR)
 	{
-		send_chatmsg(line, len-1); // strip trailing newline
+		send_chatmsg(line, strlen(line));
 	}
 	free(line);
 }

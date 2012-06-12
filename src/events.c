@@ -2,9 +2,9 @@
 #include <stdbool.h>
 
 #include "events.h"
-#include "input.h"
 #include "globals.h"
 #include "ui.h"
+
 int ev_old_man()
 {
 	wclear(gamew);
@@ -13,13 +13,14 @@ int ev_old_man()
 
 	wprintw(gamew,"\nHelp the old man? (y/n)");
 	wrefresh(gamew);
-	char c;
 	while (true) 
 	{
-		if (!todd_getchar(&c))
+		int getch_res = getch();
+		if (getch_res == ERR)
 		{
 			return 0;
 		}
+		char c = getch_res & 0xFF;
 		if (c == 'n')
 		{
 			wclear(gamew);
