@@ -1,16 +1,14 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "player.h"
 #include "locations.h"
 #include "enemy.h"
 #include "networking.h"
 #include "globals.h"
-#include "input.h"
 #include "events.h"
 #include "ui.h"
-
-extern WINDOW *gamew;
 
 // globals are nasty?
 Enemy enemy;
@@ -61,7 +59,7 @@ enemy.water = 5;
 void set_player_location(Location* loc)
 {
 	player.location = loc;
-	print_location_info();
+	ncurs_location();
 }
 
 void ac_dungeons()
@@ -161,6 +159,26 @@ void ac_dungeons_glow()
 	set_player_location(&loc_shrine);
 }
 
+void ac_ev_oldman_help()
+{
+	wprintw(gamew,"Thank you kind sir! Here take this for your trouble.\n\n");
+	wprintw(gamew,"The old man shoves a purse in your hands.\n");
+	wattron(gamew,A_BOLD);
+	wprintw(gamew,"\n\nYou gain 100 gold!");
+	wattroff(gamew,A_BOLD);
+	wrefresh(gamew);
+	player.money += 100;
+	getch();
+	set_player_location(&loc_dungeons);
+}
+
+void ac_ev_oldman_nohelp()
+{
+	ncurs_msg("May the gods curse you, mutters the old man.");
+	player.action_points++;
+	set_player_location(&loc_dungeons);
+}
+
 void ac_shrine_heal_1()
 {
 	if (player.health < player.max_health)
@@ -216,11 +234,11 @@ void ac_tavern()
 void ac_tavern_shout()
 {
 	puts("What do you want to yell?");
-	char *line = NULL;
-	size_t len;
-	if (todd_getline(&line, &len))
+	int len = 80;
+	char *line = malloc(len); // more dynamic memory allocation would be nice
+	if (getnstr(line, len) != ERR)
 	{
-		send_chatmsg(line, len-1); // strip trailing newline
+		send_chatmsg(line, strlen(line));
 	}
 	free(line);
 }

@@ -71,6 +71,25 @@ Location loc_dungeons = {
 	}
 };
 
+Location loc_ev_oldman = {
+	"An old man is wandering along the path, looking confused and worried.\n"
+	"-It seems I have managed to lose my way to the town.\nWould you be so kind to escort me there?\n"
+	"\nHelp the old man?",
+	2,
+	{
+		{
+			'y',
+			"(Y)es",
+			&ac_ev_oldman_help
+		},
+		{
+			'n',
+			"(N)o",
+			&ac_ev_oldman_nohelp
+		}
+	}
+};
+
 Location loc_tavern = {
 	"The tavern is eerlily quiet.\n\nYou thought you saw something move in the shadows, but\nfound nothing. What sort of madness leads a man to builda fine tavern like this, and then abadon it?",
 	2,

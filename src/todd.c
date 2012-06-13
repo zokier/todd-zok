@@ -14,7 +14,6 @@
 #include "player.h"
 #include "locations.h"
 #include "networking.h"
-#include "input.h"
 #include "ui.h"
 
 #define NAME_QUERY "What's your name, adventurer?  "
@@ -68,7 +67,7 @@ bool get_name()
 bool get_id()
 {
 	bool ret = false;
-	char *params[1] = {player.name};
+	const char *params[1] = {player.name};
 	PGresult *res;
 	res = PQexecPrepared(conn, "get_login_id", 1, params, NULL, NULL, 0);
 	if (PQresultStatus(res) == PGRES_TUPLES_OK)
@@ -92,7 +91,8 @@ bool check_passwd()
 	printf("Welcome number %d, enter password: ", player.id);
 	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
 	passwd[line_len-1] = '\0'; // strip newline
-	char *params[2] = {itoa(player.id), passwd};
+	char *player_id = itoa(player.id);
+	const char *params[2] = {player_id, passwd};
 	PGresult *res;
 	res = PQexecPrepared(conn, "check_passwd", 2, params, NULL, NULL, 0);
 	if (PQresultStatus(res) == PGRES_TUPLES_OK)
@@ -104,7 +104,7 @@ bool check_passwd()
 	}
 	PQclear(res);
 	free(passwd);
-	free(params[0]);
+	free(player_id);
 	return ret;
 }
 
@@ -133,7 +133,7 @@ bool create_player()
 	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
 	passwd[line_len-1] = '\0'; // strip newline
 	// TODO ask password for a second time to avoid typos
-	char *params[2] = {player.name, passwd};
+	const char *params[2] = {player.name, passwd};
 	PGresult *res;
 	res = PQexecPrepared(conn, "new_login", 2, params, NULL, NULL, 0);
 	if (PQresultStatus(res) == PGRES_COMMAND_OK)
@@ -173,22 +173,6 @@ bool get_player()
 	}
 }
 
-/*
-	Prints descriptions at current player position
-*/
-void print_location_info()
-{
-	ncurs_location(player);
-	ncurs_commands(player);
-/*
-ORIGINAL METHOD COMMENTED OUT, NOW USING NCURSES
-	puts(player.location->description);
-	for (size_t i = 0; i < player.location->action_count; i++)
-	{
-		printf("\t* %s\n", player.location->actions[i].description);
-	}
-*/
-}
 
 /*
 	Tries to find and call the action user requested
@@ -210,37 +194,30 @@ void execute_action(char cmd_char)
 			break;
 		}
 	}
-/*
-	if (playing)
-	{
-		print_location_info();
-	}
-*/
 }
+
+void init_ncurses() {
+	init_ui();
+}
+
 
 /*
 	Main gameloop here
 */
-
-void init_ncurses() {
-init_ui();
-}
-
-
 void enter_game()
 {
-	print_location_info();
+	ncurs_location();
 	playing = true;
 	while (playing)
 	{
-		char cmd_char;
-		if (!todd_getchar(&cmd_char))
+		int getch_res = getch();
+		if (getch_res == ERR)
 		{
 			//eof or other read error
 			playing = false;
 			break;
 		}
-		execute_action(cmd_char);
+		execute_action(getch_res & 0xFF);
 	}
 }
 
@@ -358,10 +335,8 @@ int main(int argc, char *argv[])
 	}
 	load_player_data();
 
-	set_terminal_mode();
 	init_ncurses();
 	enter_game();
-	reset_terminal_mode();
 
 	return_code = EXIT_SUCCESS; // returned from game, success
 

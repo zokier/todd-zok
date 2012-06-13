@@ -4,6 +4,8 @@
 #include "player.h"
 
 void ac_dungeons();
+void ac_ev_oldman_help();
+void ac_ev_oldman_nohelp();
 void ac_dungeons_action();
 void ac_dungeons_glow();
 void ac_shrine_heal_1();

@@ -1,11 +1,14 @@
-#include <ncurses.h>
-#include "player.h"
-#include "enemy.h"
+#ifndef UI_H
+#define UI_H
 
-WINDOW *mainbw, *gamebw, *gamew, *commandw;
+#include <ncurses.h>
+
+extern WINDOW *mainbw, *gamebw, *gamew, *commandw;
 
 void init_ui();
-void ncurs_location(Player player);
-void ncurs_stats(Player player);
-void ncurs_enemy(Enemy enemy);
+void ncurs_location();
+void ncurs_commands();
+void ncurs_stats();
 void ncurs_msg(char *buffer);
+
+#endif
