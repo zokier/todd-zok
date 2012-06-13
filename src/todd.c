@@ -133,10 +133,10 @@ bool check_name()
 				if (c != ' ' && c != '-')
 					return false;
 	}
-	if (len < NAME_MIN_LEN)
+	if (len < NAME_MIN_LENGTH)
 		return false;
-	if (len > NAME_MAX_LEN)
-		return false
+	if (len > NAME_MAX_LENGTH)
+		return false;
 	return true;
 }
 
