@@ -3,40 +3,44 @@
 #include "actions.h"
 #include "location.h"
 
-// ansi control code for underlining, and reverting back to normal
-
 Location loc_town = {
 	"You wander around the desolate town.\nYou begin to wonder why you even bothered coming here.",
 	6,
 	{
 		{
 			'd',
-			"(D)ungeons",
+			"",
+			"Dungeons",
 			&ac_dungeons
 		},
 		{
 			'l',
-			"(L)ist players",
+			"",
+			"List players",
 			&ac_list_players
 		},
 		{
 			'v',
-			"(V)iew stats",
+			"",
+			"View stats",
 			&ac_view_stats
 		},
 		{
 			't',
-			"(T)avern",
+			"",
+			"Tavern",
 			&ac_tavern
 		},
 		{
 			's',
-			"(S)hop",
+			"",
+			"Shop",
 			&ac_shop
 		},
 		{
 			'q',
-			"(Q)uit",
+			"",
+			"Quit",
 			&ac_quit
 		}
 
@@ -55,17 +59,20 @@ Location loc_dungeons = {
 	{
 		{
 			'a',
-			"Look for (A)ction",
+			"Look for ",
+			"Action",
 			&ac_dungeons_action
 		},
 		{
 			'g',
-			"Examine the (G)low",
+			"Examine the ",
+			"Glow",
 			&ac_dungeons_glow
 		},
 		{
 			'r',
-			"(R)eturn to town",
+			"",
+			"Return to town",
 			&ac_return_to_town
 		}
 	}
@@ -79,12 +86,14 @@ Location loc_ev_oldman = {
 	{
 		{
 			'y',
-			"(Y)es",
+			"",
+			"Yes",
 			&ac_ev_oldman_help
 		},
 		{
 			'n',
-			"(N)o",
+			"",
+			"No",
 			&ac_ev_oldman_nohelp
 		}
 	}
@@ -96,12 +105,14 @@ Location loc_tavern = {
 	{
 		{
 			'y',
-			"(Y)ell",
+			"",
+			"Yell",
 			&ac_tavern_shout
 		},
 		{
 			'r',
-			"(R)eturn to town",
+			"",
+			"Return to town",
 			&ac_return_to_town
 		}
 	}
@@ -113,17 +124,20 @@ Location loc_shop = {
 	{
 		{
 			'b',
-			"(B)uy items",
+			"",
+			"Buy items",
 			&ac_shop_buy
 		},
 		{
 			's',
-			"(S)ell items",
+			"",
+			"Sell items",
 			&ac_shop_sell
 		},
 		{
 			'r',
-			"(R)eturn to town",
+			"",
+			"Return to town",
 			&ac_return_to_town
 		}
 	}
@@ -135,12 +149,14 @@ Location loc_fight = {
 	{
 		{
 			'f',
-			"(F)ight",
+			"",
+			"Fight",
 			&ac_fight_fight
 		},
 		{
 			'r',
-			"(R)un",
+			"",
+			"Run",
 			&ac_return_to_town
 		}
 	}
@@ -152,17 +168,20 @@ Location loc_shrine = {
 	{
 		{
 			'i',
-			"(I)nsert a coin",
+			"",
+			"Insert a coin",
 			&ac_shrine_heal_1
 		},
 		{
 			'a',
-			"Insert (A)ll the coins",
+			"Insert ",
+			"All the coins",
 			&ac_shrine_heal_all
 		},
 		{
 			'r',
-			"(R)eturn to town",
+			"",
+			"Return to town",
 			&ac_return_to_town
 		}
 	}
