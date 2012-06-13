@@ -7,7 +7,8 @@ typedef void (*Action_function)();
 
 typedef struct Action Action;
 struct Action {
-	char hotkey;
+	char hotkey; // hotkey == description[0]
+	char *description_prefix;
 	char *description;
 	Action_function function;
 };

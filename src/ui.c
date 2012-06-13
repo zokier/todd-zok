@@ -103,7 +103,9 @@ void ncurs_commands() {
 	wclear(commandw);
 	for (size_t i = 0; i < player.location->action_count; i++)
 	{
-		wprintw(commandw, "%s\n", player.location->actions[i].description);
+		wprintw(commandw, "%s", player.location->actions[i].description_prefix);
+		waddch(commandw, player.location->actions[i].description[0] | A_BOLD | A_UNDERLINE);
+		wprintw(commandw, "%s\n", player.location->actions[i].description + 1);
 	}
 	wrefresh(commandw);
 }
