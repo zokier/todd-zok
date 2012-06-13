@@ -14,6 +14,11 @@ struct Player {
 	int health;
 	int money;
 	// TODO add more stats 
+	int wood;
+	int fire;
+	int earth;
+	int metal;
+	int water;
 };
 
 #endif //PLAYER_H

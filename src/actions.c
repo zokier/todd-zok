@@ -51,6 +51,11 @@ void create_enemy()
 	{
 		enemy.name = "Fierce goblin";
 	}
+enemy.wood = 5;
+enemy.fire = 5;
+enemy.earth = 5;
+enemy.metal = 5;
+enemy.water = 5;
 }
 
 void set_player_location(Location* loc)
@@ -74,17 +79,36 @@ void ac_dungeons_action()
 			set_player_location(&loc_fight);
 			create_enemy();
 			werase(gamew);
+			/* TODO: UI prettier, do you need fight_youw or not? */
 			wprintw(gamew,"You encounter a %s!\n\n", enemy.name);
-			mvwprintw(gamew,2,0,"Your hitpoints: %d/%d\n",player.health,player.max_health);
-			mvwprintw(gamew,3,0,"Hitpoints for %s: %d\n",enemy.name,enemy.health);
+			mvwprintw(gamew,2,0,"%s",player.name);
+			mvwprintw(gamew,2,20,"%s",enemy.name);
 			wrefresh(gamew);
+			WINDOW *fight_youw = newwin(7,11,6,22);
+			box(fight_youw,0,0);
+ 			mvwprintw(fight_youw,1,1,"Wood:  %d",player.wood);
+		        mvwprintw(fight_youw,2,1,"Fire:  %d",player.fire);
+		        mvwprintw(fight_youw,3,1,"Earth: %d",player.earth);
+		        mvwprintw(fight_youw,4,1,"Metal: %d",player.metal);
+		        mvwprintw(fight_youw,5,1,"Water: %d",player.water);
+
+			WINDOW *fight_enemyw = newwin(7,11,6,40);
+			box(fight_enemyw,0,0);
+ 			mvwprintw(fight_enemyw,1,1,"Wood:  %d",enemy.wood);
+		        mvwprintw(fight_enemyw,2,1,"Fire:  %d",enemy.fire);
+		        mvwprintw(fight_enemyw,3,1,"Earth: %d",enemy.earth);
+		        mvwprintw(fight_enemyw,4,1,"Metal: %d",enemy.metal);
+		        mvwprintw(fight_enemyw,5,1,"Water: %d",enemy.water);
+			touchwin(gamew);
+			wrefresh(fight_youw);
+			wrefresh(fight_enemyw);
+			delwin(fight_youw);
+			delwin(fight_enemyw);
 		}
 	}
 	else
 	{
-			werase(gamew);
-			wprintw(gamew,"You feel too tired to fight\n");
-			wrefresh(gamew);
+			ncurs_msg("You feel too tired to fight\n");
 	}
 }
 void ac_fight_fight()

@@ -102,11 +102,18 @@ wrefresh(commandw);
 void ncurs_stats(Player player) {
 	werase(gamew);
 	wrefresh(gamew);
-	wprintw(gamew, "name:         %s\n", player.name);
-	wprintw(gamew,"stamina / AP: %d\n", player.action_points);
+	wprintw(gamew,"Name:         %s\n", player.name);
+	wprintw(gamew,"Stamina / AP: %d\n", player.action_points);
 	wprintw(gamew,"XP:           %d\n", player.experience);
-	wprintw(gamew,"Health:       %d/%d\n",player.max_health,player.health);
 	wprintw(gamew,"Money:        %d\n",player.money);
+	wattron(gamew,A_BOLD);
+	wprintw(gamew,"\nElements:\n");
+	wattroff(gamew,A_BOLD);
+	wprintw(gamew,"Wood:         %d\n",player.wood);
+	wprintw(gamew,"Fire:         %d\n",player.fire);
+	wprintw(gamew,"Earth:        %d\n",player.earth);
+	wprintw(gamew,"Metal:        %d\n",player.metal);
+	wprintw(gamew,"Water:        %d\n",player.water);
 	wrefresh(gamew);
 
 }

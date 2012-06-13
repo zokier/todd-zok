@@ -117,6 +117,11 @@ void load_player_data()
 	player.max_health = 20;
 	player.health = player.max_health;
 	player.money = 10;
+	player.wood = 5;
+	player.fire = 5;
+	player.earth = 5;
+	player.metal = 5;
+	player.water = 5;
 }
 
 bool create_player()
