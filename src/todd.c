@@ -114,14 +114,13 @@ void load_player_data()
 	player.location = &loc_town;
 	player.action_points = 10;
 	player.experience = 0;
-	player.max_health = 20;
-	player.health = player.max_health;
 	player.money = 10;
 	player.wood = 5;
 	player.fire = 5;
 	player.earth = 5;
 	player.metal = 5;
 	player.water = 5;
+	player.weapon_index = 0;
 }
 
 bool create_player()
@@ -180,10 +179,11 @@ bool get_player()
 void execute_action(char cmd_char)
 {
 	//convert upper case to lower case
-	if (cmd_char < 'a')
+	if (cmd_char < 'a' && cmd_char > '9') /* accept letters and numbers */
 	{
 		cmd_char += 'a' - 'A';
 	}
+
 	// search for the corresponding action
 	for (size_t i = 0; i < player.location->action_count; i++)
 	{

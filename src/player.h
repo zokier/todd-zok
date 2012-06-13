@@ -10,8 +10,6 @@ struct Player {
 	Location *location;
 	unsigned int action_points;
 	unsigned int experience;
-	unsigned int max_health;
-	int health;
 	int money;
 	// TODO add more stats 
 	int wood;
@@ -19,6 +17,7 @@ struct Player {
 	int earth;
 	int metal;
 	int water;
+	int weapon_index; /* currently only 1 weapon and 0 skills is used. Here should be a struct Skills[4] or something */
 };
 
 #endif //PLAYER_H

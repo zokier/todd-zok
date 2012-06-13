@@ -1,12 +1,15 @@
-#include <ncurses.h>
-#include <locale.h>
-#include <string.h>
-#include <syslog.h>
-#include "ui.h"
-#include "player.h"
-#include "globals.h"
+#include <ncurses.h> 
+#include <locale.h> 
+#include <string.h> 
+#include <syslog.h> 
+#include "ui.h" 
+#include "player.h" 
+#include "globals.h" 
+#include "enemy.h"
 
-WINDOW *mainbw, *gamebw, *gamew, *commandw;
+extern Enemy enemy;
+
+WINDOW *mainbw, *gamebw, *gamew, *commandw, *skillsw;
 void init_ui()
 {
 	// locale needs to be initialized for ncurses
@@ -66,6 +69,7 @@ void init_ui()
 	   gamebw  = main game "box"
 	   gamew = main game area
 	   commandw = command listing window
+           skillsw = skills listing window
 	   */
 
 	/* TODO: calculate window sizes */
@@ -78,6 +82,7 @@ void init_ui()
 
 	commandw = subwin(mainbw, 18, 20, 3, 1);
 	wborder(commandw, 1, 0, 0, 1, 1, 1, 1, 1);
+	skillsw = subwin(mainbw, 8, 20, 11, 1);
 
 	gamebw = subwin(mainbw, 18, 58, 1, 20);
 	wattron(gamebw, A_UNDERLINE);
@@ -88,7 +93,7 @@ void init_ui()
 	wrefresh(mainbw);
 	wrefresh(commandw);
 	wrefresh(gamew);
-
+	wrefresh(skillsw);
 	doupdate();
 
 }
@@ -110,11 +115,9 @@ void ncurs_commands() {
 	wrefresh(commandw);
 }
 
-// Should this be in actions instead
 void ncurs_stats() {
 	werase(gamew);
 	wrefresh(gamew);
-<<<<<<< HEAD
 	wprintw(gamew,"Name:         %s\n", player.name);
 	wprintw(gamew,"Stamina / AP: %d\n", player.action_points);
 	wprintw(gamew,"XP:           %d\n", player.experience);
@@ -142,4 +145,25 @@ void ncurs_location()
 {
 	ncurs_location_desc(player);
 	ncurs_commands(player);
+}
+
+/* TODO: it's stupid to have 2 functions that differ so slightly. Make this one function */
+void ncurs_fightstats(WINDOW *window) {
+	box(window,0,0);
+	mvwprintw(window,1,1,"Wood:  %d",player.wood);
+	mvwprintw(window,2,1,"Fire:  %d",player.fire);
+	mvwprintw(window,3,1,"Earth: %d",player.earth);
+	mvwprintw(window,4,1,"Metal: %d",player.metal);
+	mvwprintw(window,5,1,"Water: %d",player.water);
+	wrefresh(window); 
+}
+
+void ncurs_fightstats_enemy(WINDOW *window) {
+	box(window,0,0);
+	mvwprintw(window,1,1,"Wood:  %d",enemy.wood);
+	mvwprintw(window,2,1,"Fire:  %d",enemy.fire);
+	mvwprintw(window,3,1,"Earth: %d",enemy.earth);
+	mvwprintw(window,4,1,"Metal: %d",enemy.metal);
+	mvwprintw(window,5,1,"Water: %d",enemy.water);
+	wrefresh(window); 
 }

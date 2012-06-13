@@ -9,10 +9,14 @@
 #include "globals.h"
 #include "events.h"
 #include "ui.h"
+#include "weapons.h"
 
 // globals are nasty?
 Enemy enemy;
+WINDOW *fight_youw;
+WINDOW *fight_enemyw;
 
+extern Weapons weapons[];
 int check_rnd_events() {
 
 	int i = rand() % 1000;
@@ -49,6 +53,7 @@ void create_enemy()
 	{
 		enemy.name = "Fierce goblin";
 	}
+
 enemy.wood = 5;
 enemy.fire = 5;
 enemy.earth = 5;
@@ -82,26 +87,17 @@ void ac_dungeons_action()
 			mvwprintw(gamew,2,0,"%s",player.name);
 			mvwprintw(gamew,2,20,"%s",enemy.name);
 			wrefresh(gamew);
-			WINDOW *fight_youw = newwin(7,11,6,22);
-			box(fight_youw,0,0);
- 			mvwprintw(fight_youw,1,1,"Wood:  %d",player.wood);
-		        mvwprintw(fight_youw,2,1,"Fire:  %d",player.fire);
-		        mvwprintw(fight_youw,3,1,"Earth: %d",player.earth);
-		        mvwprintw(fight_youw,4,1,"Metal: %d",player.metal);
-		        mvwprintw(fight_youw,5,1,"Water: %d",player.water);
+	
+			fight_youw = newwin(7,11,6,22);
+			fight_enemyw = newwin(7,11,6,40);
+			ncurs_fightstats(fight_youw);
+			ncurs_fightstats_enemy(fight_enemyw);
 
-			WINDOW *fight_enemyw = newwin(7,11,6,40);
-			box(fight_enemyw,0,0);
- 			mvwprintw(fight_enemyw,1,1,"Wood:  %d",enemy.wood);
-		        mvwprintw(fight_enemyw,2,1,"Fire:  %d",enemy.fire);
-		        mvwprintw(fight_enemyw,3,1,"Earth: %d",enemy.earth);
-		        mvwprintw(fight_enemyw,4,1,"Metal: %d",enemy.metal);
-		        mvwprintw(fight_enemyw,5,1,"Water: %d",enemy.water);
-			touchwin(gamew);
-			wrefresh(fight_youw);
-			wrefresh(fight_enemyw);
-			delwin(fight_youw);
-			delwin(fight_enemyw);
+			/* display skills */
+			for (int i = 0; i < 1; i++)
+				wprintw(skillsw,"%d - %s\n",0,weapons[player.weapon_index].name);
+			wrefresh(skillsw);
+
 		}
 	}
 	else
@@ -109,38 +105,96 @@ void ac_dungeons_action()
 			ncurs_msg("You feel too tired to fight\n");
 	}
 }
-void ac_fight_fight()
+
+/* helper functions so I don't need to rewrite that much code */
+void ac_fight_0() {
+ac_fight_fight(0);
+}
+
+void ac_fight_1() {
+ac_fight_fight(1);
+}
+
+void ac_fight_fight(int keypress)
 {
-	/* player hits */
-	int damage = 3; // chosen by fair dice roll
 
-	mvwprintw(gamew,5,0,"You hit %s with %d points of damage\n", enemy.name, damage);
+/* this function is entered with a keypress from ac_fight0 and so on*/
+/* the keypress is used to determine what attack is used */
 
-	enemy.health -= damage;
+/* 1. the player already chose the attack (int keypress), now it's time for the enemy */
+/* TODO: make the enemy actually attack */
+/* TODO: struct enemy needs a weapon etc */
 
-	/* update current hitpoints */
-	mvwprintw(gamew,3,0,"Hitpoints for %s: %d\n",enemy.name,enemy.health);
+/* 2. calculate damage */
+/* player does damage */
+/* Wu Xing cycles:
+Wood causes +FIRE, -EARTH
+Fire causes +EARTH, -METAL
+Earth causes +METAL, -WATER
+Metal causes +WATER, -WOOD
+Water causes +WOOD, -FIRE
+*/
 
-	if (enemy.health <= 0)
-	{
-		mvwprintw(gamew,8,0,"%s is slain!\n", enemy.name);
-		int money = 7;
-		int exp = 10;
-		wprintw(gamew,"You find %d coins on the corpse, and gain %d experience\n", money, exp);
-		player.money += money;
-		player.experience += exp;
-		mvwprintw(gamew,12,0,"<MORE>");
-		wrefresh(gamew);
-		getch(),
-		set_player_location(&loc_dungeons);
+switch (weapons[player.weapon_index].dmg_type) {
+	case DMG_WOOD:
+		enemy.fire++;
+		enemy.earth--;
+		break;
+
+
+	case DMG_FIRE:
+		enemy.earth++;
+		enemy.metal--;
+		break;
+
+
+	case DMG_EARTH:
+		enemy.metal++;
+		enemy.water--;
+		break;
+
+
+	case DMG_METAL:
+		enemy.water++;
+		enemy.wood--;
+		break;
+
+
+	case DMG_WATER:
+		enemy.water++;
+		enemy.fire--;
+		break;
+
+	default:
+		break;
 	}
-	else
+
+/* 3. update stats and display them, TODO: display attack info */
+
+	ncurs_fightstats(fight_youw);
+	ncurs_fightstats_enemy(fight_enemyw);
+
+/* 3. check for dead player/enemy */
+
+/* TODO: currently only checks for dead enemies */
+if (enemy.wood <= 0||enemy.fire <= 0||enemy.earth <= 0||enemy.metal <= 0||enemy.water <= 0)
 	{
-		damage = 2; // goblins are bit weaker than you
-		mvwprintw(gamew,6,0,"%s hits you with %d points of damage\n", enemy.name, damage);
-		player.health -= damage;
-		mvwprintw(gamew,2,0,"Your hitpoints: %d/%d\n",player.health,player.max_health);
-		if (player.health <= 0)
+	mvwprintw(gamew,10,0,"%s is slain!\n", enemy.name);
+	int money = 7;
+	int exp = 10;
+	wprintw(gamew,"You find %d coins on the corpse, and gain %d experience\n", money, exp);
+	player.money += money;
+	player.experience += exp;
+	mvwprintw(gamew,12,0,"<MORE>");
+	wrefresh(gamew);
+	getch(),
+	set_player_location(&loc_dungeons);
+	}
+/* TODO: figure out the order of checking deaths if stuff is done simultaneously.. */
+/*
+else
+	{
+		if (player.fire <= 0)
 		{
 			mvwprintw(gamew,8,0,"The world fades around you as you fall to the ground,\nbleeding.");
 			wattron(gamew,A_BOLD);
@@ -151,6 +205,7 @@ void ac_fight_fight()
 			playing = false;
 		}
 	}
+*/
 wrefresh(gamew);
 }
 
@@ -181,6 +236,7 @@ void ac_ev_oldman_nohelp()
 
 void ac_shrine_heal_1()
 {
+/*
 	if (player.health < player.max_health)
 	{
 		if (player.money > 0)
@@ -198,10 +254,12 @@ void ac_shrine_heal_1()
 	{
 		puts("You try to insert a coin into the slot but to your surprise the crystal repels your coin.");
 	}
+*/
 }
 
 void ac_shrine_heal_all()
 {
+/*
 	int money = player.money;
 	money -= player.max_health - player.health;
 	player.health = player.max_health;
@@ -213,6 +271,7 @@ void ac_shrine_heal_all()
 	player.money = money;
 	player.location = &loc_dungeons;
 	puts("The crystal dazes you with blindingly bright light. As you regain control, you notice that all your wounds have mended.");
+*/
 }
 
 void ac_list_players()
@@ -250,13 +309,21 @@ void ac_shop()
 
 void ac_shop_buy()
 {
-	ncurs_msg("The poor man has nothing to sell to you.");
+	wprintw(gamew,"\nThe poor man is selling these items:\n");
+	for (int i=0; i <= WEAPON_NR; i++)
+		wprintw(gamew,"%s\n", weapons[i].name);
+
+	wprintw(gamew,"TODO: actually choose what you buy. \nYOU JUST BOUGHT: %s\n",weapons[1].name);
+	player.weapon_index = 1;
+	wrefresh(gamew);
+
 }
 
 void ac_shop_sell()
 {
 	ncurs_msg("The poor man has no coins to buy anything from you.");
-
+	wprintw(gamew,"you have: %s\n",weapons[player.weapon_index].name);
+	wrefresh(gamew);
 }
 
 void ac_return_to_town()
