@@ -1,6 +1,4 @@
 * Validate user input
-	* Names
-		* A-Z, a-z, space, and dash
 	* Messges
 		* Printable characters only 
 * Configuration
@@ -34,7 +32,6 @@
 	* Mechanism
 		* Element based?
 * Persistance
-	* Character data
 		* stats
 	* Messageboard
 	* Configuration data
@@ -54,10 +51,6 @@
 		* Weapons
 		* Potions?
 		* ...
-* UI
-	* ncurses
-	* linebased
-	* other?
 * Loot
 	* Creeps drop stuff to sell to vendors
 		* need skills to recover
