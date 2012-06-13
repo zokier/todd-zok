@@ -1,10 +1,10 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
+#define ENEMY_NR 6
 typedef struct Enemy Enemy;
 struct Enemy {
 	char *name;
-	int health;
         // TODO add more stats
         int wood;
         int fire;

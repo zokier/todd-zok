@@ -18,6 +18,8 @@ WINDOW *fight_youw;
 WINDOW *fight_enemyw;
 
 extern Weapons weapons[];
+extern Enemy enemylist[];
+
 int check_rnd_events() {
 
 	int i = rand() % 1000;
@@ -45,21 +47,9 @@ int check_rnd_events() {
 
 void create_enemy()
 {
-	enemy.health = (rand() % 15) + 5;
-	if (enemy.health < 15)
-	{
-		enemy.name = "Feeble goblin";
-	}
-	else
-	{
-		enemy.name = "Fierce goblin";
-	}
-
-enemy.wood = 5;
-enemy.fire = 5;
-enemy.earth = 5;
-enemy.metal = 5;
-enemy.water = 5;
+/* randomly choose an enemy from enemylist */
+int random_enemy = rand() % ENEMY_NR;
+memcpy(&enemy,&enemylist[random_enemy], sizeof(struct Enemy));
 }
 
 void set_player_location(Location* loc)
@@ -95,6 +85,7 @@ void ac_dungeons_action()
 			ncurs_fightstats_enemy(fight_enemyw);
 
 			/* display skills */
+			werase(skillsw);
 			for (int i = 0; i < 1; i++)
 				wprintw(skillsw,"%d - %s\n",0,weapons[player.weapon_index].name);
 			wrefresh(skillsw);
