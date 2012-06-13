@@ -315,6 +315,19 @@ bool init_pq()
 		goto pq_cleanup;
 	}
 	PQclear(res);
+	res = PQprepare(conn, "view_messageboard", "select name, timestamp, body from messageboard, player_logins where player_logins.id = messageboard.player_id order by messageboard.id desc;", 0, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear(res);
+	res = PQprepare(conn, "write_to_messageboard", "insert into messageboard (player_id, body) values ($1, $2);", 2, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear(res);
+
 	return true;
 
 pq_cleanup:

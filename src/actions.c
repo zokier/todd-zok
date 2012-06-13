@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 #include "player.h"
 #include "locations.h"
 #include "enemy.h"
@@ -233,6 +234,53 @@ void ac_shop_sell()
 {
 	ncurs_msg("The poor man has no coins to buy anything from you.");
 
+}
+
+void ac_messageboard()
+{
+	set_player_location(&loc_messageboard);
+}
+
+void ac_messageboard_view()
+{
+	wclear(gamew);
+	PGresult *res;
+	res = PQexecPrepared(conn, "view_messageboard", 0, NULL, NULL, NULL, 0);
+	if (PQresultStatus(res) == PGRES_TUPLES_OK)
+	{
+		int row_count = PQntuples(res);
+		int col_count = PQnfields(res);
+		for (int i = 0; i < row_count; i++)
+		{
+			for (int j = 0; j < col_count; j++)
+			{
+				wprintw(gamew, "%s\t\t", PQgetvalue(res, i, j));
+			}
+			wprintw(gamew, "\n");
+		}
+	}
+	wrefresh(gamew);
+	PQclear(res);
+}
+
+void ac_messageboard_write()
+{
+	int len = 80;
+	char *line = malloc(len); // more dynamic memory allocation would be nice
+	if (getnstr(line, len) != ERR) // TODO a better way to get input
+	{
+		char *player_id = itoa(player.id);
+		const char *params[2] = {player_id, line};
+		PGresult *res;
+		res = PQexecPrepared(conn, "write_to_messageboard", 2, params, NULL, NULL, 0);
+		if (PQresultStatus(res) != PGRES_COMMAND_OK)
+		{
+			syslog(LOG_WARNING, "Messageboard write failed: %s", PQresultErrorMessage(res));
+		}
+		PQclear(res);
+		free(player_id);
+	}
+	free(line);
 }
 
 void ac_return_to_town()

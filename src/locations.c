@@ -5,7 +5,7 @@
 
 Location loc_town = {
 	"You wander around the desolate town.\nYou begin to wonder why you even bothered coming here.",
-	6,
+	7,
 	{
 		{
 			'd',
@@ -36,6 +36,12 @@ Location loc_town = {
 			"",
 			"Shop",
 			&ac_shop
+		},
+		{
+			'm',
+			"",
+			"Messageboard",
+			&ac_messageboard
 		},
 		{
 			'q',
@@ -177,6 +183,31 @@ Location loc_shrine = {
 			"Insert ",
 			"All the coins",
 			&ac_shrine_heal_all
+		},
+		{
+			'r',
+			"",
+			"Return to town",
+			&ac_return_to_town
+		}
+	}
+};
+
+Location loc_messageboard = {
+	"There is a large messageboard in the middle of the town square. It is plastered with layers of old notes. Most of them are weathered completely unintelligible. Beside the board is a small table with a pen and a stack of empty papers.",
+	3,
+	{
+		{
+			'v',
+			"",
+			"View messages",
+			&ac_messageboard_view
+		},
+		{
+			'w',
+			"",
+			"Write a message",
+			&ac_messageboard_write
 		},
 		{
 			'r',

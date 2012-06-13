@@ -41,6 +41,10 @@ NOTICE: CREATE TABLE / UNIQUE will create implicit index "player_logins_name_key
 CREATE TABLE
 todd=> alter table player_logins add check (name <> '');
 ALTER TABLE
+todd=> create table messageboard (id serial primary key, timestamp timestamp default now() not null, player_id integer references player_logins(id) on update cascade not null, body text not null);
+NOTICE:  CREATE TABLE will create implicit sequence "messageboard_id_seq" for serial column "messageboard.id"
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "messageboard_pkey" for table "messageboard"
+CREATE TABLE
 todd=> \q
 $
 
