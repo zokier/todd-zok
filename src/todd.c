@@ -20,6 +20,8 @@
 #define WELCOME_NEW "The bards have not heard of you before.\nWelcome to Tales of Deep Dungeons, "
 #define WELCOME_OLD "Welcome back to Tales of Deep Dungeons, "
 #define RETRY_LIMIT 3
+#define NAME_MIN_LENGTH 4
+#define NAME_MAX_LENGTH 16
 
 
 // ugly globals go here
@@ -119,9 +121,34 @@ void load_player_data()
 	player.money = 10;
 }
 
+bool check_name()
+{
+	size_t len = 0;
+	char *it = player.name;
+	for (char c = *it++; c != '\0'; c = *it++)
+	{
+		len++;
+		if (c < 'a' || c > 'z')
+			if (c < 'A' || c > 'Z')
+				if (c != ' ' && c != '-')
+					return false;
+	}
+	if (len < NAME_MIN_LEN)
+		return false;
+	if (len > NAME_MAX_LEN)
+		return false
+	return true;
+}
+
 bool create_player()
 {
 	bool ret = false;
+	if (!check_name())
+	{
+		puts("Invalid name. Allowed characters: A-Z, a-z, dash and space.");
+		printf("Minimum name length: %d characters.\n", NAME_MIN_LENGTH);
+		return ret;
+	}
 	char *passwd = NULL;
 	size_t passwd_len = 0;
 	printf("Welcome new player, enter password: ");
