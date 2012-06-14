@@ -11,6 +11,7 @@
 #include "events.h"
 #include "ui.h"
 #include "weapons.h"
+#include "skills.h"
 
 // globals are nasty?
 Enemy enemy;
@@ -19,7 +20,7 @@ WINDOW *fight_enemyw;
 
 extern Weapons weapons[];
 extern Enemy enemylist[];
-
+extern Skills skills_list[];
 int check_rnd_events() {
 
 	int i = rand() % 1000;
@@ -79,8 +80,8 @@ void ac_dungeons_action()
 			mvwprintw(gamew,2,20,"%s",enemy.name);
 			wrefresh(gamew);
 	
-			fight_youw = newwin(7,11,6,22);
-			fight_enemyw = newwin(7,11,6,40);
+			fight_youw = newwin(7,10,6,22);
+			fight_enemyw = newwin(9,13,6,40);
 			ncurs_fightstats(fight_youw);
 			ncurs_fightstats_enemy(fight_enemyw);
 
@@ -153,7 +154,7 @@ switch (weapons[player.weapon_index].dmg_type) {
 
 
 	case DMG_WATER:
-		enemy.water++;
+		enemy.wood++;
 		enemy.fire--;
 		break;
 
@@ -161,14 +162,76 @@ switch (weapons[player.weapon_index].dmg_type) {
 		break;
 	}
 
+/* enemy hits */
+/* this is more complicated than player,
+for a proof-of-concept battle system:
+if skill dmg_type and enemy dominant type match, enemy gets a bonus
+*/
+
+switch (enemy.skill->dmg_type) {
+	case DMG_WOOD:
+		player.fire++;
+		player.earth--;
+		if (enemy.dom_type == TYPE_WOOD) {
+			player.fire++;
+			player.earth--;
+			}
+		break;
+
+
+	case DMG_FIRE:
+		player.earth++;
+		player.metal--;
+		if (enemy.dom_type == TYPE_FIRE) {
+			player.earth++;
+			player.metal--;
+			}
+		break;
+
+
+	case DMG_EARTH:
+		player.metal++;
+		player.water--;
+		if (enemy.dom_type == TYPE_EARTH) {
+			player.metal++;
+			player.water--;
+			}
+		break;
+
+
+	case DMG_METAL:
+		player.water++;
+		player.wood--;
+		if (enemy.dom_type == TYPE_METAL) {
+			player.water++;
+			player.wood--;
+			}
+		break;
+
+
+	case DMG_WATER:
+		player.wood++;
+		player.fire--;
+		if (enemy.dom_type == TYPE_WATER) {
+			player.wood++;
+			player.fire--;
+			}
+		break;
+
+	default:
+		break;
+	}
+
+
 /* 3. update stats and display them, TODO: display attack info */
 
 	ncurs_fightstats(fight_youw);
 	ncurs_fightstats_enemy(fight_enemyw);
 
-/* 3. check for dead player/enemy */
+/* 4. check for dead player/enemy */
 
-/* TODO: currently only checks for dead enemies */
+/* figure out the order of checking deaths: attacks are simultaneous. Iniative? */
+/* check if enemy dies */
 if (enemy.wood <= 0||enemy.fire <= 0||enemy.earth <= 0||enemy.metal <= 0||enemy.water <= 0)
 	{
 	mvwprintw(gamew,10,0,"%s is slain!\n", enemy.name);
@@ -182,22 +245,20 @@ if (enemy.wood <= 0||enemy.fire <= 0||enemy.earth <= 0||enemy.metal <= 0||enemy.
 	getch(),
 	set_player_location(&loc_dungeons);
 	}
-/* TODO: figure out the order of checking deaths if stuff is done simultaneously.. */
-/*
-else
+
+/* check if player dies as well */
+if (player.wood <= 0||player.fire <= 0||player.earth <= 0||player.metal <= 0||player.water <= 0)
 	{
-		if (player.fire <= 0)
-		{
-			mvwprintw(gamew,8,0,"The world fades around you as you fall to the ground,\nbleeding.");
-			wattron(gamew,A_BOLD);
-			wattron(gamew,A_UNDERLINE);
-			mvwprintw(gamew,11,0,"You are dead.");
-			wattroff(gamew,A_BOLD);
-			wattroff(gamew,A_UNDERLINE);
-			playing = false;
-		}
+	wclear (gamew);
+	mvwprintw(gamew,12,0,"The world fades around you as you fall to the ground,\nbleeding.");
+	wattron(gamew,A_BOLD);
+	wattron(gamew,A_UNDERLINE);
+	mvwprintw(gamew,15,0,"You are dead.");
+	wattroff(gamew,A_BOLD);
+	wattroff(gamew,A_UNDERLINE);
+	playing = false;
 	}
-*/
+
 wrefresh(gamew);
 }
 

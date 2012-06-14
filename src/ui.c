@@ -6,8 +6,10 @@
 #include "player.h" 
 #include "globals.h" 
 #include "enemy.h"
+#include "skills.h"
 
 extern Enemy enemy;
+extern Skills skills_list[];
 
 WINDOW *mainbw, *gamebw, *gamew, *commandw, *skillsw;
 void init_ui()
@@ -149,7 +151,11 @@ void ncurs_location()
 
 /* TODO: it's stupid to have 2 functions that differ so slightly. Make this one function */
 void ncurs_fightstats(WINDOW *window) {
+	/* werase makes it possible to cleanly go from 10 to 9 hitpoints (second number cleared) */
+	/* TODO: if it flickers, only clean the number part */
+	werase(window); 
 	box(window,0,0);
+
 	mvwprintw(window,1,1,"Wood:  %d",player.wood);
 	mvwprintw(window,2,1,"Fire:  %d",player.fire);
 	mvwprintw(window,3,1,"Earth: %d",player.earth);
@@ -159,11 +165,18 @@ void ncurs_fightstats(WINDOW *window) {
 }
 
 void ncurs_fightstats_enemy(WINDOW *window) {
+	/* werase makes it possible to cleanly go from 10 to 9 hitpoints (second number cleared) */
+	/* TODO: if it flickers, only clean the number part */
+	werase(window); 
+
 	box(window,0,0);
-	mvwprintw(window,1,1,"Wood:  %d",enemy.wood);
-	mvwprintw(window,2,1,"Fire:  %d",enemy.fire);
-	mvwprintw(window,3,1,"Earth: %d",enemy.earth);
-	mvwprintw(window,4,1,"Metal: %d",enemy.metal);
-	mvwprintw(window,5,1,"Water: %d",enemy.water);
+	mvwprintw(window,1,1,"TYPE:  %d",enemy.dom_type); /* todo: text instead of numbers */
+	mvwprintw(window,2,1,"Wood:  %d",enemy.wood);
+	mvwprintw(window,3,1,"Fire:  %d",enemy.fire);
+	mvwprintw(window,4,1,"Earth: %d",enemy.earth);
+	mvwprintw(window,5,1,"Metal: %d",enemy.metal);
+	mvwprintw(window,6,1,"Water: %d",enemy.water);
+	mvwprintw(window,7,1,"skill: %s",enemy.skill->name);
+	
 	wrefresh(window); 
 }
