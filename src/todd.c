@@ -230,10 +230,6 @@ void execute_action(char cmd_char)
 	}
 }
 
-void init_ncurses() {
-	init_ui();
-}
-
 
 /*
 	Main gameloop here
@@ -382,7 +378,7 @@ int main(int argc, char *argv[])
 	}
 	load_player_data();
 
-	init_ncurses();
+	init_ui();
 	enter_game();
 
 	return_code = EXIT_SUCCESS; // returned from game, success
