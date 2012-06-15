@@ -151,19 +151,26 @@ Location loc_shop = {
 
 Location loc_fight = {
 	"",
-	2,
+	3,
 	{
-		{
-			'f',
-			"",
-			"Fight",
-			&ac_fight_fight
-		},
 		{
 			'r',
 			"",
 			"Run",
 			&ac_return_to_town
+		},
+		{
+			'0',
+			"",
+			NULL,
+			&ac_fight_0
+		},
+
+		{
+			'1',
+			"",
+			NULL,
+			&ac_fight_1
 		}
 	}
 };

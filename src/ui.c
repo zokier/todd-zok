@@ -1,12 +1,16 @@
-#include <ncurses.h>
-#include <locale.h>
-#include <string.h>
-#include <syslog.h>
-#include "ui.h"
-#include "player.h"
-#include "globals.h"
+#include <ncurses.h> 
+#include <locale.h> 
+#include <string.h> 
+#include <syslog.h> 
+#include "ui.h" 
+#include "player.h" 
+#include "globals.h" 
+#include "enemy.h"
+#include "skills.h"
 
-WINDOW *mainbw, *gamebw, *gamew, *commandw;
+extern Enemy enemy;
+
+WINDOW *mainbw, *gamebw, *gamew, *commandw, *skillsw;
 void init_ui()
 {
 	// locale needs to be initialized for ncurses
@@ -66,6 +70,7 @@ void init_ui()
 	   gamebw  = main game "box"
 	   gamew = main game area
 	   commandw = command listing window
+           skillsw = skills listing window
 	   */
 
 	/* TODO: calculate window sizes */
@@ -78,6 +83,7 @@ void init_ui()
 
 	commandw = subwin(mainbw, 18, 20, 3, 1);
 	wborder(commandw, 1, 0, 0, 1, 1, 1, 1, 1);
+	skillsw = subwin(mainbw, 8, 20, 11, 1);
 
 	gamebw = subwin(mainbw, 18, 58, 1, 20);
 	wattron(gamebw, A_UNDERLINE);
@@ -88,7 +94,7 @@ void init_ui()
 	wrefresh(mainbw);
 	wrefresh(commandw);
 	wrefresh(gamew);
-
+	wrefresh(skillsw);
 	doupdate();
 
 }
@@ -103,24 +109,14 @@ void ncurs_commands() {
 	wclear(commandw);
 	for (size_t i = 0; i < player.location->action_count; i++)
 	{
-		wprintw(commandw, "%s", player.location->actions[i].description_prefix);
-		waddch(commandw, player.location->actions[i].description[0] | A_BOLD | A_UNDERLINE);
-		wprintw(commandw, "%s\n", player.location->actions[i].description + 1);
+		if (player.location->actions[i].description != NULL)
+		{
+			wprintw(commandw, "%s", player.location->actions[i].description_prefix);
+			waddch(commandw, player.location->actions[i].description[0] | A_BOLD | A_UNDERLINE);
+			wprintw(commandw, "%s\n", player.location->actions[i].description + 1);
+		}
 	}
 	wrefresh(commandw);
-}
-
-// Should this be in actions instead
-void ncurs_stats() {
-	werase(gamew);
-	wrefresh(gamew);
-	wprintw(gamew, "name:         %s\n", player.name);
-	wprintw(gamew, "stamina / AP: %d\n", player.action_points);
-	wprintw(gamew, "XP:           %d\n", player.experience);
-	wprintw(gamew, "Health:       %d/%d\n", player.max_health, player.health);
-	wprintw(gamew, "Money:        %d\n", player.money);
-	wrefresh(gamew);
-
 }
 
 void ncurs_msg(char *buffer) {
@@ -129,11 +125,67 @@ void ncurs_msg(char *buffer) {
 	wrefresh(gamew);
 }
 
-/*
-	Prints descriptions at current player position
-*/
+/*	Prints descriptions at current player position */
 void ncurs_location()
 {
 	ncurs_location_desc(player);
 	ncurs_commands(player);
+}
+
+char *elem_type_to_str(int elem_type)
+{
+	switch (elem_type)
+	{
+	case ELEM_WOOD:
+		return "Wood";
+	case ELEM_FIRE:
+		return "Fire";
+	case ELEM_EARTH:
+		return "Earth";
+	case ELEM_METAL:
+		return "Metal";
+	case ELEM_WATER:
+		return "Water";
+	}
+}
+
+/* TODO: it's stupid to have 2 functions that differ so slightly. Make this one function */
+void ncurs_fightstats(WINDOW *window) {
+	/* werase makes it possible to cleanly go from 10 to 9 hitpoints (second number cleared) */
+	/* TODO: if it flickers, only clean the number part */
+	werase(window); 
+	box(window,0,0);
+
+	mvwprintw(window,1,1,"Health: %d/%d",player.health,player.max_health);
+	mvwprintw(window,3,1,"Wood:   %d",player.elements[ELEM_WOOD]);
+	mvwprintw(window,4,1,"Fire:   %d",player.elements[ELEM_FIRE]);
+	mvwprintw(window,5,1,"Earth:  %d",player.elements[ELEM_EARTH]);
+	mvwprintw(window,6,1,"Metal:  %d",player.elements[ELEM_METAL]);
+	mvwprintw(window,7,1,"Water:  %d",player.elements[ELEM_WATER]);
+
+	if(player.elemental_type == player.skill->dmg_type && player.elemental_type == player.weapon->dmg_type)
+                mvwprintw(window,10,1,"ALIGNED, POWERFUL!");
+	wrefresh(window); 
+}
+
+void ncurs_fightstats_enemy(WINDOW *window) {
+	/* werase makes it possible to cleanly go from 10 to 9 hitpoints (second number cleared) */
+	/* TODO: if it flickers, only clean the number part */
+	werase(window); 
+
+	box(window,0,0);
+	mvwprintw(window,1,1,"Health: %d",enemy.health);
+	mvwprintw(window,2,1,"TYPE:   %s",elem_type_to_str(enemy.elemental_type));
+	mvwprintw(window,3,1,"Wood:   %d",enemy.elements[ELEM_WOOD]);
+	mvwprintw(window,4,1,"Fire:   %d",enemy.elements[ELEM_FIRE]);
+	mvwprintw(window,5,1,"Earth:  %d",enemy.elements[ELEM_EARTH]);
+	mvwprintw(window,6,1,"Metal:  %d",enemy.elements[ELEM_METAL]);
+	mvwprintw(window,7,1,"Water:  %d",enemy.elements[ELEM_WATER]);
+	mvwprintw(window,8,1,"skill:  %s",enemy.skill->name);
+	mvwprintw(window,9,1,"weapon: %s",enemy.weapon->name);
+
+	if(enemy.elemental_type == enemy.skill->dmg_type && enemy.elemental_type == enemy.weapon->dmg_type)
+		mvwprintw(window,10,1,"ALIGNED, POWERFUL!");	
+
+	wrefresh(window); 
 }

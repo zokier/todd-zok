@@ -18,7 +18,6 @@
 	* partymsg/channels
 	* verify reliability
 * Combat
-	* Enemy generation
 	* Random numbers
 		* dSFMT (is rand()%n good enough?)
 		* seeding
@@ -29,8 +28,8 @@
 	* Special skills
 	* Items
 	* Dungeon levels
-	* Mechanism
-		* Element based?
+	* Combat system
+		* Fine tuning the principles
 * Persistance
 		* stats
 	* Messageboard

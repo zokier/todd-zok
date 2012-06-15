@@ -2,18 +2,24 @@
 #define PLAYER_H
 
 #include "location.h"
+#include "weapons.h"
+#include "skills.h"
 
 typedef struct Player Player;
 struct Player {
 	int id;
 	char *name;
 	Location *location;
-	unsigned int action_points;
-	unsigned int experience;
-	unsigned int max_health;
-	int health;
+	int action_points;
+	int experience;
 	int money;
 	// TODO add more stats 
+	int health;
+	int max_health;
+	int elemental_type;
+	int elements[5]; // use enum Element to access
+	Weapons *weapon;
+	Skills *skill;
 };
 
 #endif //PLAYER_H

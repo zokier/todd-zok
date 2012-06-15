@@ -46,5 +46,18 @@ NOTICE:  CREATE TABLE will create implicit sequence "messageboard_id_seq" for se
 NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "messageboard_pkey" for table "messageboard"
 CREATE TABLE
 todd=> \q
-$
 
+=== Combat system description ===
+
+Damage is calculated: skill.damage + weapon.damage
+
+if "elements are aligned" (means that elemental_type, skill.dmg_type and weapon.dmg_type are the same),
+damage gets a bonus the size of player.element (or enemy.element)
+
+blocking is calculated:
+the element of the blocker that is equivalent to the skill used to attack
+For example, player attacks with a metal type skill. Damage = Damage - enemy.metal
+
+If the elements are aligned when attacking, the blocking player elements get realigned.
+
+Player / enemy dies if any elements OR hitpoins reach 0
