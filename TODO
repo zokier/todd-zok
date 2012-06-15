@@ -1,3 +1,44 @@
+* UI
+	* Add log/chat window
+	* Improve combat view
+	* Merge/abadon nc_popup
+* Persistance
+	* stats
+	* Configuration data
+		* Vendor items/prices
+		* Enemy types
+		* ...
+* Multiplayer communication
+	* Recreate input.{h,c}
+	* pvp combat
+	* privmsg
+	* party
+	* partymsg/channels
+	* list online players
+	* verify reliability
+* Combat
+	* Special skills
+	* Items
+	* Dungeon levels
+	* Combat system
+		* Fine tuning the principles
+	* Random numbers
+		* dSFMT (is rand()%n good enough?)
+		* seeding
+			* time(0)
+				* predictable
+				* multiple users could get same seed
+			* /dev/random
+* Recovery
+	* stamina/ap:
+		* recovery faster in inn/tavern
+		* recovery slows down over time
+	* health:
+		* cheaper in larger blocks
+* Configurable/translatable strings
+	* gettext
+	* most strings need replacement to fit game theme
+		* Objective is to have everything seem like ingame
 * Validate user input
 	* Messges
 		* Printable characters only 
@@ -7,42 +48,6 @@
 	* Compile time (defines)
 	* In database
 		* Database login info etc needs to be somewhere too
-* Configurable/translatable strings
-	* gettext
-	* most strings need replacement to fit game theme
-		* Objective is to have everything seem like ingame
-* Multiplayer communication
-	* party
-	* pvp combat
-	* privmsg
-	* partymsg/channels
-	* verify reliability
-* Combat
-	* Random numbers
-		* dSFMT (is rand()%n good enough?)
-		* seeding
-			* time(0)
-				* predictable
-				* multiple users could get same seed
-			* /dev/random
-	* Special skills
-	* Items
-	* Dungeon levels
-	* Combat system
-		* Fine tuning the principles
-* Persistance
-		* stats
-	* Messageboard
-	* Configuration data
-		* Vendor items/prices
-		* Enemy types
-		* ...
-* Recovery
-	* stamina/ap:
-		* recovery faster in inn/tavern
-		* recovery slows down over time
-	* health:
-		* cheaper in larger blocks
 * Vendors
 	* Buy/sell stuff
 	* Items
@@ -50,6 +55,16 @@
 		* Weapons
 		* Potions?
 		* ...
+	* improve ui
 * Loot
 	* Creeps drop stuff to sell to vendors
 		* need skills to recover
+* Weather
+	* Daily buffs/debuffs for elements
+* Day/night cycle?
+	* What effects would it have
+	* Day length 
+		* 24/12/8 hours
+* Web ui
+	* "High score" list
+	* "Daily news"
