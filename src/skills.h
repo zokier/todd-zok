@@ -2,18 +2,23 @@
 #define SKILLS_H
 
 /* damage types, declared here for a lack of a better place */
-#define TYPE_WOOD 1
-#define TYPE_FIRE 2
-#define TYPE_EARTH 3
-#define TYPE_METAL 4
-#define TYPE_WATER 5
+typedef enum Element Element;
+enum Element
+{
+	ELEM_WOOD = 0,
+	ELEM_FIRE,
+	ELEM_EARTH,
+	ELEM_METAL,
+	ELEM_WATER,
+};
 
-#define SKILLS_NR 3
+#define SKILLS_COUNT 3
+
 typedef struct Skills Skills;
 struct Skills {
-        char *name;
-        // TODO add more stats
-        int dmg_type;
+	char *name;
+	// TODO add more stats
+	int dmg_type;
 	int damage;
 };
 

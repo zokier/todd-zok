@@ -154,23 +154,23 @@ Location loc_fight = {
 	3,
 	{
 		{
+			'r',
+			"",
+			"Run",
+			&ac_return_to_town
+		},
+		{
 			'0',
 			"",
-			"Press 0!!",
+			NULL,
 			&ac_fight_0
 		},
 
 		{
 			'1',
 			"",
-			"DOESN'T WORK!",
+			NULL,
 			&ac_fight_1
-		},
-		{
-			'r',
-			"",
-			"Run",
-			&ac_return_to_town
 		}
 	}
 };

@@ -10,18 +10,14 @@ struct Player {
 	int id;
 	char *name;
 	Location *location;
-	unsigned int action_points;
-	unsigned int experience;
+	int action_points;
+	int experience;
 	int money;
 	// TODO add more stats 
 	int health;
 	int max_health;
 	int elemental_type;
-	int wood;
-	int fire;
-	int earth;
-	int metal;
-	int water;
+	int elements[5]; // use enum Element to access
 	Weapons *weapon;
 	Skills *skill;
 };

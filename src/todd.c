@@ -16,6 +16,7 @@
 #include "networking.h"
 #include "ui.h"
 #include "weapons.h"
+#include "globals.h"
 
 #define NAME_QUERY "What's your name, adventurer?  "
 #define WELCOME_NEW "The bards have not heard of you before.\nWelcome to Tales of Deep Dungeons, "
@@ -31,9 +32,6 @@ void *chat_socket = NULL;
 void *zmq_context = NULL;
 Player player;
 PGconn *conn;
-
-extern Weapons weapons_list[];
-extern Skills skills_list[];
 
 char *itoa(int i)
 {
@@ -122,12 +120,11 @@ void load_player_data()
 	player.money = 10;
 	player.max_health = 10;
 	player.health = player.max_health;
-	player.wood = 5;
-	player.fire = 5;
-	player.earth = 5;
-	player.metal = 5;
-	player.water = 5;
-	player.elemental_type = TYPE_WOOD;
+	for (int i = 0; i < 5; i++)
+	{
+		player.elements[i] = 5;
+	}
+	player.elemental_type = ELEM_WOOD;
 	player.weapon = &weapons_list[0];
 	player.skill = &skills_list[1];
 }

@@ -2,6 +2,7 @@
 #define LOCATION_H
 
 #include "action.h"
+#include <stddef.h>
 
 typedef struct Location Location;
 struct Location {

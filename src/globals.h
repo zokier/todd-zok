@@ -2,6 +2,7 @@
 #define GLOBALS_H
 
 #include "player.h"
+#include "enemy.h"
 #include <libpq-fe.h>
 
 // ugly globals go here
@@ -11,5 +12,9 @@ extern void *chat_socket;
 extern void *zmq_context;
 extern Player player;
 extern PGconn *conn;
+
+extern Weapons weapons_list[];
+extern Enemy enemylist[];
+extern Skills skills_list[];
 
 #endif

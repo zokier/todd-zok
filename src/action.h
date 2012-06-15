@@ -1,8 +1,6 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-// Action_function is pointer to void function taking Player* as parameter
-// use void* as parameter to avoid circular dependencies
 typedef void (*Action_function)();
 
 typedef struct Action Action;
