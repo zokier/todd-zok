@@ -42,6 +42,7 @@ void init_ui()
 	}
 
 	/* checks that terminal supports color */
+
 	if (has_colors() == FALSE)
 	{
 		wprintw(stdscr, "Your terminal does not seem to support color!\n");
@@ -49,7 +50,6 @@ void init_ui()
 		wprintw(stdscr, "You might experience problems\n");
 		wprintw(stdscr, "Press a key to continue\n");
 		getch();
-		werase(stdscr);
 	}
 
 	/*
@@ -80,7 +80,7 @@ void init_ui()
 	mvwprintw(mainbw, 0, 2, "Tales of Deep Dungeons");
 	wattroff(mainbw, A_BOLD);
 	wrefresh(mainbw);
-
+	doupdate();
 	commandw = subwin(mainbw, 18, 20, 3, 1);
 	wborder(commandw, 1, 0, 0, 1, 1, 1, 1, 1);
 	skillsw = subwin(mainbw, 8, 20, 11, 1);
