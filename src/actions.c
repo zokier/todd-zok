@@ -18,9 +18,10 @@ Enemy enemy;
 WINDOW *fight_youw;
 WINDOW *fight_enemyw;
 
-extern Weapons weapons[];
+extern Weapons weapons_list[];
 extern Enemy enemylist[];
 extern Skills skills_list[];
+
 int check_rnd_events() {
 
 	int i = rand() % 1000;
@@ -77,18 +78,18 @@ void ac_dungeons_action()
 			/* TODO: UI prettier, do you need fight_youw or not? */
 			wprintw(gamew,"You encounter a %s!\n\n", enemy.name);
 			mvwprintw(gamew,2,0,"%s",player.name);
-			mvwprintw(gamew,2,20,"%s",enemy.name);
+			mvwprintw(gamew,2,30,"%s",enemy.name);
 			wrefresh(gamew);
 	
-			fight_youw = newwin(7,10,6,22);
-			fight_enemyw = newwin(9,13,6,40);
+			fight_youw = newwin(12,25,6,22);
+			fight_enemyw = newwin(12,25,6,50);
 			ncurs_fightstats(fight_youw);
 			ncurs_fightstats_enemy(fight_enemyw);
 
 			/* display skills */
 			werase(skillsw);
 			for (int i = 0; i < 1; i++)
-				wprintw(skillsw,"%d - %s\n",0,weapons[player.weapon_index].name);
+				wprintw(skillsw,"%d - %s\n",0,player.skill->name);
 			wrefresh(skillsw);
 
 		}
@@ -128,136 +129,18 @@ Metal causes +WATER, -WOOD
 Water causes +WOOD, -FIRE
 */
 
-switch (weapons[player.weapon_index].dmg_type) {
-	case DMG_WOOD:
-		enemy.fire++;
-		enemy.earth--;
-		break;
-
-
-	case DMG_FIRE:
-		enemy.earth++;
-		enemy.metal--;
-		break;
-
-
-	case DMG_EARTH:
-		enemy.metal++;
-		enemy.water--;
-		break;
-
-
-	case DMG_METAL:
-		enemy.water++;
-		enemy.wood--;
-		break;
-
-
-	case DMG_WATER:
-		enemy.wood++;
-		enemy.fire--;
-		break;
-
-	default:
-		break;
-	}
-
-/* enemy hits */
-/* this is more complicated than player,
-for a proof-of-concept battle system:
-if skill dmg_type and enemy dominant type match, enemy gets a bonus
-*/
-
-switch (enemy.skill->dmg_type) {
-	case DMG_WOOD:
-		player.fire++;
-		player.earth--;
-		if (enemy.dom_type == TYPE_WOOD) {
-			player.fire++;
-			player.earth--;
-			}
-		break;
-
-
-	case DMG_FIRE:
-		player.earth++;
-		player.metal--;
-		if (enemy.dom_type == TYPE_FIRE) {
-			player.earth++;
-			player.metal--;
-			}
-		break;
-
-
-	case DMG_EARTH:
-		player.metal++;
-		player.water--;
-		if (enemy.dom_type == TYPE_EARTH) {
-			player.metal++;
-			player.water--;
-			}
-		break;
-
-
-	case DMG_METAL:
-		player.water++;
-		player.wood--;
-		if (enemy.dom_type == TYPE_METAL) {
-			player.water++;
-			player.wood--;
-			}
-		break;
-
-
-	case DMG_WATER:
-		player.wood++;
-		player.fire--;
-		if (enemy.dom_type == TYPE_WATER) {
-			player.wood++;
-			player.fire--;
-			}
-		break;
-
-	default:
-		break;
-	}
+dmg_calc(0); /* player hits enemy */
+dmg_calc(1); /* enemy hits player */
 
 
 /* 3. update stats and display them, TODO: display attack info */
 
-	ncurs_fightstats(fight_youw);
-	ncurs_fightstats_enemy(fight_enemyw);
+ncurs_fightstats(fight_youw);
+ncurs_fightstats_enemy(fight_enemyw);
 
 /* 4. check for dead player/enemy */
 
-/* figure out the order of checking deaths: attacks are simultaneous. Iniative? */
-/* check if enemy dies */
-if (enemy.wood <= 0||enemy.fire <= 0||enemy.earth <= 0||enemy.metal <= 0||enemy.water <= 0)
-	{
-	mvwprintw(gamew,10,0,"%s is slain!\n", enemy.name);
-	int money = 7;
-	int exp = 10;
-	wprintw(gamew,"You find %d coins on the corpse, and gain %d experience\n", money, exp);
-	player.money += money;
-	player.experience += exp;
-	mvwprintw(gamew,12,0,"<MORE>");
-	wrefresh(gamew);
-	getch(),
-	set_player_location(&loc_dungeons);
-	}
-
-/* check if player dies as well */
-if (player.wood <= 0||player.fire <= 0||player.earth <= 0||player.metal <= 0||player.water <= 0)
-	{
-	wclear (gamew);
-	mvwprintw(gamew,12,0,"The world fades around you as you fall to the ground,\nbleeding.");
-	wattron(gamew,A_BOLD);
-	wattron(gamew,A_UNDERLINE);
-	mvwprintw(gamew,15,0,"You are dead.");
-	wattroff(gamew,A_BOLD);
-	wattroff(gamew,A_UNDERLINE);
-	playing = false;
-	}
+fight_check_dead();
 
 wrefresh(gamew);
 }
@@ -364,10 +247,10 @@ void ac_shop_buy()
 {
 	wprintw(gamew,"\nThe poor man is selling these items:\n");
 	for (int i=0; i <= WEAPON_NR; i++)
-		wprintw(gamew,"%s\n", weapons[i].name);
+		wprintw(gamew,"%s\n", weapons_list[i].name);
 
-	wprintw(gamew,"TODO: actually choose what you buy. \nYOU JUST BOUGHT: %s\n",weapons[1].name);
-	player.weapon_index = 1;
+	wprintw(gamew,"TODO: actually choose what you buy. \nYOU JUST BOUGHT: %s\n",weapons_list[1].name);
+	player.weapon = &weapons_list[1];
 	wrefresh(gamew);
 
 }
@@ -375,7 +258,7 @@ void ac_shop_buy()
 void ac_shop_sell()
 {
 	ncurs_msg("The poor man has no coins to buy anything from you.");
-	wprintw(gamew,"you have: %s\n",weapons[player.weapon_index].name);
+	wprintw(gamew,"you have: %s\n",player.weapon->name);
 	wrefresh(gamew);
 }
 
@@ -437,3 +320,287 @@ void ac_quit()
 	playing = false;
 }
 
+/* direction: 0 => player hits enemy, 1 => enemy hits player */
+/* TODO: is there a simpler way to do this? */
+
+int dmg_calc(int direction) {
+int dmg = 0;
+
+switch (direction) {
+	case 0: { /* player hits enemy */
+		/* calculate normal damage done based on skill + weapon */
+		dmg = (player.skill->damage + player.weapon->damage);
+
+		/* elements align == player elemental type (dominant element), skill type and weapon type are the same */
+		/* if elements align, dmg = dmg + element of player.element_type */
+		/* also, if elements align, changes to enemy elemental balance occur */
+		if (player.elemental_type == player.skill->dmg_type && player.elemental_type == player.weapon->dmg_type) {
+			dmg = dmg + dmg_calc_alignbonus(direction, player.elemental_type);
+			align_elements(direction,player.elemental_type);
+			}
+
+		/* calculate blocking by enemy*/
+		/* blocking elements are based on skill used to attack. TODO: should this be weapon instead? */
+		dmg = dmg - dmg_calc_blocking(direction, player.skill->dmg_type);
+
+		/* calculate damage */
+		if (dmg > 0) 
+			enemy.health = enemy.health - dmg;
+		else { /* don't do negative damage */
+			wprintw(gamew,"Enemy blocked!\n"); /* TODO: wprintw(logw); */
+			wrefresh(gamew);
+			}	
+		break;
+		} /* player hits enemy */
+
+	case 1: { /* enemy hits player */
+		/* calculate normal damage done based on skill + weapon */
+		dmg = (enemy.skill->damage + enemy.weapon->damage);
+
+		/* elements align == player elemental type (dominant element), skill type and weapon type are the same */
+		/* if elements align, dmg = dmg + element of player.element_type */
+		/* also, if elements align, changes to enemy elemental balance occur */
+		if (enemy.elemental_type == enemy.skill->dmg_type && enemy.elemental_type == enemy.weapon->dmg_type) {
+			dmg = dmg + dmg_calc_alignbonus(direction, enemy.elemental_type);
+			align_elements(direction,enemy.elemental_type);
+			}
+
+		/* calculate blocking by player */
+		/* blocking elements are based on skill used to attack. TODO: should this be weapon instead? */
+		dmg = dmg - dmg_calc_blocking(direction, enemy.skill->dmg_type);
+
+		/* calculate damage */
+		if (dmg > 0) 
+			player.health = player.health - dmg;
+		else { /* don't do negative damage */
+			wprintw(gamew,"You blocked!\n"); /* TODO: wprintw(logw); */
+			wrefresh(gamew);
+			}
+		break;
+		}
+	}
+}
+
+/* direction: 0 => player->enemy. 1 => enemy->player */
+void align_elements(int direction, int TYPE) {
+switch (direction) {
+	case 0: {/* player hits enemy, enemy elements change */
+		switch (TYPE) {
+			case TYPE_WOOD:
+				enemy.fire++;
+				enemy.earth--;
+				break;
+
+			case TYPE_FIRE:
+				enemy.earth++;
+				enemy.metal--;
+				break;
+
+			case TYPE_EARTH:
+				enemy.metal++;
+				enemy.water--;
+				break;
+
+			case TYPE_METAL:
+				enemy.water++;
+				enemy.wood--;
+				break;
+
+			case TYPE_WATER:
+				enemy.wood++;
+				enemy.fire--;
+				break;
+
+			default:
+				break;
+			} /* enemy elements align */
+		break;
+		}
+	case 1: /* enemy hits player, player elements change */
+		switch (TYPE) {
+			case TYPE_WOOD:
+				player.fire++;
+				player.earth--;
+				break;
+
+			case TYPE_FIRE:
+				player.earth++;
+				player.metal--;
+				break;
+
+			case TYPE_EARTH:
+				player.metal++;
+				player.water--;
+				break;
+
+			case TYPE_METAL:
+				player.water++;
+				player.wood--;
+				break;
+
+			case TYPE_WATER:
+				player.wood++;
+				player.fire--;
+				break;
+			default:
+				break;
+			} /* player elements align */
+		break;
+	}
+}
+
+int dmg_calc_alignbonus(int direction, int type) {
+switch (direction) {
+	case 0: /* 0 = player hits enemy */
+		switch(player.elemental_type) {
+			case TYPE_WOOD:
+				return player.wood;
+				break;
+
+			case TYPE_FIRE:
+				return player.fire;
+				break;
+
+			case TYPE_EARTH:
+				return player.earth;
+				break;
+
+			case TYPE_METAL:
+				return player.metal;
+				break;
+
+			case TYPE_WATER:
+				return player.water;
+				break;
+			default:
+				break;
+				
+			}
+	case 1: /* 1 = enemy hits player */
+		switch(enemy.elemental_type) {
+			case TYPE_WOOD:
+				return enemy.wood;
+				break;
+
+			case TYPE_FIRE:
+				return enemy.fire;
+				break;
+
+			case TYPE_EARTH:
+				return enemy.earth;
+				break;
+
+			case TYPE_METAL:
+				return enemy.metal;
+				break;
+
+			case TYPE_WATER:
+				return enemy.water;
+				break;
+			default:
+				break;
+			}
+
+	default:
+		break;
+	}
+			
+
+}
+ 
+int dmg_calc_blocking(int direction, int dmg_type) 
+{
+switch (direction) {
+	case 0:
+		switch(dmg_type) {
+			case TYPE_WOOD: {
+				return enemy.metal;
+				break;
+				}
+			case TYPE_FIRE:
+				return enemy.water;
+				break;
+
+			case TYPE_EARTH:
+				return enemy.wood;
+				break;
+
+			case TYPE_METAL:
+				return enemy.fire;
+				break;
+
+			case TYPE_WATER:
+				return enemy.earth;
+				break;
+			
+			default:
+				break;
+			}
+		break;
+	case 1:
+		switch(dmg_type) {
+			case TYPE_WOOD: {
+				return player.metal;
+				break;
+				}
+			case TYPE_FIRE:
+				return player.water;
+				break;
+
+			case TYPE_EARTH:
+				return player.wood;
+				break;
+
+			case TYPE_METAL:
+				return player.fire;
+				break;
+
+			case TYPE_WATER:
+				return player.earth;
+				break;
+			
+			default:
+				break;
+			}
+		break;
+
+	default:
+		break;
+
+	}
+}
+
+
+void fight_check_dead() {
+
+/* TODO: figure out the order of checking deaths: attacks are simultaneous. Iniative? */
+
+/* check if enemy dies */
+if (enemy.wood <= 0||enemy.fire <= 0||enemy.earth <= 0||enemy.metal <= 0||enemy.water <= 0||enemy.health <= 0)
+	{
+	mvwprintw(gamew,14,0,"%s is slain!\n\n", enemy.name);
+	int money = 7;
+	int exp = 10;
+	mvwprintw(gamew,15,0,"You find %d coins on the corpse, and gain %d experience\n", money, exp);
+	player.money += money;
+	player.experience += exp;
+	mvwprintw(gamew,16,0,"<MORE>");
+	wrefresh(gamew);
+	getch(),
+	set_player_location(&loc_dungeons);
+	}
+
+/* check if player dies as well */
+if (player.wood <= 0||player.fire <= 0||player.earth <= 0||player.metal <= 0||player.water <= 0||player.health <= 0)
+	{
+	wclear (gamew);
+	mvwprintw(gamew,6,0,"The world fades around you as you fall to the ground,\nbleeding.");
+	wattron(gamew,A_BOLD);
+	wattron(gamew,A_UNDERLINE);
+	mvwprintw(gamew,8,0,"You are dead.");
+	wattroff(gamew,A_BOLD);
+	wattroff(gamew,A_UNDERLINE);
+	playing = false;
+	}
+
+}

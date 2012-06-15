@@ -2,7 +2,7 @@
 #include "enemy.h"
 
 Skills skills_list[SKILLS_NR] = {
-{"Claw",TYPE_WOOD},
-{"Bite",TYPE_FIRE},
-{"Sting",TYPE_EARTH}
+{"Basic Attack",TYPE_EARTH,3},
+{"Wood Attack",TYPE_WOOD,3},
+{"TODO:Skill3",TYPE_EARTH,3}
 };

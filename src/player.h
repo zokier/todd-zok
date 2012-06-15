@@ -2,6 +2,8 @@
 #define PLAYER_H
 
 #include "location.h"
+#include "weapons.h"
+#include "skills.h"
 
 typedef struct Player Player;
 struct Player {
@@ -12,12 +14,16 @@ struct Player {
 	unsigned int experience;
 	int money;
 	// TODO add more stats 
+	int health;
+	int max_health;
+	int elemental_type;
 	int wood;
 	int fire;
 	int earth;
 	int metal;
 	int water;
-	int weapon_index; /* currently only 1 weapon and 0 skills is used. Here should be a struct Skills[4] or something */
+	Weapons *weapon;
+	Skills *skill;
 };
 
 #endif //PLAYER_H

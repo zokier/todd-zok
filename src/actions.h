@@ -2,6 +2,7 @@
 #define ACTIONS_H
 
 #include "player.h"
+#include "enemy.h"
 
 void ac_dungeons();
 void ac_ev_oldman_help();
@@ -25,5 +26,9 @@ void ac_messageboard_view();
 void ac_messageboard_write();
 void ac_return_to_town();
 void ac_quit();
+int dmg_calc(Player player, Enemy enemy, int direction);
+int dmg_calc_alignbonus(int direction, int type);
+int dmg_calc_blocking(int direction, int type);
+void fight_check_dead();
 
 #endif //ACTIONS_H

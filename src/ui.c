@@ -156,11 +156,15 @@ void ncurs_fightstats(WINDOW *window) {
 	werase(window); 
 	box(window,0,0);
 
-	mvwprintw(window,1,1,"Wood:  %d",player.wood);
-	mvwprintw(window,2,1,"Fire:  %d",player.fire);
-	mvwprintw(window,3,1,"Earth: %d",player.earth);
-	mvwprintw(window,4,1,"Metal: %d",player.metal);
-	mvwprintw(window,5,1,"Water: %d",player.water);
+	mvwprintw(window,1,1,"Health: %d/%d",player.health,player.max_health);
+	mvwprintw(window,2,1,"Wood:   %d",player.wood);
+	mvwprintw(window,3,1,"Fire:   %d",player.fire);
+	mvwprintw(window,4,1,"Earth:  %d",player.earth);
+	mvwprintw(window,5,1,"Metal:  %d",player.metal);
+	mvwprintw(window,6,1,"Water:  %d",player.water);
+
+	if(player.elemental_type == player.skill->dmg_type && player.elemental_type == player.weapon->dmg_type)
+                mvwprintw(window,10,1,"ALIGNED, POWERFUL!\n");
 	wrefresh(window); 
 }
 
@@ -170,13 +174,18 @@ void ncurs_fightstats_enemy(WINDOW *window) {
 	werase(window); 
 
 	box(window,0,0);
-	mvwprintw(window,1,1,"TYPE:  %d",enemy.dom_type); /* todo: text instead of numbers */
-	mvwprintw(window,2,1,"Wood:  %d",enemy.wood);
-	mvwprintw(window,3,1,"Fire:  %d",enemy.fire);
-	mvwprintw(window,4,1,"Earth: %d",enemy.earth);
-	mvwprintw(window,5,1,"Metal: %d",enemy.metal);
-	mvwprintw(window,6,1,"Water: %d",enemy.water);
-	mvwprintw(window,7,1,"skill: %s",enemy.skill->name);
-	
+	mvwprintw(window,1,1,"Health: %d",enemy.health);
+	mvwprintw(window,2,1,"TYPE:   %d",enemy.elemental_type); /* todo: text instead of numbers */
+	mvwprintw(window,3,1,"Wood:   %d",enemy.wood);
+	mvwprintw(window,4,1,"Fire:   %d",enemy.fire);
+	mvwprintw(window,5,1,"Earth:  %d",enemy.earth);
+	mvwprintw(window,6,1,"Metal:  %d",enemy.metal);
+	mvwprintw(window,7,1,"Water:  %d",enemy.water);
+	mvwprintw(window,8,1,"skill:  %s",enemy.skill->name);
+	mvwprintw(window,9,1,"weapon: %s",enemy.weapon->name);
+
+	if(enemy.elemental_type == enemy.skill->dmg_type && enemy.elemental_type == enemy.weapon->dmg_type)
+		mvwprintw(window,10,1,"ALIGNED, POWERFUL!\n");	
+
 	wrefresh(window); 
 }

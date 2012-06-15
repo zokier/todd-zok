@@ -15,6 +15,7 @@
 #include "locations.h"
 #include "networking.h"
 #include "ui.h"
+#include "weapons.h"
 
 #define NAME_QUERY "What's your name, adventurer?  "
 #define WELCOME_NEW "The bards have not heard of you before.\nWelcome to Tales of Deep Dungeons, "
@@ -23,7 +24,6 @@
 #define NAME_MIN_LENGTH 4
 #define NAME_MAX_LENGTH 16
 
-
 // ugly globals go here
 int playing;
 void *push_socket = NULL;
@@ -31,6 +31,9 @@ void *chat_socket = NULL;
 void *zmq_context = NULL;
 Player player;
 PGconn *conn;
+
+extern Weapons weapons_list[];
+extern Skills skills_list[];
 
 char *itoa(int i)
 {
@@ -117,12 +120,16 @@ void load_player_data()
 	player.action_points = 10;
 	player.experience = 0;
 	player.money = 10;
+	player.max_health = 10;
+	player.health = player.max_health;
 	player.wood = 5;
 	player.fire = 5;
 	player.earth = 5;
 	player.metal = 5;
 	player.water = 5;
-	player.weapon_index = 0;
+	player.elemental_type = TYPE_WOOD;
+	player.weapon = &weapons_list[0];
+	player.skill = &skills_list[1];
 }
 
 bool check_name()
