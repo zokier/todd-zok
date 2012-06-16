@@ -1,187 +1,185 @@
-#include "enemy.h"
 #include "globals.h"
+#include "character.h"
 
-Enemy enemylist_0[ENEMY_COUNT] = {
+Character enemylist[2][ENEMY_COUNT] = {{
 	{
-		"Wood elemental baby",
-		10,
-		ELEM_WOOD,
-		{
+		.name = "Wood elemental baby",
+		.health = 10,
+		.elemental_type = ELEM_WOOD,
+		.elements = {
 			10,
 			2,
 			2,
 			2,
 			2
 		},
-		&weapons_enemy[0],
-		&skills_list[1]
+		.weapon = &weapons_enemy[0],
+		.skill = &skills_list[1]
 	},
 
 	{
-		"Wolf cub",
-		7,
-		ELEM_WOOD,
-		{
+		.name = "Wolf cub",
+		.health = 7,
+		.elemental_type = ELEM_WOOD,
+		.elements = {
 			4,
 			2,
 			2,
 			2,
 			2
 		},
-		&weapons_enemy[0],
-		&skills_list[0]
+		.weapon = &weapons_enemy[0],
+		.skill = &skills_list[0]
 	},
 
 	{
-		"Wild boar",
-		10,
-		ELEM_WOOD,
-		{
+		.name = "Wild boar",
+		.health = 10,
+		.elemental_type = ELEM_WOOD,
+		.elements = {
 			5,
 			2,
 			2,
 			2,
 			2
 		},
-		&weapons_enemy[0],
-		&skills_list[0]
+		.weapon = &weapons_enemy[0],
+		.skill = &skills_list[0]
 	},
 
 	{
-		"Wolf mother",
-		15,
-		ELEM_WOOD,
-		{
+		.name = "Wolf mother",
+		.health = 15,
+		.elemental_type = ELEM_WOOD,
+		.elements = {
 			7,
 			3,
 			3,
 			3,
 			3,
 		},
-		&weapons_enemy[0],
-		&skills_list[0]
+		.weapon = &weapons_enemy[0],
+		.skill = &skills_list[0]
 	},
 
 	{
-		"Woodland critter",
-		4,
-		ELEM_WOOD,
-		{
+		.name = "Woodland critter",
+		.health = 4,
+		.elemental_type = ELEM_WOOD,
+		.elements = {
 			3,
 			1,
 			1,
 			1,
 			1
 		},
-		&weapons_enemy[0],
-		&skills_list[0]
+		.weapon = &weapons_enemy[0],
+		.skill = &skills_list[0]
 	},
 
 	{
-		"Bear",
-		25,
-		ELEM_WOOD,
-		{
+		.name = "Bear",
+		.health = 25,
+		.elemental_type = ELEM_WOOD,
+		.elements = {
 			9,
 			4,
 			4,
 			4,
 			4
 		},
-		&weapons_enemy[0],
-		&skills_list[0]
+		.weapon = &weapons_enemy[0],
+		.skill = &skills_list[0]
 	}
-};
+},
 
-
-Enemy enemylist_1[ENEMY_COUNT] = {
-
+{
 	{
-		"Wood elemental baby",
-		10,
-		ELEM_WOOD,
-		{
+		.name = "Wood elemental baby",
+		.health = 10,
+		.elemental_type = ELEM_WOOD,
+		.elements = {
 			5,
 			2,
 			2,
 			2,
 			2
 		},
-		&weapons_enemy[0],
-		&skills_list[1]
+		.weapon = &weapons_enemy[0],
+		.skill = &skills_list[1]
 	},
 
 	{
-		"Fire elemental baby",
-		10,
-		ELEM_FIRE,
-		{
+		.name = "Fire elemental baby",
+		.health = 10,
+		.elemental_type = ELEM_FIRE,
+		.elements = {
 			2,
 			5,
 			2,
 			2,
 			2
 		},
-		&weapons_enemy[1],
-		&skills_list[0]
+		.weapon = &weapons_enemy[1],
+		.skill = &skills_list[0]
 	},
 
 	{
-		"Earth elemental baby",
-		10,
-		ELEM_EARTH,
-		{
+		.name = "Earth elemental baby",
+		.health = 10,
+		.elemental_type = ELEM_EARTH,
+		.elements = {
 			2,
 			2,
 			5,
 			2,
 			2
 		},
-		&weapons_list[0],
-		&skills_list[0]
+		.weapon = &weapons_list[0],
+		.skill = &skills_list[0]
 	},
 
 	{
-		"Metal elemental baby",
-		10,
-		ELEM_METAL,
-		{
+		.name = "Metal elemental baby",
+		.health = 10,
+		.elemental_type = ELEM_METAL,
+		.elements = {
 			2,
 			2,
 			2,
 			5,
 			2
 		},
-		&weapons_list[0],
-		&skills_list[0]
+		.weapon = &weapons_list[0],
+		.skill = &skills_list[0]
 	},
 
 	{
-		"Water elemental baby",
-		10,
-		ELEM_WATER,
-		{
+		.name = "Water elemental baby",
+		.health = 10,
+		.elemental_type = ELEM_WATER,
+		.elements = {
 			2,
 			2,
 			2,
 			2,
 			5
 		},
-		&weapons_list[0],
-		&skills_list[0]
+		.weapon = &weapons_list[0],
+		.skill = &skills_list[0]
 	},
 
 	{
-		"Touho the dog",
-		99,
-		ELEM_EARTH,
-		{
+		.name = "Touho the dog",
+		.health = 99,
+		.elemental_type = ELEM_EARTH,
+		.elements = {
 			99,
 			99,
 			99,
 			99,
 			99
 		},
-		&weapons_enemy[2],
-		&skills_list[0]}
-};
+		.weapon = &weapons_enemy[2],
+		.skill = &skills_list[0]}
+}};

@@ -3,12 +3,11 @@
 #include <string.h> 
 #include <syslog.h> 
 #include "ui.h" 
-#include "player.h" 
 #include "globals.h" 
-#include "enemy.h"
 #include "skills.h"
+#include "character.h"
 
-extern Enemy enemy;
+extern Character enemy;
 
 WINDOW *mainbw, *gamebw, *gamew, *commandw, *skillsw;
 void init_ui()

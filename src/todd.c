@@ -11,12 +11,12 @@
 
 #include "action.h"
 #include "location.h"
-#include "player.h"
 #include "locations.h"
 #include "networking.h"
 #include "ui.h"
 #include "weapons.h"
 #include "globals.h"
+#include "character.h"
 
 #define NAME_QUERY "What's your name, adventurer?  "
 #define WELCOME_NEW "The bards have not heard of you before.\nWelcome to Tales of Deep Dungeons, "
@@ -30,7 +30,7 @@ int playing;
 void *push_socket = NULL;
 void *chat_socket = NULL;
 void *zmq_context = NULL;
-Player player;
+Character player;
 PGconn *conn;
 
 char *itoa(int i)

@@ -1,9 +1,6 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
-#include "player.h"
-#include "enemy.h"
-
 void ac_dungeons();
 void ac_ev_oldman_help();
 void ac_ev_oldman_nohelp();

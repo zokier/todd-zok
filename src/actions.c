@@ -3,18 +3,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
-#include "player.h"
 #include "locations.h"
-#include "enemy.h"
 #include "networking.h"
 #include "globals.h"
 #include "events.h"
 #include "ui.h"
 #include "weapons.h"
 #include "skills.h"
+#include "character.h"
 
 // globals are nasty?
-Enemy enemy;
+Character enemy;
 WINDOW *fight_youw;
 WINDOW *fight_enemyw;
 
@@ -52,19 +51,9 @@ int check_rnd_events() {
 
 void create_enemy()
 {
-/* randomly choose an enemy from enemylist, based on player dungeon level */
-int random_enemy = rand() % ENEMY_COUNT;
-switch (player.dungeon_lvl) 
-	{
-	case 0:
-		memcpy(&enemy,&enemylist_0[random_enemy], sizeof(struct Enemy));
-		break;
-	case 1:
-		memcpy(&enemy,&enemylist_1[random_enemy], sizeof(struct Enemy));
-		break;
-	default:
-		break;
-	}
+	/* randomly choose an enemy from enemylist, based on player dungeon level */
+	int random_enemy = rand() % ENEMY_COUNT;
+	memcpy(&enemy,&enemylist[player.dungeon_lvl][random_enemy], sizeof(enemy));
 }
 
 void set_player_location(Location* loc)
