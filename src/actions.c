@@ -52,9 +52,19 @@ int check_rnd_events() {
 
 void create_enemy()
 {
-	/* randomly choose an enemy from enemylist */
-	int random_enemy = rand() % ENEMY_COUNT;
-	memcpy(&enemy,&enemylist[random_enemy], sizeof(struct Enemy));
+/* randomly choose an enemy from enemylist, based on player dungeon level */
+int random_enemy = rand() % ENEMY_COUNT;
+switch (player.dungeon_lvl) 
+	{
+	case 0:
+		memcpy(&enemy,&enemylist_0[random_enemy], sizeof(struct Enemy));
+		break;
+	case 1:
+		memcpy(&enemy,&enemylist_1[random_enemy], sizeof(struct Enemy));
+		break;
+	default:
+		break;
+	}
 }
 
 void set_player_location(Location* loc)
@@ -66,10 +76,12 @@ void set_player_location(Location* loc)
 void ac_dungeons()
 {
 	set_player_location(&loc_dungeons);
+	player.dungeon_lvl = 0;
 }
 
 void ac_dungeons_enter() {
 	set_player_location(&loc_dungeons_level1);
+	player.dungeon_lvl = 1;
 }
 
 void ac_dungeons_action()
@@ -410,6 +422,7 @@ int dmg_calc(int direction) {
 					break;
 				}
 	}
+return 0; /* this should never happen, btw */
 }
 
 /* direction: 0 => player->enemy. 1 => enemy->player */

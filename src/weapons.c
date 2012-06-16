@@ -1,7 +1,7 @@
 #include "weapons.h"
 #include "skills.h"
 
-Weapons weapons_enemy[2] = {
+Weapons weapons_enemy[3] = {
 	{
 		0,
 		"Claw",

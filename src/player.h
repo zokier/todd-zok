@@ -20,6 +20,7 @@ struct Player {
 	int elements[5]; // use enum Element to access
 	Weapons *weapon;
 	Skills *skill;
+	int dungeon_lvl; 
 };
 
 #endif //PLAYER_H

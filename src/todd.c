@@ -127,6 +127,7 @@ void load_player_data()
 	player.elemental_type = ELEM_WOOD;
 	player.weapon = &weapons_list[0];
 	player.skill = &skills_list[1];
+	player.dungeon_lvl = 0;
 }
 
 bool check_name()

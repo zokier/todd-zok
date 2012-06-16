@@ -1,7 +1,100 @@
 #include "enemy.h"
 #include "globals.h"
 
-Enemy enemylist[ENEMY_COUNT] = {
+Enemy enemylist_0[ENEMY_COUNT] = {
+	{
+		"Wood elemental baby",
+		10,
+		ELEM_WOOD,
+		{
+			10,
+			2,
+			2,
+			2,
+			2
+		},
+		&weapons_enemy[0],
+		&skills_list[1]
+	},
+
+	{
+		"Wolf cub",
+		7,
+		ELEM_WOOD,
+		{
+			4,
+			2,
+			2,
+			2,
+			2
+		},
+		&weapons_enemy[0],
+		&skills_list[0]
+	},
+
+	{
+		"Wild boar",
+		10,
+		ELEM_WOOD,
+		{
+			5,
+			2,
+			2,
+			2,
+			2
+		},
+		&weapons_enemy[0],
+		&skills_list[0]
+	},
+
+	{
+		"Wolf mother",
+		15,
+		ELEM_WOOD,
+		{
+			7,
+			3,
+			3,
+			3,
+			3,
+		},
+		&weapons_enemy[0],
+		&skills_list[0]
+	},
+
+	{
+		"Woodland critter",
+		4,
+		ELEM_WOOD,
+		{
+			3,
+			1,
+			1,
+			1,
+			1
+		},
+		&weapons_enemy[0],
+		&skills_list[0]
+	},
+
+	{
+		"Bear",
+		25,
+		ELEM_WOOD,
+		{
+			9,
+			4,
+			4,
+			4,
+			4
+		},
+		&weapons_enemy[0],
+		&skills_list[0]
+	}
+};
+
+
+Enemy enemylist_1[ENEMY_COUNT] = {
 
 	{
 		"Wood elemental baby",
