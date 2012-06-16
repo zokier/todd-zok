@@ -1,6 +1,7 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
+#include "element.h"
 #include "skills.h"
 #include "weapons.h"
 
@@ -10,8 +11,8 @@ struct Enemy {
 	char *name;
 	int health;
 	// TODO add more stats
-	int elemental_type;	/* dominant energy type */
-	int elements[5]; // use enum Element to access
+	Element elemental_type;	/* dominant energy type */
+	int elements[ELEM_COUNT]; // use enum Element to access
 	Weapons *weapon;
 	Skills *skill;
 };

@@ -120,7 +120,7 @@ void load_player_data()
 	player.money = 10;
 	player.max_health = 10;
 	player.health = player.max_health;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < ELEM_COUNT; i++)
 	{
 		player.elements[i] = 5;
 	}
