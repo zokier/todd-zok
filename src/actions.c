@@ -270,6 +270,35 @@ void ac_tavern_shout()
 	free(line);
 }
 
+void ac_warena()
+{
+	set_player_location(&loc_warena);
+}
+
+void ac_warena_skills()
+{
+/* The function is exactly the same than in shop_buy, could these be combined? */
+	wprintw(gamew,"\nBren can teach you one of these skills:\n");
+	for (int i=0; i < SKILLS_COUNT; i++)
+		wprintw(gamew,"%i) %s\n", i, skills_list[i].name);
+	wrefresh(gamew);
+
+	// warning: ugly code ahead
+	int getch_res = ERR;
+	while (getch_res == ERR)
+	{
+		getch_res = getch();
+		// lets hope that SKILLS_COUNT < 10
+		if (getch_res < '0' || getch_res > '0'+SKILLS_COUNT)
+			getch_res = ERR;
+	}
+	getch_res -= '0';
+	wprintw(gamew,"YOU JUST LEARNED: %s\n",skills_list[getch_res].name);
+	player.skill = &skills_list[getch_res];
+	wrefresh(gamew);
+
+}	
+
 void ac_shop()
 {
 	set_player_location(&loc_shop);

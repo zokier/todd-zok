@@ -12,6 +12,6 @@ extern Location loc_shrine;
 extern Location loc_tavern;
 extern Location loc_shop;
 extern Location loc_messageboard;
-
+extern Location loc_warena;
 
 #endif //LOCATIONS_H

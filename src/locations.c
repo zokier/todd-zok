@@ -5,7 +5,7 @@
 
 Location loc_town = {
 	"You wander around the desolate town.\nYou begin to wonder why you even bothered coming here.",
-	7,
+	8,
 	{
 		{
 			'd',
@@ -30,6 +30,12 @@ Location loc_town = {
 			"",
 			"Tavern",
 			&ac_tavern
+		},
+		{
+			'w',
+			"",
+			"Warrior arena",
+			&ac_warena
 		},
 		{
 			's',
@@ -143,6 +149,25 @@ Location loc_tavern = {
 			"",
 			"Yell",
 			&ac_tavern_shout
+		},
+		{
+			'r',
+			"",
+			"Return to town",
+			&ac_return_to_town
+		}
+	}
+};
+
+Location loc_warena = {
+	"You enter Bren's Warrior arena.\n\nThe place is populated with warriors-to-be, training in all aspects of fighting.",
+	2,
+	{
+		{
+			'a',
+			"",
+			"Ask for a lesson",
+			&ac_warena_skills
 		},
 		{
 			'r',
