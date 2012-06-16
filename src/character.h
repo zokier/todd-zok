@@ -21,7 +21,7 @@ struct Character {
 	Element elemental_type;
 	int elements[ELEM_COUNT]; // use enum Element to access
 	Weapons *weapon;
-	Skills *skill;
+	Skills *skill[4];
 	int dungeon_lvl; 
 };
 

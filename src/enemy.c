@@ -14,7 +14,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2
 		},
 		.weapon = &weapons_enemy[0],
-		.skill = &skills_list[1]
+		.skill[0] = &skills_list[1]
 	},
 
 	{
@@ -29,7 +29,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2
 		},
 		.weapon = &weapons_enemy[0],
-		.skill = &skills_list[0]
+		.skill[0] = &skills_list[0]
 	},
 
 	{
@@ -44,7 +44,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2
 		},
 		.weapon = &weapons_enemy[0],
-		.skill = &skills_list[0]
+		.skill[0] = &skills_list[0]
 	},
 
 	{
@@ -59,7 +59,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			3,
 		},
 		.weapon = &weapons_enemy[0],
-		.skill = &skills_list[0]
+		.skill[0] = &skills_list[0]
 	},
 
 	{
@@ -74,7 +74,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			1
 		},
 		.weapon = &weapons_enemy[0],
-		.skill = &skills_list[0]
+		.skill[0] = &skills_list[0]
 	},
 
 	{
@@ -89,7 +89,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			4
 		},
 		.weapon = &weapons_enemy[0],
-		.skill = &skills_list[0]
+		.skill[0] = &skills_list[0]
 	}
 },
 
@@ -106,7 +106,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2
 		},
 		.weapon = &weapons_enemy[0],
-		.skill = &skills_list[1]
+		.skill[0] = &skills_list[1]
 	},
 
 	{
@@ -121,7 +121,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2
 		},
 		.weapon = &weapons_enemy[1],
-		.skill = &skills_list[0]
+		.skill[0] = &skills_list[0]
 	},
 
 	{
@@ -136,7 +136,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2
 		},
 		.weapon = &weapons_list[0],
-		.skill = &skills_list[0]
+		.skill[0] = &skills_list[0]
 	},
 
 	{
@@ -151,7 +151,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2
 		},
 		.weapon = &weapons_list[0],
-		.skill = &skills_list[0]
+		.skill[0] = &skills_list[0]
 	},
 
 	{
@@ -166,7 +166,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			5
 		},
 		.weapon = &weapons_list[0],
-		.skill = &skills_list[0]
+		.skill[0] = &skills_list[0]
 	},
 
 	{
@@ -181,5 +181,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			99
 		},
 		.weapon = &weapons_enemy[2],
-		.skill = &skills_list[0]}
+		.skill[0] = &skills_list[0]
+	}
 }};
