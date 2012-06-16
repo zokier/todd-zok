@@ -3,27 +3,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
-#include "player.h"
 #include "locations.h"
-#include "enemy.h"
 #include "networking.h"
 #include "globals.h"
 #include "events.h"
 #include "ui.h"
 #include "weapons.h"
 #include "skills.h"
+#include "character.h"
 
 // globals are nasty?
-Enemy enemy;
+Character enemy;
 WINDOW *fight_youw;
 WINDOW *fight_enemyw;
 
 void use_skill(int keypress);
 int dmg_calc(int direction);
-int dmg_calc_alignbonus(int direction, int type);
-int dmg_calc_blocking(int direction, int type);
+int dmg_calc_alignbonus(int direction, Element type);
+int dmg_calc_blocking(int direction, Element type);
 void fight_check_dead();
-void align_elements(int direction, int TYPE);
+void align_elements(int direction, Element type);
 
 int check_rnd_events() {
 
@@ -52,19 +51,9 @@ int check_rnd_events() {
 
 void create_enemy()
 {
-/* randomly choose an enemy from enemylist, based on player dungeon level */
-int random_enemy = rand() % ENEMY_COUNT;
-switch (player.dungeon_lvl) 
-	{
-	case 0:
-		memcpy(&enemy,&enemylist_0[random_enemy], sizeof(struct Enemy));
-		break;
-	case 1:
-		memcpy(&enemy,&enemylist_1[random_enemy], sizeof(struct Enemy));
-		break;
-	default:
-		break;
-	}
+	/* randomly choose an enemy from enemylist, based on player dungeon level */
+	int random_enemy = rand() % ENEMY_COUNT;
+	memcpy(&enemy,&enemylist[player.dungeon_lvl][random_enemy], sizeof(enemy));
 }
 
 void set_player_location(Location* loc)
@@ -457,20 +446,20 @@ return 0; /* this should never happen, btw */
 }
 
 /* direction: 0 => player->enemy. 1 => enemy->player */
-void align_elements(int direction, int TYPE) {
+void align_elements(int direction, Element type) {
 	switch (direction) {
 		case 0: /* player hits enemy, enemy elements change */
-			enemy.elements[(TYPE+1)%5]++;
-			enemy.elements[(TYPE+2)%5]--;
+			enemy.elements[(type+1) % ELEM_COUNT]++;
+			enemy.elements[(type+2) % ELEM_COUNT]--;
 			break;
 		case 1: /* enemy hits player, player elements change */
-			player.elements[(TYPE+1)%5]++;
-			player.elements[(TYPE+2)%5]--;
+			player.elements[(type+1) % ELEM_COUNT]++;
+			player.elements[(type+2) % ELEM_COUNT]--;
 			break;
 	}
 }
 
-int dmg_calc_alignbonus(int direction, int type) {
+int dmg_calc_alignbonus(int direction, Element type) {
 	switch (direction) {
 		case 0: /* 0 = player hits enemy */
 			return player.elements[player.elemental_type];
@@ -480,13 +469,13 @@ int dmg_calc_alignbonus(int direction, int type) {
 	return 0;
 }
 
-int dmg_calc_blocking(int direction, int dmg_type) 
+int dmg_calc_blocking(int direction, Element dmg_type)
 {
 	switch (direction) {
 		case 0:
-			return enemy.elements[(dmg_type+3)%5];
+			return enemy.elements[(dmg_type+3) % ELEM_COUNT];
 		case 1:
-			return player.elements[(dmg_type+3)%5];
+			return player.elements[(dmg_type+3) % ELEM_COUNT];
 	}
 	return 0;
 }
@@ -498,7 +487,7 @@ void fight_check_dead() {
 
 	/* check if enemy dies */
 	bool enemy_dead = false;
-	for (size_t i = 0; i < 5; i++)
+	for (size_t i = 0; i < ELEM_COUNT; i++)
 	{
 		if(enemy.elements[i] <= 0)
 			enemy_dead = true;

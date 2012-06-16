@@ -1,5 +1,4 @@
 #include "skills.h"
-#include "enemy.h"
 
 Skills skills_list[SKILLS_COUNT] = {
 

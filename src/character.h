@@ -1,12 +1,14 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef CHARACTER_H
+#define CHARACTER_H
 
+#include "element.h"
 #include "location.h"
 #include "weapons.h"
 #include "skills.h"
 
-typedef struct Player Player;
-struct Player {
+#define ENEMY_COUNT 6
+typedef struct Character Character;
+struct Character {
 	int id;
 	char *name;
 	Location *location;
@@ -16,11 +18,11 @@ struct Player {
 	// TODO add more stats 
 	int health;
 	int max_health;
-	int elemental_type;
-	int elements[5]; // use enum Element to access
+	Element elemental_type;
+	int elements[ELEM_COUNT]; // use enum Element to access
 	Weapons *weapon;
 	Skills *skill;
 	int dungeon_lvl; 
 };
 
-#endif //PLAYER_H
+#endif //CHARACTER_H

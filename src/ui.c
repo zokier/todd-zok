@@ -3,12 +3,11 @@
 #include <string.h> 
 #include <syslog.h> 
 #include "ui.h" 
-#include "player.h" 
 #include "globals.h" 
-#include "enemy.h"
 #include "skills.h"
+#include "character.h"
 
-extern Enemy enemy;
+extern Character enemy;
 
 WINDOW *mainbw, *gamebw, *gamew, *commandw, *skillsw;
 void init_ui()
@@ -132,23 +131,6 @@ void ncurs_location()
 	ncurs_commands(player);
 }
 
-char *elem_type_to_str(int elem_type)
-{
-	switch (elem_type)
-	{
-	case ELEM_WOOD:
-		return "Wood";
-	case ELEM_FIRE:
-		return "Fire";
-	case ELEM_EARTH:
-		return "Earth";
-	case ELEM_METAL:
-		return "Metal";
-	case ELEM_WATER:
-		return "Water";
-	}
-}
-
 /* TODO: it's stupid to have 2 functions that differ so slightly. Make this one function */
 void ncurs_fightstats(WINDOW *window) {
 	/* werase makes it possible to cleanly go from 10 to 9 hitpoints (second number cleared) */
@@ -175,7 +157,7 @@ void ncurs_fightstats_enemy(WINDOW *window) {
 
 	box(window,0,0);
 	mvwprintw(window,1,1,"Health: %d",enemy.health);
-	mvwprintw(window,2,1,"TYPE:   %s",elem_type_to_str(enemy.elemental_type));
+	mvwprintw(window,2,1,"TYPE:   %s",element_names[enemy.elemental_type]);
 	mvwprintw(window,3,1,"Wood:   %d",enemy.elements[ELEM_WOOD]);
 	mvwprintw(window,4,1,"Fire:   %d",enemy.elements[ELEM_FIRE]);
 	mvwprintw(window,5,1,"Earth:  %d",enemy.elements[ELEM_EARTH]);
