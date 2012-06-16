@@ -115,7 +115,7 @@ void load_player_data()
 {
 	// TODO fetch data from DB
 	player.location = &loc_town;
-	player.action_points = 10;
+	player.action_points = 100;
 	player.experience = 0;
 	player.money = 10;
 	player.max_health = 10;

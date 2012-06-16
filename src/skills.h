@@ -11,6 +11,7 @@ struct Skills {
 	// TODO add more stats
 	Element dmg_type;
 	int damage;
+	int ap_cost;
 };
 
 #endif //SKILLS_H
