@@ -20,6 +20,7 @@ struct Skills {
 	// TODO add more stats
 	int dmg_type;
 	int damage;
+	int ap_cost;
 };
 
 #endif //SKILLS_H

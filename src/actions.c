@@ -149,8 +149,10 @@ void use_skill(int keypress)
 	   */
 
 	dmg_calc(0); /* player hits enemy */
-	dmg_calc(1); /* enemy hits player */
+	player.action_points = player.action_points - player.skill->ap_cost; /* spend action points on the attack */
 
+	dmg_calc(1); /* enemy hits player */
+	/* TODO: Struct Enemy don't have action points. Once they do, make enemy spend action points as well */
 
 	/* 3. update stats and display them, TODO: display attack info */
 
