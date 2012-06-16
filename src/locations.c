@@ -60,9 +60,18 @@ Location loc_dungeons = {
 	"\t| Beware of bugs |\n"
 	"\t+----------------+\n"
 	"\n"
-	"As you ponder how large bugs must be to threaten grown  men, you notice faint, strangely compelling, reddish\nglow emanating from nearby ruins.",
-	3,
+	"As you ponder how large bugs must be to threaten grown  men, you notice faint, strangely compelling, reddish\nglow emanating from nearby ruins."
+	"\n"
+	"You may enter the dungeons or look for action in the surrounding forest.",
+	4,
 	{
+		{
+			'e',
+			"",
+			"Enter dungeons",
+			&ac_dungeons_enter
+		},
+
 		{
 			'a',
 			"Look for ",
@@ -80,6 +89,26 @@ Location loc_dungeons = {
 			"",
 			"Return to town",
 			&ac_return_to_town
+		}
+	}
+};
+
+Location loc_dungeons_level1 = {
+	"You enter the dungeons. There are dimly lit torches on the wall. You realize that other people have been here.\n"
+	"\nTODO: Finish the description, add something else besides look for action\n",
+	2,
+	{
+		{
+			'a',
+			"Look for ",
+			"Action",
+			&ac_dungeons_action
+		},
+		{
+			'r',
+			"",
+			"Return to fresh air",
+			&ac_dungeons
 		}
 	}
 };

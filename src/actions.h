@@ -9,6 +9,7 @@ void ac_ev_oldman_help();
 void ac_ev_oldman_nohelp();
 void ac_dungeons_action();
 void ac_dungeons_glow();
+void ac_dungeons_enter();
 void ac_shrine_heal_1();
 void ac_shrine_heal_all();
 void ac_fight_0();

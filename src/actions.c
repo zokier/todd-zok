@@ -68,6 +68,10 @@ void ac_dungeons()
 	set_player_location(&loc_dungeons);
 }
 
+void ac_dungeons_enter() {
+	set_player_location(&loc_dungeons_level1);
+}
+
 void ac_dungeons_action()
 {
 	if (player.action_points > 0)
@@ -339,6 +343,7 @@ void ac_return_to_town()
 {
 	set_player_location(&loc_town);
 }
+
 
 void ac_quit()
 {
