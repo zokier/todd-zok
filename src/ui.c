@@ -1,19 +1,27 @@
-#include <ncurses.h> 
-#include <locale.h> 
-#include <string.h> 
-#include <syslog.h> 
-#include "ui.h" 
-#include "globals.h" 
+#include <ncurses.h>
+#include <locale.h>
+#include <string.h>
+#include <syslog.h>
+#include "ui.h"
+#include "globals.h"
 #include "skills.h"
 #include "character.h"
 
-extern Character enemy;
+WINDOW *background_win;
+WINDOW *command_win;
+WINDOW *skills_win;
+WINDOW *game_win;
+WINDOW *log_win;
+WINDOW *input_win;
 
-WINDOW *mainbw, *gamebw, *gamew, *commandw, *skillsw;
+void draw_background(int x_size, int y_size);
+
 void init_ui()
 {
 	// locale needs to be initialized for ncurses
 	// "" sets "native" locale
+	// TODO should we force some locale (UTF-8)
+	// telnetd gives us "posix" locale
 	char *locale = setlocale(LC_ALL, "");
 	if (locale == NULL)
 	{
@@ -33,22 +41,23 @@ void init_ui()
 	getmaxyx(stdscr, y_size, x_size);
 	if (y_size < 24 || x_size < 80)
 	{
-		wprintw(stdscr, "This program needs 80x24 characters of screen 	size to run.\n");
-		wprintw(stdscr, "You currently have: %dx%d\n", x_size, y_size);
-		wprintw(stdscr, "Enlarge your screen and press a key or this program might segfault.\n");
+		printw("This program needs 80x24 characters of screen 	size to run.\n");
+		printw("You currently have: %dx%d\n", x_size, y_size);
+		printw("Enlarge your screen and press a key or this program might segfault.\n");
 		getch();
-		werase(stdscr);
+		refresh();
 	}
 
 	/* checks that terminal supports color */
 
 	if (has_colors() == FALSE)
 	{
-		wprintw(stdscr, "Your terminal does not seem to support color!\n");
-		wprintw(stdscr, "The game will try to use color whenever possible\n");
-		wprintw(stdscr, "You might experience problems\n");
-		wprintw(stdscr, "Press a key to continue\n");
+		printw("Your terminal does not seem to support color!\n");
+		printw("The game will try to use color whenever possible\n");
+		printw("You might experience problems\n");
+		printw("Press a key to continue\n");
 		getch();
+		refresh();
 	}
 
 	/*
@@ -69,59 +78,156 @@ void init_ui()
 	   gamebw  = main game "box"
 	   gamew = main game area
 	   commandw = command listing window
-           skillsw = skills listing window
-	   */
+	   skillsw = skills listing window
+   */
+	background_win = newwin(y_size, x_size, 0, 0);
+	draw_background(x_size, y_size);
+	wnoutrefresh(background_win);
 
-	/* TODO: calculate window sizes */
-	mainbw = newwin(24, 80, 0, 0);
-	box(mainbw, 0, 0);
-	wattron(mainbw, A_BOLD);
-	mvwprintw(mainbw, 0, 2, "Tales of Deep Dungeons");
-	wattroff(mainbw, A_BOLD);
-	wrefresh(mainbw);
+	// calculate widths
+	int remaining_width = x_size;
+	remaining_width -= 2; // outer borders
+	int cmdw_width = 17;
+	remaining_width -= cmdw_width;
+	remaining_width -= 2; // margins for cmdw
+	remaining_width -= 1; // vertical line between cmdw and gamew
+	int skillsw_width = cmdw_width;
+	skillsw_width -= 2; // margin for index numbers
+	int gamew_width = remaining_width / 2;
+	remaining_width -= gamew_width;
+	remaining_width -= 1; // vertical line between gamew and logw
+	int logw_width = remaining_width;
+	int inputw_width = logw_width;
+	inputw_width -= 2; // margin for prompt
+
+	// calculate heights
+	int skillsw_height = 4;
+	int cmdw_height = y_size;
+	cmdw_height -= 2; // outer borders
+	cmdw_height -= 1; // horiz line between cmdw and skillsw
+	cmdw_height -= 1; // one line margin at top
+	cmdw_height -= skillsw_height;
+	int inputw_height = 1;
+	int logw_height = y_size;
+	logw_height -= 2; // outer borders
+	logw_height -= 1; // horiz line between logw and inputw
+	logw_height -= inputw_height;
+	int gamew_height = y_size;
+	gamew_height -= 2; // outer borders
+
+	command_win = newwin(cmdw_height, cmdw_width, 2, 2);
+	skills_win = newwin(skillsw_height, skillsw_width, y_size-(skillsw_height+1), 4);
+	game_win = newwin(gamew_height, gamew_width, 1, cmdw_width+4);
+	log_win = newwin(logw_height, logw_width, 1, (x_size-logw_width)-1);
+	input_win = newwin(inputw_height, inputw_width, y_size-2, (x_size-inputw_width)-1);
+	/* debugging: Show windows
+	wbkgd(command_win, 'C');
+	wbkgd(skills_win, 'S');
+	wbkgd(game_win, 'G');
+	wbkgd(log_win, 'L');
+	wbkgd(input_win, 'I');
+	wnoutrefresh(command_win);
+	wnoutrefresh(skills_win);
+	wnoutrefresh(game_win);
+	wnoutrefresh(log_win);
+	wnoutrefresh(input_win);
+	*/
 	doupdate();
-	commandw = subwin(mainbw, 18, 20, 3, 1);
-	wborder(commandw, 1, 0, 0, 1, 1, 1, 1, 1);
-	skillsw = subwin(mainbw, 8, 20, 11, 1);
+	getch();
+}
 
-	gamebw = subwin(mainbw, 18, 58, 1, 20);
-	wattron(gamebw, A_UNDERLINE);
-	mvwprintw(gamebw, 0, 2, "TODO: Location info here");
-	wattroff(gamebw, A_UNDERLINE);
-	wrefresh(gamebw);
-	gamew = subwin(gamebw, 16, 56, 3, 22);
-	wrefresh(mainbw);
-	wrefresh(commandw);
-	wrefresh(gamew);
-	wrefresh(skillsw);
-	doupdate();
+void draw_background(int x_size, int y_size)
+{
+	// TODO use same calculations as the actual windows
+	int gamew_width = (x_size - 20)/2;
+	int gamew_logw_sep = gamew_width + 20;
+	wclear(background_win);
+	box(background_win, 0, 0);
+	mvwvline(background_win, 1, 20, ACS_VLINE, y_size-2);
+	mvwvline(background_win, 1, gamew_logw_sep, ACS_VLINE, y_size-2);
+	mvwhline(background_win, y_size-6, 1, ACS_HLINE, 20-1);
+	mvwhline(background_win, y_size-3, gamew_logw_sep+1, ACS_HLINE, x_size-(gamew_logw_sep+2));
+	mvwaddch(background_win, 0, 20, ACS_TTEE);
+	mvwaddch(background_win, 0, gamew_logw_sep, ACS_TTEE);
+	mvwaddch(background_win, y_size-1, 20, ACS_BTEE);
+	mvwaddch(background_win, y_size-1, gamew_logw_sep, ACS_BTEE);
+	mvwaddch(background_win, y_size-6, 0, ACS_LTEE);
+	mvwaddch(background_win, y_size-6, 20, ACS_RTEE);
+	mvwaddch(background_win, y_size-3, gamew_logw_sep, ACS_LTEE);
+	mvwaddch(background_win, y_size-3, x_size-1, ACS_RTEE);
+	for (int i = 0; i < 4; i++)
+	{
+		// skill numbers
+		mvwaddch(background_win, (y_size-5)+i, 2, ('1' + i) | A_BOLD);
+	}
+	// input prompt
+	mvwaddch(background_win, y_size-2, gamew_logw_sep+1, ACS_RARROW | A_BOLD);
 
+	//window titles
+	mvwaddstr(background_win, 0, 2, "Actions");
+	mvwaddstr(background_win, y_size-6, 2, "Skills");
+	mvwaddstr(background_win, 0, 22, "GameW");
+	mvwaddstr(background_win, 0, gamew_logw_sep+2, "Log");
+	mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
+	wattron(background_win, A_DIM);
+	mvwaddstr(background_win, y_size-1, 20 + (gamew_width/2) - 5, "ToDD 0.8.62");
+	wattroff(background_win, A_DIM);
 }
 
 void ncurs_location_desc() {
-	wclear(gamew);
-	mvwprintw(gamew, 1, 0, player.location->description);
-	wrefresh(gamew);
+	wclear(game_win);
+	mvwprintw(game_win, 0, 0, player.location->description);
+	wrefresh(game_win);
 }
 
 void ncurs_commands() {
-	wclear(commandw);
+	wclear(command_win);
 	for (size_t i = 0; i < player.location->action_count; i++)
 	{
 		if (player.location->actions[i].description != NULL)
 		{
-			wprintw(commandw, "%s", player.location->actions[i].description_prefix);
-			waddch(commandw, player.location->actions[i].description[0] | A_BOLD | A_UNDERLINE);
-			wprintw(commandw, "%s\n", player.location->actions[i].description + 1);
+			wprintw(command_win, "%s", player.location->actions[i].description_prefix);
+			waddch(command_win, player.location->actions[i].description[0] | A_BOLD | A_UNDERLINE);
+			wprintw(command_win, "%s\n", player.location->actions[i].description + 1);
 		}
 	}
-	wrefresh(commandw);
+	wrefresh(command_win);
 }
 
-void ncurs_msg(char *buffer) {
-	wclear(gamew);
-	wprintw(gamew, "\n%s\n", buffer);
-	wrefresh(gamew);
+/* Prints a message to game window
+ * Waits user to press a key */
+void ncurs_modal_msg(const char *fmt, ...)
+{
+	// TODO do we want to clear the window first?
+	va_list argp;
+	va_start(argp, fmt);
+	vwprintw(game_win, fmt, argp);
+	va_end(argp);
+	wprintw(game_win, "\nContinue...\n");
+	wrefresh(game_win);
+	getch();
+}
+
+/* Prints a message to log window
+ * The message is styled as a "system" message */
+void ncurs_log_sysmsg(const char *fmt, ...)
+{
+	// TODO scrolling
+	wprintw(log_win, "-!- ");
+	va_list argp;
+	va_start(argp, fmt);
+	vwprintw(log_win, fmt, argp);
+	va_end(argp);
+	waddch(log_win, '\n');
+	wrefresh(log_win);
+}
+
+/* Print a message to log window
+ * The message is styled as a "chat" message */
+void ncurs_log_chatmsg(char *msg, char *source)
+{
+	// TODO scrolling
+	wprintw(log_win, "%s> %s\n", source, msg);
 }
 
 /*	Prints descriptions at current player position */
@@ -131,43 +237,66 @@ void ncurs_location()
 	ncurs_commands(player);
 }
 
-/* TODO: it's stupid to have 2 functions that differ so slightly. Make this one function */
-void ncurs_fightstats(WINDOW *window) {
-	/* werase makes it possible to cleanly go from 10 to 9 hitpoints (second number cleared) */
-	/* TODO: if it flickers, only clean the number part */
-	werase(window); 
-	box(window,0,0);
-
-	mvwprintw(window,1,1,"Health: %d/%d",player.health,player.max_health);
-	mvwprintw(window,3,1,"Wood:   %d",player.elements[ELEM_WOOD]);
-	mvwprintw(window,4,1,"Fire:   %d",player.elements[ELEM_FIRE]);
-	mvwprintw(window,5,1,"Earth:  %d",player.elements[ELEM_EARTH]);
-	mvwprintw(window,6,1,"Metal:  %d",player.elements[ELEM_METAL]);
-	mvwprintw(window,7,1,"Water:  %d",player.elements[ELEM_WATER]);
-
-	if(player.elemental_type == player.skill->dmg_type && player.elemental_type == player.weapon->dmg_type)
-                mvwprintw(window,10,1,"ALIGNED, POWERFUL!");
-	wrefresh(window); 
+/* Draws character info in a slot defined by index parameter
+ * indices:
+ * +----+
+ * | 0  |
+ * | 1 5|
+ * | 2 4|
+ * |   3|
+ * +----+
+ */
+void ncurs_fightinfo(Character *chr, int index)
+{
+	ncurs_log_sysmsg("Chr \"%s\" info at %d", chr->name, index);
 }
 
-void ncurs_fightstats_enemy(WINDOW *window) {
-	/* werase makes it possible to cleanly go from 10 to 9 hitpoints (second number cleared) */
-	/* TODO: if it flickers, only clean the number part */
-	werase(window); 
-
-	box(window,0,0);
-	mvwprintw(window,1,1,"Health: %d",enemy.health);
-	mvwprintw(window,2,1,"TYPE:   %s",element_names[enemy.elemental_type]);
-	mvwprintw(window,3,1,"Wood:   %d",enemy.elements[ELEM_WOOD]);
-	mvwprintw(window,4,1,"Fire:   %d",enemy.elements[ELEM_FIRE]);
-	mvwprintw(window,5,1,"Earth:  %d",enemy.elements[ELEM_EARTH]);
-	mvwprintw(window,6,1,"Metal:  %d",enemy.elements[ELEM_METAL]);
-	mvwprintw(window,7,1,"Water:  %d",enemy.elements[ELEM_WATER]);
-	mvwprintw(window,8,1,"skill:  %s",enemy.skill->name);
-	mvwprintw(window,9,1,"weapon: %s",enemy.weapon->name);
-
-	if(enemy.elemental_type == enemy.skill->dmg_type && enemy.elemental_type == enemy.weapon->dmg_type)
-		mvwprintw(window,10,1,"ALIGNED, POWERFUL!");	
-
-	wrefresh(window); 
+/* Refreshes the skill window */
+void ncurs_skills()
+{
+	werase(skills_win);
+	for (int i = 0; i < 4; i++)
+	{
+		if (player.skill[i] != NULL)
+		{
+			wprintw(skills_win, "%s\n", player.skill[i]->name);
+		}
+		else 
+		{
+			// empty skill slot
+			waddch(skills_win, '\n');
+		}
+	}
+	wrefresh(skills_win);
 }
+
+/* Prints a list of items to game window
+ * returns the index of the item that player chooses */
+int ncurs_listselect(char *first_item, size_t stride, size_t count)
+{
+	// TODO support more than 16 items
+	for (size_t i = 0; i < count; i++)
+	{
+		// print index as hex to get larger single character range
+		wprintw(game_win, "%x) %s\n", i&0xF, first_item+(stride*i));
+	}
+	wrefresh(game_win);
+	int getch_res = ERR;
+	while (true)
+	{
+		getch_res = getch();
+		if (getch_res >= '0' && getch_res <= '9')
+		{
+			getch_res -= '0';
+			break;
+		}
+		else if (getch_res >= 'a' && getch_res <= 'f')
+		{
+			getch_res -= 'a';
+			getch_res += 10;
+			break;
+		}
+	}
+	return getch_res;
+}
+

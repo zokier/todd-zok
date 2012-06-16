@@ -126,7 +126,10 @@ void load_player_data()
 	}
 	player.elemental_type = ELEM_WOOD;
 	player.weapon = &weapons_list[0];
-	player.skill = &skills_list[1];
+	player.skill[0] = &skills_list[1];
+	player.skill[1] = NULL;
+	player.skill[2] = NULL;
+	player.skill[3] = NULL;
 	player.dungeon_lvl = 0;
 }
 

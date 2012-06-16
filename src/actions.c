@@ -12,10 +12,10 @@
 #include "skills.h"
 #include "character.h"
 
+#define DISABLE_COMBAT
+
 // globals are nasty?
 Character enemy;
-WINDOW *fight_youw;
-WINDOW *fight_enemyw;
 
 void use_skill(int keypress);
 int dmg_calc(int direction);
@@ -75,6 +75,7 @@ void ac_dungeons_enter() {
 
 void ac_dungeons_action()
 {
+#ifndef DISABLE_COMBAT
 	if (player.action_points > 0)
 	{
 		player.action_points--;
@@ -82,30 +83,20 @@ void ac_dungeons_action()
 		if (check_rnd_events() != 1) {/* return 1 => a random event occurred, don't fight */
 			set_player_location(&loc_fight);
 			create_enemy();
-			werase(gamew);
 			/* TODO: UI prettier, do you need fight_youw or not? */
-			wprintw(gamew,"You encounter a %s!\n\n", enemy.name);
-			mvwprintw(gamew,2,0,"%s",player.name);
-			mvwprintw(gamew,2,30,"%s",enemy.name);
-			wrefresh(gamew);
+			ncurs_log_sysmsg("You encounter a %s!", enemy.name);
 
-			fight_youw = newwin(12,25,6,22);
-			fight_enemyw = newwin(12,25,6,50);
-			ncurs_fightstats(fight_youw);
-			ncurs_fightstats_enemy(fight_enemyw);
-
-			/* display skills */
-			werase(skillsw);
-			for (int i = 0; i < 1; i++) // TODO i < 1 ???
-				wprintw(skillsw,"%d - %s\n",0,player.skill->name);
-			wrefresh(skillsw);
-
+			ncurs_fightinfo(player, 0);
+			ncurs_fightinfo(enemy, 3);
 		}
 	}
 	else
 	{
-		ncurs_msg("You feel too tired to fight\n");
+		ncurs_log_sysmsg("You feel too tired to fight\n");
 	}
+#else
+	ncurs_modal_msg("Tumbleweed rolls across the road. No action here");
+#endif
 }
 
 /* helper functions so I don't need to rewrite that much code */
@@ -120,6 +111,7 @@ void ac_fight_1() {
 void use_skill(int keypress)
 {
 
+#ifndef DISABLE_COMBAT
 	/* this function is entered with a keypress from ac_fight0 and so on*/
 	/* the keypress is used to determine what attack is used */
 
@@ -153,6 +145,7 @@ void use_skill(int keypress)
 	fight_check_dead();
 
 	wrefresh(gamew);
+#endif
 }
 
 void ac_dungeons_glow()
@@ -162,20 +155,16 @@ void ac_dungeons_glow()
 
 void ac_ev_oldman_help()
 {
-	wprintw(gamew,"Thank you kind sir! Here take this for your trouble.\n\n");
-	wprintw(gamew,"The old man shoves a purse in your hands.\n");
-	wattron(gamew,A_BOLD);
-	wprintw(gamew,"\n\nYou gain 100 gold!");
-	wattroff(gamew,A_BOLD);
-	wrefresh(gamew);
+	ncurs_modal_msg("Thank you kind sir! Here take this for your trouble.\n\n"
+	                "The old man shoves a purse in your hands.\n");
+	ncurs_log_sysmsg("You gain 100 gold!");
 	player.money += 100;
-	getch();
 	set_player_location(&loc_dungeons);
 }
 
 void ac_ev_oldman_nohelp()
 {
-	ncurs_msg("May the gods curse you, mutters the old man.");
+	ncurs_log_chatmsg("May the gods curse you.", "Old man"); // just for fun
 	player.action_points++;
 	set_player_location(&loc_dungeons);
 }
@@ -188,16 +177,16 @@ void ac_shrine_heal_1()
 		{
 			player.health++;
 			player.money--;
-			ncurs_msg("The coin disappears into the slot with a clink. The crystal brightens for a moment and you step away from it feeling slightly better.");
+			ncurs_modal_msg("The coin disappears into the slot with a clink. The crystal brightens for a moment and you step away from it feeling slightly better.");
 		}
 		else
 		{
-			ncurs_msg("You search your pockets for coin, but find none.");
+			ncurs_modal_msg("You search your pockets for coin, but find none.");
 		}
 	}
 	else
 	{
-		ncurs_msg("You try to insert a coin into the slot but to your surprise the crystal repels your coin.");
+		ncurs_modal_msg("You try to insert a coin into the slot but to your surprise the crystal repels your coin.");
 	}
 }
 
@@ -208,37 +197,40 @@ void ac_shrine_heal_all()
 	player.health = player.max_health;
 	if (money < 0)
 	{
+		// TODO print different messsage 
 		player.health += money;
 		money = 0;
 	}
 	player.money = money;
-	player.location = &loc_dungeons;
-	ncurs_msg("The crystal dazes you with blindingly bright light. As you regain control, you notice that all your wounds have mended.");
+	ncurs_modal_msg("The crystal dazes you with blindingly bright light. As you regain control, you notice that all your wounds have mended.");
+	set_player_location(&loc_dungeons);
 }
 
 void ac_list_players()
 {
 	// TODO fetch player list
-	ncurs_msg("The wind is howling in the empty streets of this god forsaken town. You are all alone here.");
+	ncurs_modal_msg("The wind is howling in the empty streets of this god forsaken town. You are all alone here.");
+	set_player_location(&loc_town);
 }
 
 void ac_view_stats()
 {
-	werase(gamew);
-	wrefresh(gamew);
-	wprintw(gamew,"Name:         %s\n", player.name);
-	wprintw(gamew,"Stamina / AP: %d\n", player.action_points);
-	wprintw(gamew,"XP:           %d\n", player.experience);
-	wprintw(gamew,"Money:        %d\n",player.money);
-	wattron(gamew,A_BOLD);
-	wprintw(gamew,"\nElements:\n");
-	wattroff(gamew,A_BOLD);
-	wprintw(gamew,"Wood:         %d\n",player.elements[ELEM_WOOD]);
-	wprintw(gamew,"Fire:         %d\n",player.elements[ELEM_FIRE]);
-	wprintw(gamew,"Earth:        %d\n",player.elements[ELEM_EARTH]);
-	wprintw(gamew,"Metal:        %d\n",player.elements[ELEM_METAL]);
-	wprintw(gamew,"Water:        %d\n",player.elements[ELEM_WATER]);
-	wrefresh(gamew);
+	// TODO prettify
+	werase(game_win);
+	wrefresh(game_win);
+	wprintw(game_win,"Name:         %s\n", player.name);
+	wprintw(game_win,"Stamina / AP: %d\n", player.action_points);
+	wprintw(game_win,"XP:           %d\n", player.experience);
+	wprintw(game_win,"Money:        %d\n",player.money);
+	wattron(game_win,A_BOLD);
+	wprintw(game_win,"\nElements:\n");
+	wattroff(game_win,A_BOLD);
+	wprintw(game_win,"Wood:         %d\n",player.elements[ELEM_WOOD]);
+	wprintw(game_win,"Fire:         %d\n",player.elements[ELEM_FIRE]);
+	wprintw(game_win,"Earth:        %d\n",player.elements[ELEM_EARTH]);
+	wprintw(game_win,"Metal:        %d\n",player.elements[ELEM_METAL]);
+	wprintw(game_win,"Water:        %d\n",player.elements[ELEM_WATER]);
+	wrefresh(game_win);
 }
 
 void ac_tavern()
@@ -295,32 +287,25 @@ void ac_shop()
 
 void ac_shop_buy()
 {
-	wprintw(gamew,"\nThe poor man is selling these items:\n");
-	for (int i=0; i < WEAPON_COUNT; i++)
-		wprintw(gamew,"%i) %s\n", i, weapons_list[i].name);
-	wrefresh(gamew);
-
-	// warning: ugly code ahead
-	int getch_res = ERR;
-	while (getch_res == ERR)
+	wprintw(game_win,"The poor man is selling these items:\n");
+	int selection = ncurs_listselect(weapons_list[0].name, sizeof(Weapons), WEAPON_COUNT);
+	if (selection > 0)
 	{
-		getch_res = getch();
-		// lets hope that WEAPON_COUNT < 10
-		if (getch_res < '0' || getch_res > '0'+WEAPON_COUNT)
-			getch_res = ERR;
+		player.weapon = &weapons_list[selection];
+		ncurs_modal_msg("YOU JUST BOUGHT: %s",player.weapon->name);
 	}
-	getch_res -= '0';
-	wprintw(gamew,"YOU JUST BOUGHT: %s\n",weapons_list[getch_res].name);
-	player.weapon = &weapons_list[getch_res];
-	wrefresh(gamew);
-
+	else
+	{
+		ncurs_modal_msg("Nevermind.");
+	}
+	set_player_location(&loc_shop);
 }
 
 void ac_shop_sell()
 {
-	ncurs_msg("The poor man has no coins to buy anything from you.");
-	wprintw(gamew,"you have: %s\n",player.weapon->name);
-	wrefresh(gamew);
+	ncurs_modal_msg("The poor man has no coins to buy anything from you.\n"
+	                "you have: %s",player.weapon->name);
+	set_player_location(&loc_shop);
 }
 
 void ac_messageboard()
@@ -330,7 +315,7 @@ void ac_messageboard()
 
 void ac_messageboard_view()
 {
-	wclear(gamew);
+	wclear(game_win);
 	PGresult *res;
 	res = PQexecPrepared(conn, "view_messageboard", 0, NULL, NULL, NULL, 0);
 	if (PQresultStatus(res) == PGRES_TUPLES_OK)
@@ -341,12 +326,12 @@ void ac_messageboard_view()
 		{
 			for (int j = 0; j < col_count; j++)
 			{
-				wprintw(gamew, "%s\t\t", PQgetvalue(res, i, j));
+				wprintw(game_win, "%s\t\t", PQgetvalue(res, i, j));
 			}
-			wprintw(gamew, "\n");
+			wprintw(game_win, "\n");
 		}
 	}
-	wrefresh(gamew);
+	wrefresh(game_win);
 	PQclear(res);
 }
 
@@ -379,10 +364,11 @@ void ac_return_to_town()
 
 void ac_quit()
 {
-	ncurs_msg("Bye.");
+	ncurs_modal_msg("Bye.");
 	playing = false;
 }
 
+#ifndef DISABLE_COMBAT
 /* direction: 0 => player hits enemy, 1 => enemy hits player */
 /* TODO: is there a simpler way to do this? */
 
@@ -530,3 +516,4 @@ void fight_check_dead() {
 	}
 
 }
+#endif 
