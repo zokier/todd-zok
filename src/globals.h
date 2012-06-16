@@ -14,6 +14,7 @@ extern Player player;
 extern PGconn *conn;
 
 extern Weapons weapons_list[];
+extern Weapons weapons_enemy[];
 extern Enemy enemylist[];
 extern Skills skills_list[];
 

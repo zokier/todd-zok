@@ -14,7 +14,7 @@ Enemy enemylist[ENEMY_COUNT] = {
 			2,
 			2
 		},
-		&weapons_list[1],
+		&weapons_enemy[0],
 		&skills_list[1]
 	},
 
@@ -29,7 +29,7 @@ Enemy enemylist[ENEMY_COUNT] = {
 			2,
 			2
 		},
-		&weapons_list[0],
+		&weapons_enemy[1],
 		&skills_list[0]
 	},
 
@@ -89,6 +89,6 @@ Enemy enemylist[ENEMY_COUNT] = {
 			99,
 			99
 		},
-		&weapons_list[3],
+		&weapons_enemy[2],
 		&skills_list[0]}
 };

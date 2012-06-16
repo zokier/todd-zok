@@ -1,6 +1,29 @@
 #include "weapons.h"
 #include "skills.h"
 
+Weapons weapons_enemy[2] = {
+	{
+		0,
+		"Claw",
+		ELEM_EARTH,
+		2
+	},
+
+	{
+		1,
+		"Fire breath",
+		ELEM_FIRE,
+		4
+	},
+
+	{
+		3,
+		"Bite of death",
+		ELEM_EARTH,
+		10
+	}
+};
+
 Weapons weapons_list[WEAPON_COUNT] = {
 
 	{
@@ -23,13 +46,6 @@ Weapons weapons_list[WEAPON_COUNT] = {
 		ELEM_METAL,
 		5
 	},
-
-	{
-		3,
-		"Bite of death",
-		ELEM_EARTH,
-		10
-	}
 
 };
 
