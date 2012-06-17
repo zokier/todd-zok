@@ -15,23 +15,29 @@ int check_rnd_events() {
         /* calculate probabilities to random events and then switch to the proper function */
         /* this part is only meant to make switching */
 
-#define PROB(x) (i < (prob_max += x))
-        int prob_max = 0;
+	int prob_max = 0;
+	#define PROB(x) (i < (prob_max += x))
+
+	
         // TODO: write the rest of the events, adjust probabilities
-        if (PROB(10)) /* ==> chance is 10 out of 1000 */
-                return ev_old_man();
-
-        if (PROB(10)) /* ==> chance is 10 out of 1000 */
-                return ev_bag_of_gold();
-
-        if (PROB(10)) /* ==> chance is 10 out of 1000 */
-                return ev_old_man();
-
-        if (PROB(2)) /* ==> chance is 2 out of 1000 */
-                return ev_old_man();
-#undef PROB
-        /* if there's no random event, return 0. All random events should return 1; */
-        return 0;
+	/* events are based on dungeon levels. Some events can occur in many levels */
+	switch(player.dungeon_lvl) {
+		case 0: {
+		        if (PROB(10)) /* ==> chance is 10 out of 1000 */
+		                return ev_old_man();
+			break;
+			}
+		case 1: {
+		        if (PROB(10)) /* ==> chance is 10 out of 1000 */
+		                return ev_bag_of_gold();
+			break;
+			}
+		default:
+			break;
+		}
+	#undef PROB
+	/* if there's no random event, return 0. All random events should return 1; */
+	return 0;
 }
 
 

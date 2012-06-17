@@ -4,6 +4,7 @@
 #include "character.h"
 
 void init_ui();
+void ncurs_chat();
 void ncurs_location();
 void ncurs_commands();
 void ncurs_skills();
