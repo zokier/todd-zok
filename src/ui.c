@@ -15,6 +15,9 @@ WINDOW *log_win;
 WINDOW *input_win;
 
 void draw_background(int x_size, int y_size);
+int y_size, x_size; /* used for bolding titles, must be global */
+int gamew_width; 
+int gamew_logw_sep; 
 
 void init_ui()
 {
@@ -37,7 +40,6 @@ void init_ui()
 	refresh();
 
 	/* checks that terminal size is big enough */
-	int y_size, x_size;
 	getmaxyx(stdscr, y_size, x_size);
 	if (y_size < 24 || x_size < 80)
 	{
@@ -139,8 +141,8 @@ void init_ui()
 void draw_background(int x_size, int y_size)
 {
 	// TODO use same calculations as the actual windows
-	int gamew_width = (x_size - 20)/2;
-	int gamew_logw_sep = gamew_width + 20;
+	gamew_width = (x_size - 20)/2;
+	gamew_logw_sep = gamew_width + 20;
 	wclear(background_win);
 	box(background_win, 0, 0);
 	mvwvline(background_win, 1, 20, ACS_VLINE, y_size-2);
@@ -228,6 +230,7 @@ void ncurs_log_chatmsg(char *msg, char *source)
 {
 	// TODO scrolling
 	wprintw(log_win, "%s> %s\n", source, msg);
+	wrefresh(log_win);
 }
 
 /*	Prints descriptions at current player position */

@@ -526,3 +526,24 @@ void fight_check_dead() {
 
 }
 #endif 
+
+void ncurs_chat(Character player) {
+int len = 80;
+char *line = malloc(len); // more dynamic memory allocation would be nice
+echo();
+/* TODO: make bolding a specified window title a function */
+wattron(background_win,A_BOLD);
+mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
+wattroff(background_win,A_BOLD);
+wrefresh(background_win);
+
+if (wgetnstr(input_win,line, len) != ERR) // TODO a better way to get input
+	ncurs_log_chatmsg(line,player.name); 
+noecho();
+werase(input_win);
+wrefresh(input_win);
+/* draw the title again, this time with no bolding */
+mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
+wrefresh(background_win);
+
+}

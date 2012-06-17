@@ -210,7 +210,7 @@ bool get_player()
 /*
 	Tries to find and call the action user requested
 */
-void execute_action(char cmd_char)
+void execute_action(unsigned char cmd_char)
 {
 	//convert upper case to lower case
 	if (cmd_char < 'a' && cmd_char > '9') /* accept letters and numbers */
@@ -247,7 +247,11 @@ void enter_game()
 			playing = false;
 			break;
 		}
-		execute_action(getch_res & 0xFF);
+		if (getch_res == 9) { /* chat window */
+			ncurs_chat(player);
+		}
+		else
+			execute_action(getch_res & 0xFF);
 	}
 }
 

@@ -19,5 +19,7 @@ extern Character enemylist[2][ENEMY_COUNT];
 extern Skills skills_list[];
 extern WINDOW *game_win;
 extern WINDOW *input_win;
-
+extern WINDOW *background_win;
+extern int y_size;
+extern int gamew_logw_sep;
 #endif
