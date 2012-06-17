@@ -121,9 +121,15 @@ Location loc_dungeons_level1 = {
 
 
 Location loc_tavern = {
-	"The tavern is eerlily quiet.\n\nYou thought you saw something move in the shadows, but\nfound nothing. What sort of madness leads a man to builda fine tavern like this, and then abadon it?",
-	2,
+	"The tavern is eerlily quiet.\n\nBartender Willie is alphabetically ordering his beer bottles.",
+	3,
 	{
+		{
+			't',
+			"",
+			"Talk to Willie",
+			&ac_tavern_bartender
+		},
 		{
 			'y',
 			"",
@@ -135,6 +141,32 @@ Location loc_tavern = {
 			"",
 			"Return to town",
 			&ac_return_to_town
+		}
+	}
+};
+
+
+Location loc_tavern_bartender = {
+	"What do you want?",
+	3,
+	{
+		{
+			'g',
+			"",
+			"Get a room",
+			&ac_tavern_room
+		},
+		{
+			'i',
+			"",
+			"Information",
+			&ac_tavern_info
+		},
+		{
+			'r',
+			"",
+			"Return to tavern",
+			&ac_tavern
 		}
 	}
 };

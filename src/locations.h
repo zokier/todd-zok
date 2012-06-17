@@ -10,6 +10,7 @@ extern Location loc_ev_oldman;
 extern Location loc_fight;
 extern Location loc_shrine;
 extern Location loc_tavern;
+extern Location loc_tavern_bartender;
 extern Location loc_shop;
 extern Location loc_messageboard;
 extern Location loc_warena;

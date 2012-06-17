@@ -143,6 +143,34 @@ void ac_tavern()
 	set_player_location(&loc_tavern);
 }
 
+void ac_tavern_bartender()
+{
+	set_player_location(&loc_tavern_bartender);
+}
+
+void ac_tavern_room()
+{
+	/* TODO:
+	1. pay for the room
+	POSSIBLE RANDOM EVENTS: someone robbing you OR a prostitute
+	2. go to sleep -> quit game
+	*/
+	werase(game_win);
+	ncurs_modal_msg("TODO: Implement\n");
+}
+
+void ac_tavern_info()
+{
+	/* TODO:
+	information about
+	1. other players
+	2. stuff in the world (tutorial/help: bartender knows everything!)
+	3. random stuff
+	*/
+	werase(game_win);
+	ncurs_modal_msg("TODO: Implement\n");
+}
+
 void ac_tavern_shout()
 {
 	puts("What do you want to yell?");
