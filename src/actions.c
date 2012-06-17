@@ -247,6 +247,7 @@ void ac_tavern_shout()
 	if (getnstr(line, len) != ERR)
 	{
 		send_chatmsg(line, strlen(line));
+		ncurs_log_chatmsg(line, player.name);
 	}
 	free(line);
 }
@@ -323,11 +324,10 @@ void ac_messageboard_view()
 		int col_count = PQnfields(res);
 		for (int i = 0; i < row_count; i++)
 		{
-			for (int j = 0; j < col_count; j++)
-			{
-				wprintw(game_win, "%s\t\t", PQgetvalue(res, i, j));
-			}
-			wprintw(game_win, "\n");
+			wprintw(game_win, "%s // ", PQgetvalue(res, i, 0));
+			wprintw(game_win, "%s\n", PQgetvalue(res, i, 1));
+			wprintw(game_win, "%s ", PQgetvalue(res, i, 2));
+			wprintw(game_win, "\n\n");
 		}
 	}
 	wrefresh(game_win);
@@ -337,9 +337,11 @@ void ac_messageboard_view()
 extern char* itoa(int i);
 void ac_messageboard_write()
 {
+/* echo, noecho and wgetnstr(input_win) enable users to see what they write */
 	int len = 80;
 	char *line = malloc(len); // more dynamic memory allocation would be nice
-	if (getnstr(line, len) != ERR) // TODO a better way to get input
+	echo();
+	if (wgetnstr(input_win,line, len) != ERR) // TODO a better way to get input
 	{
 		char *player_id = itoa(player.id);
 		const char *params[2] = {player_id, line};
@@ -353,6 +355,9 @@ void ac_messageboard_write()
 		free(player_id);
 	}
 	free(line);
+	noecho();
+	werase(game_win);
+	ncurs_modal_msg("\n\nYour message has been written.\nYou start to wonder if it was worth it.\n");
 }
 
 void ac_return_to_town()
