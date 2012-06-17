@@ -23,5 +23,6 @@ void ac_messageboard_view();
 void ac_messageboard_write();
 void ac_return_to_town();
 void ac_quit();
+void set_player_location(Location* loc);
 
 #endif //ACTIONS_H

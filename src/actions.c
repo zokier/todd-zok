@@ -262,15 +262,12 @@ void ac_shop_buy()
 	{
 		ncurs_modal_msg("May the gods curse you for wasting my time, mutters the old man.");
 	}
-
-	set_player_location(&loc_shop);
 }
 
 void ac_shop_sell()
 {
 	ncurs_modal_msg("The poor man has no coins to buy anything from you.\n"
 	                "you have: %s",player.weapon->name);
-	set_player_location(&loc_shop);
 }
 
 void ac_messageboard()

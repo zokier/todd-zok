@@ -6,6 +6,7 @@
 #include "globals.h"
 #include "skills.h"
 #include "character.h"
+#include "actions.h"
 
 WINDOW *background_win;
 WINDOW *command_win;
@@ -211,6 +212,7 @@ void ncurs_modal_msg(const char *fmt, ...)
 	wprintw(game_win, "\n\nContinue...\n");
 	wrefresh(game_win);
 	getch();
+	set_player_location(player.location); /* after getch, redraw command_win */
 }
 
 /* Prints a message to log window
