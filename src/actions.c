@@ -60,6 +60,14 @@ void ac_fight_1() {
 	use_skill(1);
 }
 
+void ac_fight_2() {
+	use_skill(2);
+}
+
+void ac_fight_3() {
+	use_skill(3);
+}
+
 void ac_dungeons_glow()
 {
 	set_player_location(&loc_shrine);
@@ -118,6 +126,7 @@ void ac_view_stats()
 	wprintw(game_win,"Stamina / AP: %d\n", player.action_points);
 	wprintw(game_win,"XP:           %d\n", player.experience);
 	wprintw(game_win,"Money:        %d\n",player.money);
+	wprintw(game_win,"Health:	%d/%d\n",player.health,player.max_health);
 	wattron(game_win,A_BOLD);
 	wprintw(game_win,"\nElements:\n");
 	wattroff(game_win,A_BOLD);
@@ -270,7 +279,11 @@ void ac_return_to_town()
 
 void ac_quit()
 {
-	ncurs_modal_msg("Bye.");
+	werase(game_win);
+	/* using modal_msg here would force the user to waste a keypress */
+//	ncurs_modal_msg("You leave the town, wondering what treasures you left behind in the dungeons\n");
+	wprintw(game_win,"You leave the town, wondering what treasures you left behind in the dungeons\n");
+	wrefresh(game_win);
 	playing = false;
 }
 

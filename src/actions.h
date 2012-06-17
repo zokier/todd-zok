@@ -11,6 +11,8 @@ void ac_shrine_heal_1();
 void ac_shrine_heal_all();
 void ac_fight_0();
 void ac_fight_1();
+void ac_fight_2();
+void ac_fight_3();
 void ac_list_players();
 void ac_view_stats();
 void ac_tavern();

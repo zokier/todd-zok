@@ -393,5 +393,6 @@ cleanup:
 	free(player.name);
 	closelog();
 	endwin(); /* for curses */
+	printf("\n"); /* cleaner exit: user console is undistorted by ncurses stuff */
 	return return_code;
 }

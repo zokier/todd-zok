@@ -185,7 +185,7 @@ Location loc_shop = {
 
 Location loc_fight = {
 	"",
-	3,
+	6,
 	{
 		{
 			'r',
@@ -193,6 +193,13 @@ Location loc_fight = {
 			"Run",
 			&ac_return_to_town
 		},
+		{
+			'v',
+			"",
+			"View stats",
+			&ac_view_stats
+		},
+
 		{
 			'1',
 			"",
@@ -203,10 +210,25 @@ Location loc_fight = {
 		{
 			'2',
 			"",
-			NULL,
+			"Press 1-4",
 			&ac_fight_1
+		},
+		{
+			'3',
+			"",
+			NULL,
+			&ac_fight_2
+		},
+
+		{
+			'4',
+			"",
+			NULL,
+			&ac_fight_3
 		}
+
 	}
+
 };
 
 Location loc_shrine = {
