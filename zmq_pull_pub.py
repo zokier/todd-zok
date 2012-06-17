@@ -10,6 +10,6 @@ pub_sock = ctx.socket(zmq.PUB)
 pub_sock.bind("tcp://*:5559")
 while True:
 	msg = pull_sock.recv()
-	print msg
+	print (msg)
 	pub_sock.send(msg)
 
