@@ -14,6 +14,7 @@ WINDOW *skills_win;
 WINDOW *game_win;
 WINDOW *log_win;
 WINDOW *input_win;
+WINDOW *fight_stat_win[6];
 
 void draw_background(int x_size, int y_size);
 int y_size, x_size; /* used for bolding titles, must be global */
@@ -123,7 +124,22 @@ void init_ui()
 	game_win = newwin(gamew_height, gamew_width, 1, cmdw_width+4);
 	log_win = newwin(logw_height, logw_width, 1, (x_size-logw_width)-1);
 	input_win = newwin(inputw_height, inputw_width, y_size-2, (x_size-inputw_width)-1);
-	/* debugging: Show windows
+
+	for (int i = 0; i < 3; i++)
+	{
+		fight_stat_win[i] = newwin(6, gamew_width/2, 1+(i*6), cmdw_width+4);
+		fight_stat_win[i+3] = newwin(6, gamew_width/2, y_size - (1+((i+1)*6)), (x_size-logw_width)-((gamew_width/2)+2));
+		/* debugging: Show windows 
+		wbkgd(fight_stat_win[i], '0' + i);
+		wbkgd(fight_stat_win[i+3], '3' + i);
+		box(fight_stat_win[i], 0, 0);
+		box(fight_stat_win[i+3], 0, 0);
+		wnoutrefresh(fight_stat_win[i]);
+		wnoutrefresh(fight_stat_win[i+3]);
+		*/
+	}
+
+	/* debugging: Show windows 
 	wbkgd(command_win, 'C');
 	wbkgd(skills_win, 'S');
 	wbkgd(game_win, 'G');
@@ -260,6 +276,20 @@ void ncurs_location()
 void ncurs_fightinfo(Character *chr, int index)
 {
 	ncurs_log_sysmsg("Chr \"%s\" info at %d", chr->name, index);
+	WINDOW *win = fight_stat_win[index];
+	werase(win);
+	box(win, 0, 0);
+	int name_counter = 0;
+	for (char *c = chr->name; *c != NULL; c++)
+	{
+		mvwaddch(win, (name_counter+1)/10, ((name_counter+1)%10)+((name_counter+1)/10), *c);
+		name_counter++;
+	}
+	for (int i = 0; i < ELEM_COUNT; i++)
+	{
+		mvwprintw(win, (i%3)+2, 1+((i/3)*7), "%c%c:%2d", element_names[i][0], element_names[i][1], chr->elements[i]);
+	}
+	wrefresh(win);
 }
 
 /* Refreshes the skill window */
