@@ -200,12 +200,15 @@ void ncurs_commands() {
  * Waits user to press a key */
 void ncurs_modal_msg(const char *fmt, ...)
 {
+	/* this function has a getch(). Clear the command window so people won't get frustrated */
+	werase(command_win);
+	wrefresh(command_win);
 	// TODO do we want to clear the window first?
 	va_list argp;
 	va_start(argp, fmt);
 	vwprintw(game_win, fmt, argp);
 	va_end(argp);
-	wprintw(game_win, "\nContinue...\n");
+	wprintw(game_win, "\n\nContinue...\n");
 	wrefresh(game_win);
 	getch();
 }
