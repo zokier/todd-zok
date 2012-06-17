@@ -44,8 +44,8 @@ void init_ui()
 		printw("This program needs 80x24 characters of screen 	size to run.\n");
 		printw("You currently have: %dx%d\n", x_size, y_size);
 		printw("Enlarge your screen and press a key or this program might segfault.\n");
-		getch();
 		refresh();
+		getch();
 	}
 
 	/* checks that terminal supports color */
@@ -56,8 +56,8 @@ void init_ui()
 		printw("The game will try to use color whenever possible\n");
 		printw("You might experience problems\n");
 		printw("Press a key to continue\n");
-		getch();
 		refresh();
+		getch();
 	}
 
 	/*
@@ -132,8 +132,8 @@ void init_ui()
 	wnoutrefresh(log_win);
 	wnoutrefresh(input_win);
 	*/
+	ncurs_skills(); /* for the lack of a better place updated here */
 	doupdate();
-	getch();
 }
 
 void draw_background(int x_size, int y_size)
@@ -275,6 +275,9 @@ void ncurs_skills()
 int ncurs_listselect(char *first_item, size_t stride, size_t count)
 {
 	// TODO support more than 16 items
+	// "Nevermind)
+	wprintw(game_win, "x) Nevermind\n");
+	
 	for (size_t i = 0; i < count; i++)
 	{
 		// print index as hex to get larger single character range
@@ -296,6 +299,9 @@ int ncurs_listselect(char *first_item, size_t stride, size_t count)
 			getch_res += 10;
 			break;
 		}
+	
+		if (getch_res == 'x') /* "Nevermind */
+			break;
 	}
 	return getch_res;
 }

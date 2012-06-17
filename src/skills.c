@@ -28,7 +28,10 @@ Skills skills_list[SKILLS_COUNT] = {
 /********************
 Ideas for skills:
 
-proficiency: 
+skill proficiency: 
+elements!
+
+weapon proficiency:
 for every succesful skill / weapon use, you get +1 proficiency for that skill / weapon when damage is done, do rand() % 100. If number is 
 smaller than proficiency, get SUPER STRIKE, double damage etc Basically, chance for a SUPER STRIKE increases when proficiency increases
 

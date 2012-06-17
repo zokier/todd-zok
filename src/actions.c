@@ -144,7 +144,7 @@ void use_skill(int keypress)
 
 	fight_check_dead();
 
-	wrefresh(gamew);
+	wrefresh(game_win);
 #endif
 }
 
@@ -259,24 +259,21 @@ void ac_warena()
 void ac_warena_skills()
 {
 /* The function is exactly the same than in shop_buy, could these be combined? */
-	wprintw(gamew,"\nBren can teach you one of these skills:\n");
-	for (int i=0; i < SKILLS_COUNT; i++)
-		wprintw(gamew,"%i) %s\n", i, skills_list[i].name);
-	wrefresh(gamew);
+	wprintw(game_win,"\nBren can teach you one of these skills:\n");
+	int selection = ncurs_listselect(skills_list[0].name, sizeof(Skills), SKILLS_COUNT);
+	if (selection > 0 && selection != 'x')
+		{
+		player.skill[0] = &skills_list[selection];
+		ncurs_skills();
 
-	// warning: ugly code ahead
-	int getch_res = ERR;
-	while (getch_res == ERR)
-	{
-		getch_res = getch();
-		// lets hope that SKILLS_COUNT < 10
-		if (getch_res < '0' || getch_res > '0'+SKILLS_COUNT)
-			getch_res = ERR;
-	}
-	getch_res -= '0';
-	wprintw(gamew,"YOU JUST LEARNED: %s\n",skills_list[getch_res].name);
-	player.skill = &skills_list[getch_res];
-	wrefresh(gamew);
+		ncurs_log_sysmsg("%s learned a new skill: %s\n",player.name, player.skill[0]->name);
+		ncurs_modal_msg("YOU JUST LEARNED: %s",player.skill[0]->name);
+		}
+
+	if (selection == 'x') {
+		ncurs_modal_msg("Your loss, buddy!\n");
+		}
+
 
 }	
 
@@ -287,17 +284,19 @@ void ac_shop()
 
 void ac_shop_buy()
 {
-	wprintw(game_win,"The poor man is selling these items:\n");
+	wprintw(game_win,"\nThe poor man is selling these items:\n\n");
 	int selection = ncurs_listselect(weapons_list[0].name, sizeof(Weapons), WEAPON_COUNT);
-	if (selection > 0)
-	{
-		player.weapon = &weapons_list[selection];
-		ncurs_modal_msg("YOU JUST BOUGHT: %s",player.weapon->name);
-	}
-	else
-	{
-		ncurs_modal_msg("Nevermind.");
-	}
+	if (selection > 0 && selection != 'x')
+		{
+			player.weapon = &weapons_list[selection];
+			ncurs_log_sysmsg("%s bought %s\n",player.name,player.weapon->name);
+			ncurs_modal_msg("YOU JUST BOUGHT: %s",player.weapon->name);
+		}
+
+	if (selection == 'x') {
+		ncurs_modal_msg("May the gods curse you for wasting my time, mutters the old man.");
+		}
+
 	set_player_location(&loc_shop);
 }
 
@@ -396,8 +395,8 @@ int dmg_calc(int direction) {
 					if (dmg > 0) 
 						enemy.health = enemy.health - dmg;
 					else { /* don't do negative damage */
-						wprintw(gamew,"Enemy blocked!\n"); /* TODO: wprintw(logw); */
-						wrefresh(gamew);
+						wprintw(game_win,"Enemy blocked!\n"); /* TODO: wprintw(logw); */
+						wrefresh(game_win);
 					}	
 					break;
 				} /* player hits enemy */
@@ -422,8 +421,8 @@ int dmg_calc(int direction) {
 					if (dmg > 0) 
 						player.health = player.health - dmg;
 					else { /* don't do negative damage */
-						wprintw(gamew,"You blocked!\n"); /* TODO: wprintw(logw); */
-						wrefresh(gamew);
+						wprintw(game_win,"You blocked!\n"); /* TODO: wprintw(logw); */
+						wrefresh(game_win);
 					}
 					break;
 				}
@@ -482,14 +481,14 @@ void fight_check_dead() {
 		enemy_dead = true;
 	if (enemy_dead)
 	{
-		mvwprintw(gamew,14,0,"%s is slain!\n\n", enemy.name);
+		mvwprintw(game_win,14,0,"%s is slain!\n\n", enemy.name);
 		int money = 7;
 		int exp = 10;
-		mvwprintw(gamew,15,0,"You find %d coins on the corpse, and gain %d experience\n", money, exp);
+		mvwprintw(game_win,15,0,"You find %d coins on the corpse, and gain %d experience\n", money, exp);
 		player.money += money;
 		player.experience += exp;
-		mvwprintw(gamew,16,0,"<MORE>");
-		wrefresh(gamew);
+		mvwprintw(game_win,16,0,"<MORE>");
+		wrefresh(game_win);
 		getch();
 		set_player_location(&loc_dungeons);
 	}
@@ -505,13 +504,13 @@ void fight_check_dead() {
 		player_dead = true;
 	if (player_dead)
 	{
-		wclear (gamew);
-		mvwprintw(gamew,6,0,"The world fades around you as you fall to the ground,\nbleeding.");
-		wattron(gamew,A_BOLD);
-		wattron(gamew,A_UNDERLINE);
-		mvwprintw(gamew,8,0,"You are dead.");
-		wattroff(gamew,A_BOLD);
-		wattroff(gamew,A_UNDERLINE);
+		wclear (game_win);
+		mvwprintw(game_win,6,0,"The world fades around you as you fall to the ground,\nbleeding.");
+		wattron(game_win,A_BOLD);
+		wattron(game_win,A_UNDERLINE);
+		mvwprintw(game_win,8,0,"You are dead.");
+		wattroff(game_win,A_BOLD);
+		wattroff(game_win,A_UNDERLINE);
 		playing = false;
 	}
 
