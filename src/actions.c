@@ -13,30 +13,6 @@
 #include "character.h"
 #include "combat.h"
 
-int check_rnd_events() {
-	int i = rand() % 1000;
-	/* calculate probabilities to random events and then switch to the proper function */
-	/* this part is only meant to make switching */
-
-#define PROB(x) (i < (prob_max += x))
-	int prob_max = 0;
-	// TODO: write the rest of the events, adjust probabilities
-	if (PROB(10)) /* ==> chance is 10 out of 1000 */
-		return ev_old_man();
-
-	if (PROB(10)) /* ==> chance is 10 out of 1000 */
-		return ev_old_man();
-
-	if (PROB(10)) /* ==> chance is 10 out of 1000 */
-		return ev_old_man();
-
-	if (PROB(2)) /* ==> chance is 2 out of 1000 */
-		return ev_old_man();
-#undef PROB
-	/* if there's no random event, return 0. All random events should return 1; */
-	return 0;
-}
-
 void set_player_location(Location* loc)
 {
 	player.location = loc;
@@ -87,22 +63,6 @@ void ac_fight_1() {
 void ac_dungeons_glow()
 {
 	set_player_location(&loc_shrine);
-}
-
-void ac_ev_oldman_help()
-{
-	ncurs_modal_msg("Thank you kind sir! Here take this for your trouble.\n\n"
-	                "The old man shoves a purse in your hands.\n");
-	ncurs_log_sysmsg("You gain 100 gold!");
-	player.money += 100;
-	set_player_location(&loc_dungeons);
-}
-
-void ac_ev_oldman_nohelp()
-{
-	ncurs_log_chatmsg("May the gods curse you.", "Old man"); // just for fun
-	player.action_points++;
-	set_player_location(&loc_dungeons);
 }
 
 void ac_shrine_heal_1()
@@ -239,15 +199,12 @@ void ac_shop_buy()
 	{
 		ncurs_modal_msg("May the gods curse you for wasting my time, mutters the old man.");
 	}
-
-	set_player_location(&loc_shop);
 }
 
 void ac_shop_sell()
 {
 	ncurs_modal_msg("The poor man has no coins to buy anything from you.\n"
 	                "you have: %s",player.weapon->name);
-	set_player_location(&loc_shop);
 }
 
 void ac_messageboard()

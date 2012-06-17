@@ -2,8 +2,6 @@
 #define ACTIONS_H
 
 void ac_dungeons();
-void ac_ev_oldman_help();
-void ac_ev_oldman_nohelp();
 void ac_dungeons_action();
 void ac_dungeons_glow();
 void ac_dungeons_enter();
@@ -25,5 +23,6 @@ void ac_messageboard_view();
 void ac_messageboard_write();
 void ac_return_to_town();
 void ac_quit();
+void set_player_location(Location* loc);
 
 #endif //ACTIONS_H

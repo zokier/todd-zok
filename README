@@ -35,16 +35,24 @@ psql (9.1.3)
 Type "help" for help.
 
 todd=>  create table player_logins (id serial primary key , name varchar not null unique, passwd text not null);
-NOTICE: CREATE TABLE will create implicit sequence "player_logins_id_seq" for serial column "player_logins.id"
-NOTICE: CREATE TABLE / PRIMARY KEY will create implicit index "player_logins_pkey" for table "player_logins"
-NOTICE: CREATE TABLE / UNIQUE will create implicit index "player_logins_name_key" for table "player_logins"
-CREATE TABLE
 todd=> alter table player_logins add check (name <> '');
-ALTER TABLE
+todd=# alter table player_logins add money int; 
+todd=# alter table player_logins add xp int;                                                                                                      
+todd=# alter table player_logins add location int;
+todd=# alter table player_logins add action_points int;
+todd=# alter table player_logins add health int;
+todd=# alter table player_logins add max_health int;
+todd=# alter table player_logins add wood int;
+todd=# alter table player_logins add fire int;
+todd=# alter table player_logins add earth int;
+todd=# alter table player_logins add metal int;
+todd=# alter table player_logins add water int;
+todd=# alter table player_logins add weapon int;
+todd=# alter table player_logins add skill1 int;
+todd=# alter table player_logins add skill2 int;
+todd=# alter table player_logins add skill3 int;
+todd=# alter table player_logins add skill4 int;
 todd=> create table messageboard (id serial primary key, timestamp timestamp default now() not null, player_id integer references player_logins(id) on update cascade not null, body text not null);
-NOTICE:  CREATE TABLE will create implicit sequence "messageboard_id_seq" for serial column "messageboard.id"
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "messageboard_pkey" for table "messageboard"
-CREATE TABLE
 todd=> \q
 
 === Combat system description ===

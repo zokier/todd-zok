@@ -6,6 +6,7 @@
 #include "globals.h"
 #include "skills.h"
 #include "character.h"
+#include "actions.h"
 
 WINDOW *background_win;
 WINDOW *command_win;
@@ -200,14 +201,18 @@ void ncurs_commands() {
  * Waits user to press a key */
 void ncurs_modal_msg(const char *fmt, ...)
 {
+	/* this function has a getch(). Clear the command window so people won't get frustrated */
+	werase(command_win);
+	wrefresh(command_win);
 	// TODO do we want to clear the window first?
 	va_list argp;
 	va_start(argp, fmt);
 	vwprintw(game_win, fmt, argp);
 	va_end(argp);
-	wprintw(game_win, "\nContinue...\n");
+	wprintw(game_win, "\n\nContinue...\n");
 	wrefresh(game_win);
 	getch();
+	set_player_location(player.location); /* after getch, redraw command_win */
 }
 
 /* Prints a message to log window
