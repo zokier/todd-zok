@@ -313,3 +313,20 @@ int ncurs_listselect(char *first_item, size_t stride, size_t count)
 	return getch_res;
 }
 
+void ncurs_bold_input(int yes) {
+if (yes) {
+        wattron(background_win,A_BOLD);
+        mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
+        wattroff(background_win,A_BOLD);
+        wrefresh(background_win);
+        }
+else {
+        werase(input_win);
+        mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
+        wrefresh(background_win);
+	wrefresh(input_win);
+        }
+}
+
+
+

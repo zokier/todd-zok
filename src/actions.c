@@ -343,6 +343,7 @@ void ac_messageboard_view()
 extern char* itoa(int i);
 void ac_messageboard_write()
 {
+ncurs_bold_input(1);
 /* echo, noecho and wgetnstr(input_win) enable users to see what they write */
 	int len = 80;
 	char *line = malloc(len); // more dynamic memory allocation would be nice
@@ -362,6 +363,8 @@ void ac_messageboard_write()
 	}
 	free(line);
 	noecho();
+	ncurs_bold_input(0);
+	
 	werase(game_win);
 	ncurs_modal_msg("\n\nYour message has been written.\nYou start to wonder if it was worth it.\n");
 }
@@ -530,18 +533,14 @@ int len = 80;
 char *line = malloc(len); // more dynamic memory allocation would be nice
 echo();
 /* TODO: make bolding a specified window title a function */
-wattron(background_win,A_BOLD);
-mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
-wattroff(background_win,A_BOLD);
-wrefresh(background_win);
+ncurs_bold_input(1);
 
 if (wgetnstr(input_win,line, len) != ERR) // TODO a better way to get input
 	ncurs_log_chatmsg(line,player.name); 
 noecho();
-werase(input_win);
 wrefresh(input_win);
 /* draw the title again, this time with no bolding */
-mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
-wrefresh(background_win);
+ncurs_bold_input(0);
 
 }
+

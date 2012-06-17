@@ -12,5 +12,5 @@ void ncurs_log_sysmsg(const char *fmt, ...);
 void ncurs_log_chatmsg(char *msg, char *source);
 void ncurs_fightwindow(Character *chr, int index);
 int ncurs_listselect(char *first_item, size_t stride, size_t count);
-
+void ncurs_bold_input(int yes);
 #endif
