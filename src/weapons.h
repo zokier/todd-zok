@@ -11,6 +11,7 @@ struct Weapons {
 	char name[20];
 	Element dmg_type;
 	int damage;
+	int price;	/* is the shop the only place to buy / sell weapons ?? */
 };
 
 #endif //PLAYER_H

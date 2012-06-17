@@ -51,7 +51,7 @@ todd=> \q
 
 Damage is calculated: skill.damage + weapon.damage
 
-if "elements are aligned" (means that elemental_type, skill.dmg_type and weapon.dmg_type are the same),
+if "elements are aligned" (means that skill.dmg_type and weapon.dmg_type are the same),
 damage gets a bonus the size of player.element (or enemy.element)
 
 blocking is calculated:

@@ -18,7 +18,6 @@ struct Character {
 	// TODO add more stats 
 	int health;
 	int max_health;
-	Element elemental_type;
 	int elements[ELEM_COUNT]; // use enum Element to access
 	Weapons *weapon;
 	Skills *skill[4];

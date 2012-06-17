@@ -289,9 +289,17 @@ void ac_shop_buy()
 	int selection = ncurs_listselect(weapons_list[0].name, sizeof(Weapons), WEAPON_COUNT);
 	if (selection > 0 && selection != 'x')
 		{
-			player.weapon = &weapons_list[selection];
-			ncurs_log_sysmsg("%s bought %s\n",player.name,player.weapon->name);
-			ncurs_modal_msg("YOU JUST BOUGHT: %s",player.weapon->name);
+			/* see if player has the money for it */
+			if (player.money >= &weapons_list[selection].price) {
+				player.weapon = &weapons_list[selection];
+				ncurs_log_sysmsg("%s bought %s\n for %d",player.name,player.weapon->name,player.weapon->price);
+				ncurs_modal_msg("YOU JUST BOUGHT: %s",player.weapon->name);
+				}
+			else
+				{
+				ncurs_modal_msg("Come back when you have the money for it!\n");
+				}
+				
 		}
 
 	if (selection == 'x') {
@@ -384,12 +392,13 @@ int dmg_calc(int direction) {
 					/* calculate normal damage done based on skill + weapon */
 					dmg = (player.skill->damage + player.weapon->damage);
 
-					/* elements align == player elemental type (dominant element), skill type and weapon type are the same */
-					/* if elements align, dmg = dmg + element of player.element_type */
+					/* elements align == player skill type and weapon type are the same */
 					/* also, if elements align, changes to enemy elemental balance occur */
-					if (player.elemental_type == player.skill->dmg_type && player.elemental_type == player.weapon->dmg_type) {
-						dmg = dmg + dmg_calc_alignbonus(direction, player.elemental_type);
-						align_elements(direction,player.elemental_type);
+					if (player.skill->dmg_type == player.weapon->dmg_type) {
+						/* TODO: rewrite functions, don't use elemental type */
+						/* instead, dmg = dmg + that element of the character*/
+						// dmg = dmg + dmg_calc_alignbonus(direction, player.elemental_type);
+						//align_elements(direction,player.elemental_type);
 					}
 
 					/* calculate blocking by enemy*/
@@ -413,9 +422,10 @@ int dmg_calc(int direction) {
 					/* elements align == player elemental type (dominant element), skill type and weapon type are the same */
 					/* if elements align, dmg = dmg + element of player.element_type */
 					/* also, if elements align, changes to enemy elemental balance occur */
-					if (enemy.elemental_type == enemy.skill->dmg_type && enemy.elemental_type == enemy.weapon->dmg_type) {
-						dmg = dmg + dmg_calc_alignbonus(direction, enemy.elemental_type);
-						align_elements(direction,enemy.elemental_type);
+					if (enemy.skill->dmg_type type == enemy.weapon->dmg_type) {
+
+						// dmg = dmg + dmg_calc_alignbonus(direction, enemy.elemental_type);
+						//align_elements(direction,enemy.elemental_type);
 					}
 
 					/* calculate blocking by player */
@@ -449,14 +459,9 @@ void align_elements(int direction, Element type) {
 	}
 }
 
-int dmg_calc_alignbonus(int direction, Element type) {
-	switch (direction) {
-		case 0: /* 0 = player hits enemy */
-			return player.elements[player.elemental_type];
-		case 1: /* 1 = enemy hits player */
-			return enemy.elements[player.elemental_type];
-	}
-	return 0;
+/* alignbonus already uses character */
+int dmg_calc_alignbonus(Character character, Element element) {
+return character.elements[element];
 }
 
 int dmg_calc_blocking(int direction, Element dmg_type)

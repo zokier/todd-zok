@@ -124,7 +124,6 @@ void load_player_data()
 	{
 		player.elements[i] = 5;
 	}
-	player.elemental_type = ELEM_WOOD;
 	player.weapon = &weapons_list[0];
 	player.skill[0] = &skills_list[1];
 	player.skill[1] = NULL;

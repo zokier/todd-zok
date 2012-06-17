@@ -5,7 +5,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Wood elemental baby",
 		.health = 10,
-		.elemental_type = ELEM_WOOD,
 		.elements = {
 			10,
 			2,
@@ -20,7 +19,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Wolf cub",
 		.health = 7,
-		.elemental_type = ELEM_WOOD,
 		.elements = {
 			4,
 			2,
@@ -35,7 +33,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Wild boar",
 		.health = 10,
-		.elemental_type = ELEM_WOOD,
 		.elements = {
 			5,
 			2,
@@ -50,7 +47,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Wolf mother",
 		.health = 15,
-		.elemental_type = ELEM_WOOD,
 		.elements = {
 			7,
 			3,
@@ -65,7 +61,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Woodland critter",
 		.health = 4,
-		.elemental_type = ELEM_WOOD,
 		.elements = {
 			3,
 			1,
@@ -80,7 +75,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Bear",
 		.health = 25,
-		.elemental_type = ELEM_WOOD,
 		.elements = {
 			9,
 			4,
@@ -97,7 +91,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Wood elemental baby",
 		.health = 10,
-		.elemental_type = ELEM_WOOD,
 		.elements = {
 			5,
 			2,
@@ -112,7 +105,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Fire elemental baby",
 		.health = 10,
-		.elemental_type = ELEM_FIRE,
 		.elements = {
 			2,
 			5,
@@ -127,7 +119,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Earth elemental baby",
 		.health = 10,
-		.elemental_type = ELEM_EARTH,
 		.elements = {
 			2,
 			2,
@@ -142,7 +133,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Metal elemental baby",
 		.health = 10,
-		.elemental_type = ELEM_METAL,
 		.elements = {
 			2,
 			2,
@@ -157,7 +147,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Water elemental baby",
 		.health = 10,
-		.elemental_type = ELEM_WATER,
 		.elements = {
 			2,
 			2,
@@ -172,7 +161,6 @@ Character enemylist[2][ENEMY_COUNT] = {{
 	{
 		.name = "Touho the dog",
 		.health = 99,
-		.elemental_type = ELEM_EARTH,
 		.elements = {
 			99,
 			99,
