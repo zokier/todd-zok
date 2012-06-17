@@ -215,11 +215,12 @@ void ncurs_modal_msg(const char *fmt, ...)
 	set_player_location(player.location); /* after getch, redraw command_win */
 }
 
+
 /* Prints a message to log window
  * The message is styled as a "system" message */
 void ncurs_log_sysmsg(const char *fmt, ...)
 {
-	// TODO scrolling
+	scrollok(log_win, 1);
 	wprintw(log_win, "-!- ");
 	va_list argp;
 	va_start(argp, fmt);
@@ -227,15 +228,17 @@ void ncurs_log_sysmsg(const char *fmt, ...)
 	va_end(argp);
 	waddch(log_win, '\n');
 	wrefresh(log_win);
+	scrollok(log_win, 0);
 }
 
 /* Print a message to log window
  * The message is styled as a "chat" message */
 void ncurs_log_chatmsg(char *msg, char *source)
 {
-	// TODO scrolling
+	scrollok(log_win, 1);
 	wprintw(log_win, "%s> %s\n", source, msg);
 	wrefresh(log_win);
+	scrollok(log_win, 0);
 }
 
 /*	Prints descriptions at current player position */
