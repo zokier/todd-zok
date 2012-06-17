@@ -11,21 +11,9 @@
 #include "weapons.h"
 #include "skills.h"
 #include "character.h"
-
-#define DISABLE_COMBAT
-
-// globals are nasty?
-Character enemy;
-
-void use_skill(int keypress);
-int dmg_calc(int direction);
-int dmg_calc_alignbonus(int direction, Element type);
-int dmg_calc_blocking(int direction, Element type);
-void fight_check_dead();
-void align_elements(int direction, Element type);
+#include "combat.h"
 
 int check_rnd_events() {
-
 	int i = rand() % 1000;
 	/* calculate probabilities to random events and then switch to the proper function */
 	/* this part is only meant to make switching */
@@ -49,13 +37,6 @@ int check_rnd_events() {
 	return 0;
 }
 
-void create_enemy()
-{
-	/* randomly choose an enemy from enemylist, based on player dungeon level */
-	int random_enemy = rand() % ENEMY_COUNT;
-	memcpy(&enemy,&enemylist[player.dungeon_lvl][random_enemy], sizeof(enemy));
-}
-
 void set_player_location(Location* loc)
 {
 	player.location = loc;
@@ -75,7 +56,6 @@ void ac_dungeons_enter() {
 
 void ac_dungeons_action()
 {
-#ifndef DISABLE_COMBAT
 	if (player.action_points > 0)
 	{
 		player.action_points--;
@@ -83,20 +63,16 @@ void ac_dungeons_action()
 		if (check_rnd_events() != 1) {/* return 1 => a random event occurred, don't fight */
 			set_player_location(&loc_fight);
 			create_enemy();
-			/* TODO: UI prettier, do you need fight_youw or not? */
 			ncurs_log_sysmsg("You encounter a %s!", enemy.name);
 
-			ncurs_fightinfo(player, 0);
-			ncurs_fightinfo(enemy, 3);
+			ncurs_fightinfo(&player, 0);
+			ncurs_fightinfo(&enemy, 3);
 		}
 	}
 	else
 	{
 		ncurs_log_sysmsg("You feel too tired to fight\n");
 	}
-#else
-	ncurs_modal_msg("Tumbleweed rolls across the road. No action here");
-#endif
 }
 
 /* helper functions so I don't need to rewrite that much code */
@@ -106,46 +82,6 @@ void ac_fight_0() {
 
 void ac_fight_1() {
 	use_skill(1);
-}
-
-void use_skill(int keypress)
-{
-
-#ifndef DISABLE_COMBAT
-	/* this function is entered with a keypress from ac_fight0 and so on*/
-	/* the keypress is used to determine what attack is used */
-
-	/* 1. the player already chose the attack (int keypress), now it's time for the enemy */
-	/* TODO: make the enemy actually attack */
-	/* TODO: struct enemy needs a weapon etc */
-
-	/* 2. calculate damage */
-	/* player does damage */
-	/* Wu Xing cycles:
-	   Wood causes +FIRE, -EARTH
-	   Fire causes +EARTH, -METAL
-	   Earth causes +METAL, -WATER
-	   Metal causes +WATER, -WOOD
-	   Water causes +WOOD, -FIRE
-	   */
-
-	dmg_calc(0); /* player hits enemy */
-	player.action_points = player.action_points - player.skill->ap_cost; /* spend action points on the attack */
-
-	dmg_calc(1); /* enemy hits player */
-	/* TODO: Struct Enemy don't have action points. Once they do, make enemy spend action points as well */
-
-	/* 3. update stats and display them, TODO: display attack info */
-
-	ncurs_fightstats(fight_youw);
-	ncurs_fightstats_enemy(fight_enemyw);
-
-	/* 4. check for dead player/enemy */
-
-	fight_check_dead();
-
-	wrefresh(game_win);
-#endif
 }
 
 void ac_dungeons_glow()
@@ -380,153 +316,6 @@ void ac_quit()
 	ncurs_modal_msg("Bye.");
 	playing = false;
 }
-
-#ifndef DISABLE_COMBAT
-/* direction: 0 => player hits enemy, 1 => enemy hits player */
-/* TODO: is there a simpler way to do this? */
-
-int dmg_calc(int direction) {
-	int dmg = 0;
-
-	switch (direction) {
-		case 0: { /* player hits enemy */
-					/* calculate normal damage done based on skill + weapon */
-					dmg = (player.skill->damage + player.weapon->damage);
-
-					/* elements align == player skill type and weapon type are the same */
-					/* also, if elements align, changes to enemy elemental balance occur */
-					if (player.skill->dmg_type == player.weapon->dmg_type) {
-						/* TODO: rewrite functions, don't use elemental type */
-						/* instead, dmg = dmg + that element of the character*/
-						// dmg = dmg + dmg_calc_alignbonus(direction, player.elemental_type);
-						//align_elements(direction,player.elemental_type);
-					}
-
-					/* calculate blocking by enemy*/
-					/* blocking elements are based on skill used to attack. TODO: should this be weapon instead? */
-					dmg = dmg - dmg_calc_blocking(direction, player.skill->dmg_type);
-
-					/* calculate damage */
-					if (dmg > 0) 
-						enemy.health = enemy.health - dmg;
-					else { /* don't do negative damage */
-						wprintw(game_win,"Enemy blocked!\n"); /* TODO: wprintw(logw); */
-						wrefresh(game_win);
-					}	
-					break;
-				} /* player hits enemy */
-
-		case 1: { /* enemy hits player */
-					/* calculate normal damage done based on skill + weapon */
-					dmg = (enemy.skill->damage + enemy.weapon->damage);
-
-					/* elements align == player elemental type (dominant element), skill type and weapon type are the same */
-					/* if elements align, dmg = dmg + element of player.element_type */
-					/* also, if elements align, changes to enemy elemental balance occur */
-					if (enemy.skill->dmg_type type == enemy.weapon->dmg_type) {
-
-						// dmg = dmg + dmg_calc_alignbonus(direction, enemy.elemental_type);
-						//align_elements(direction,enemy.elemental_type);
-					}
-
-					/* calculate blocking by player */
-					/* blocking elements are based on skill used to attack. TODO: should this be weapon instead? */
-					dmg = dmg - dmg_calc_blocking(direction, enemy.skill->dmg_type);
-
-					/* calculate damage */
-					if (dmg > 0) 
-						player.health = player.health - dmg;
-					else { /* don't do negative damage */
-						wprintw(game_win,"You blocked!\n"); /* TODO: wprintw(logw); */
-						wrefresh(game_win);
-					}
-					break;
-				}
-	}
-return 0; /* this should never happen, btw */
-}
-
-/* direction: 0 => player->enemy. 1 => enemy->player */
-void align_elements(int direction, Element type) {
-	switch (direction) {
-		case 0: /* player hits enemy, enemy elements change */
-			enemy.elements[(type+1) % ELEM_COUNT]++;
-			enemy.elements[(type+2) % ELEM_COUNT]--;
-			break;
-		case 1: /* enemy hits player, player elements change */
-			player.elements[(type+1) % ELEM_COUNT]++;
-			player.elements[(type+2) % ELEM_COUNT]--;
-			break;
-	}
-}
-
-/* alignbonus already uses character */
-int dmg_calc_alignbonus(Character character, Element element) {
-return character.elements[element];
-}
-
-int dmg_calc_blocking(int direction, Element dmg_type)
-{
-	switch (direction) {
-		case 0:
-			return enemy.elements[(dmg_type+3) % ELEM_COUNT];
-		case 1:
-			return player.elements[(dmg_type+3) % ELEM_COUNT];
-	}
-	return 0;
-}
-
-
-void fight_check_dead() {
-
-	/* TODO: figure out the order of checking deaths: attacks are simultaneous. Iniative? */
-
-	/* check if enemy dies */
-	bool enemy_dead = false;
-	for (size_t i = 0; i < ELEM_COUNT; i++)
-	{
-		if(enemy.elements[i] <= 0)
-			enemy_dead = true;
-	}
-	if (enemy.health <= 0)
-		enemy_dead = true;
-	if (enemy_dead)
-	{
-		mvwprintw(game_win,14,0,"%s is slain!\n\n", enemy.name);
-		int money = 7;
-		int exp = 10;
-		mvwprintw(game_win,15,0,"You find %d coins on the corpse, and gain %d experience\n", money, exp);
-		player.money += money;
-		player.experience += exp;
-		mvwprintw(game_win,16,0,"<MORE>");
-		wrefresh(game_win);
-		getch();
-		set_player_location(&loc_dungeons);
-	}
-
-	/* check if player dies as well */
-	bool player_dead = false;
-	for (size_t i = 0; i < 5; i++)
-	{
-		if(player.elements[i] <= 0)
-			player_dead = true;
-	}
-	if (player.health <= 0)
-		player_dead = true;
-	if (player_dead)
-	{
-		wclear (game_win);
-		mvwprintw(game_win,6,0,"The world fades around you as you fall to the ground,\nbleeding.");
-		wattron(game_win,A_BOLD);
-		wattron(game_win,A_UNDERLINE);
-		mvwprintw(game_win,8,0,"You are dead.");
-		wattroff(game_win,A_BOLD);
-		wattroff(game_win,A_UNDERLINE);
-		playing = false;
-	}
-
-}
-#endif 
 
 void ncurs_chat(Character player) {
 int len = 80;

@@ -11,6 +11,7 @@ extern void *push_socket;
 extern void *chat_socket;
 extern void *zmq_context;
 extern Character player;
+extern Character enemy;
 extern PGconn *conn;
 
 extern Weapons weapons_list[];

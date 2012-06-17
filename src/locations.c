@@ -214,14 +214,14 @@ Location loc_fight = {
 			&ac_return_to_town
 		},
 		{
-			'0',
+			'1',
 			"",
 			NULL,
 			&ac_fight_0
 		},
 
 		{
-			'1',
+			'2',
 			"",
 			NULL,
 			&ac_fight_1
