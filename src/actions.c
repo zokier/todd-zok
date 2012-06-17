@@ -261,7 +261,7 @@ void ac_warena_skills()
 {
 	/* The function is exactly the same than in shop_buy, could these be combined? */
 	wprintw(game_win,"\nBren can teach you one of these skills:\n");
-	int selection = ncurs_listselect(skills_list[0].name, sizeof(Skills), SKILLS_COUNT);
+	int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), SKILLS_COUNT);
 	if (selection > 0)
 	{
 		player.skill[0] = &skills_list[selection];
@@ -284,11 +284,11 @@ void ac_shop()
 void ac_shop_buy()
 {
 	wprintw(game_win,"\nThe poor man is selling these items:\n\n");
-	int selection = ncurs_listselect(weapons_list[0].name, sizeof(Weapons), WEAPON_COUNT);
+	int selection = ncurs_listselect(&(weapons_list[0].name), sizeof(Weapons), WEAPON_COUNT);
 	if (selection > 0)
 	{
 		/* see if player has the money for it */
-		if (player.money >= &weapons_list[selection].price) {
+		if (player.money >= weapons_list[selection].price) {
 			player.weapon = &weapons_list[selection];
 			ncurs_log_sysmsg("%s bought %s\n for %d",player.name,player.weapon->name,player.weapon->price);
 			ncurs_modal_msg("YOU JUST BOUGHT: %s",player.weapon->name);

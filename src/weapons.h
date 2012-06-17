@@ -8,7 +8,7 @@
 typedef struct Weapons Weapons;
 struct Weapons {
 	int index;	/* is index used anywhere? Can it be removed? */
-	char name[20];
+	char *name;
 	Element dmg_type;
 	int damage;
 	int price;	/* is the shop the only place to buy / sell weapons ?? */

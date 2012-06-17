@@ -276,7 +276,7 @@ void ncurs_skills()
 /* Prints a list of items to game window
  * returns the index of the item that player chooses
  * or -1 if player cancels or error occures */
-int ncurs_listselect(char *first_item, size_t stride, size_t count)
+int ncurs_listselect(char **first_item, size_t stride, size_t count)
 {
 	// TODO support more than 16 items
 	// "Nevermind)
@@ -285,7 +285,8 @@ int ncurs_listselect(char *first_item, size_t stride, size_t count)
 	for (size_t i = 0; i < count; i++)
 	{
 		// print index as hex to get larger single character range
-		wprintw(game_win, "%x) %s\n", i&0xF, first_item+(stride*i));
+		// pointer is cast to void and back to calculate the position of next string
+		wprintw(game_win, "%x) %s\n", i&0xF, *(char**)(((void*)first_item)+(stride*i)));
 	}
 	wrefresh(game_win);
 	int getch_res = ERR;

@@ -7,7 +7,7 @@
 
 typedef struct Skills Skills;
 struct Skills {
-	char name[20];
+	char *name;
 	// TODO add more stats
 	Element dmg_type;
 	int damage;
