@@ -259,23 +259,21 @@ void ac_warena()
 
 void ac_warena_skills()
 {
-/* The function is exactly the same than in shop_buy, could these be combined? */
+	/* The function is exactly the same than in shop_buy, could these be combined? */
 	wprintw(game_win,"\nBren can teach you one of these skills:\n");
 	int selection = ncurs_listselect(skills_list[0].name, sizeof(Skills), SKILLS_COUNT);
-	if (selection > 0 && selection != 'x')
-		{
+	if (selection > 0)
+	{
 		player.skill[0] = &skills_list[selection];
 		ncurs_skills();
 
 		ncurs_log_sysmsg("%s learned a new skill: %s\n",player.name, player.skill[0]->name);
 		ncurs_modal_msg("YOU JUST LEARNED: %s",player.skill[0]->name);
-		}
-
-	if (selection == 'x') {
+	}
+	else
+	{
 		ncurs_modal_msg("Your loss, buddy!\n");
-		}
-
-
+	}
 }	
 
 void ac_shop()
@@ -287,24 +285,24 @@ void ac_shop_buy()
 {
 	wprintw(game_win,"\nThe poor man is selling these items:\n\n");
 	int selection = ncurs_listselect(weapons_list[0].name, sizeof(Weapons), WEAPON_COUNT);
-	if (selection > 0 && selection != 'x')
+	if (selection > 0)
+	{
+		/* see if player has the money for it */
+		if (player.money >= &weapons_list[selection].price) {
+			player.weapon = &weapons_list[selection];
+			ncurs_log_sysmsg("%s bought %s\n for %d",player.name,player.weapon->name,player.weapon->price);
+			ncurs_modal_msg("YOU JUST BOUGHT: %s",player.weapon->name);
+		}
+		else
 		{
-			/* see if player has the money for it */
-			if (player.money >= &weapons_list[selection].price) {
-				player.weapon = &weapons_list[selection];
-				ncurs_log_sysmsg("%s bought %s\n for %d",player.name,player.weapon->name,player.weapon->price);
-				ncurs_modal_msg("YOU JUST BOUGHT: %s",player.weapon->name);
-				}
-			else
-				{
-				ncurs_modal_msg("Come back when you have the money for it!\n");
-				}
-				
+			ncurs_modal_msg("Come back when you have the money for it!\n");
 		}
 
-	if (selection == 'x') {
+	}
+	else
+	{
 		ncurs_modal_msg("May the gods curse you for wasting my time, mutters the old man.");
-		}
+	}
 
 	set_player_location(&loc_shop);
 }

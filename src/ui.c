@@ -274,7 +274,8 @@ void ncurs_skills()
 }
 
 /* Prints a list of items to game window
- * returns the index of the item that player chooses */
+ * returns the index of the item that player chooses
+ * or -1 if player cancels or error occures */
 int ncurs_listselect(char *first_item, size_t stride, size_t count)
 {
 	// TODO support more than 16 items
@@ -302,9 +303,12 @@ int ncurs_listselect(char *first_item, size_t stride, size_t count)
 			getch_res += 10;
 			break;
 		}
-	
-		if (getch_res == 'x') /* "Nevermind */
+		else if (getch_res == 'x' || getch_res == ERR)
+		{
+			/* "Nevermind */
+			getch_res = -1;
 			break;
+		}
 	}
 	return getch_res;
 }
