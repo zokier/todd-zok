@@ -1,0 +1,31 @@
+database:
+	- save/restore char data
+		- create table
+		- prepare queries
+
+ui:
+	- listselect
+		- show prices
+	- combat
+		- show hp
+		- less hardcoding and magic numbers
+		- right align second column of stats
+		- be smarter about stat box width
+	- input
+		- make a line input function
+		- async with zmq
+
+random stuff:
+	- dungeons->glow->return to town -> return to dungeons
+	- view stats -> health is not aligned
+	- Stamina/AP -> just stamina or ap
+	- remove yelling?
+	- ask for lesson 
+		-> '0' cancels action?! (also in shop. bug in listselect?)
+		-> Heavy attack should not replace previous skill
+			-> player should choose which slot new skill is placed?
+	- buy items -> "Bare hands"? Bit grotesque, are they in a jar?
+	- death -> game freeze?
+	- view stats should show weapons etc
+	- loot/exp gain should be logged
+	- dungeons->return to town quits game (after a fight)
