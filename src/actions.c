@@ -188,13 +188,12 @@ void ac_warena_skills()
 	/* The function is exactly the same than in shop_buy, could these be combined? */
 	wprintw(game_win,"\nBren can teach you one of these skills:\n");
 	int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), SKILLS_COUNT);
-	if (selection > 0)
+	if (selection >= 0 && selection <= SKILLS_COUNT)
 	{
-		player.skill[0] = &skills_list[selection];
-		ncurs_skills();
+		int slot = check_for_skill_slots(selection);
 
-		ncurs_log_sysmsg("%s learned a new skill: %s\n",player.name, player.skill[0]->name);
-		ncurs_modal_msg("YOU JUST LEARNED: %s",player.skill[0]->name);
+		ncurs_log_sysmsg("%s learned a new skill: %s\n",player.name, player.skill[slot]->name);
+		ncurs_modal_msg("YOU JUST LEARNED: %s",player.skill[slot]->name);
 	}
 	else
 	{

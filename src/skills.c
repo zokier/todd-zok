@@ -1,4 +1,6 @@
+#include <string.h>
 #include "skills.h"
+#include "globals.h"
 
 Skills unused_skill = { "Unused",0,0,0 };
 Skills skills_list[SKILLS_COUNT] = {
@@ -25,6 +27,26 @@ Skills skills_list[SKILLS_COUNT] = {
 	}
 
 };
+
+int check_for_skill_slots(int skillnumber) {
+int i;
+for (i = 0; i <= 3; i++) { /* go through all available slots first */
+        if (strcmp(player.skill[i]->name,"Unused") == 0) {
+		ncurs_log_sysmsg("found");
+		player.skill[i] = &skills_list[skillnumber];
+		ncurs_skills();
+		return i;
+		}
+	}
+
+/* No Unused skill slot found */
+/* TODO: create a function to ask player what skill will be overwritten */
+	ncurs_log_chatmsg("Looks like you've got to forget something to learn something. (TODO)", "Bren");
+	player.skill[0] = &skills_list[skillnumber];
+	ncurs_skills();
+	return 0;
+
+}
 
 /********************
 Ideas for skills:

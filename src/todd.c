@@ -125,7 +125,7 @@ void load_player_data()
 		player.elements[i] = 5;
 	}
 	player.weapon = &weapons_list[0];
-	player.skill[0] = &skills_list[1];
+	player.skill[0] = &skills_list[0];
 	player.skill[1] = &unused_skill;
 	player.skill[2] = &unused_skill;
 	player.skill[3] = &unused_skill;

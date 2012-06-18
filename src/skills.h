@@ -5,6 +5,7 @@
 
 #define SKILLS_COUNT 3
 
+
 typedef struct Skills Skills;
 struct Skills {
 	char *name;
@@ -14,4 +15,8 @@ struct Skills {
 	int ap_cost;
 };
 
+int check_for_skill_slots(int skillnumber);
+
+
 #endif //SKILLS_H
+
