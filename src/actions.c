@@ -143,6 +143,18 @@ void ac_view_stats()
 	wprintw(game_win,"Skill 4:	%s\n",player.skill[3]->name);
 
 	wrefresh(game_win);
+
+	/* if stats are viewed during a fight, getch() and display char info again */
+	/* TODO: player and enemy hardcoded to 0 and 3 */
+	if (player.location == &loc_fight) {
+		wprintw(game_win,"\n\n<MORE>");
+		wrefresh(game_win);
+		getch();
+		werase(game_win);
+		wrefresh(game_win);
+		ncurs_fightinfo(&player, 0);
+		ncurs_fightinfo(&enemy, 3);
+		}
 }
 
 void ac_tavern()

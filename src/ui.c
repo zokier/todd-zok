@@ -275,7 +275,7 @@ void ncurs_location()
  */
 void ncurs_fightinfo(Character *chr, int index)
 {
-	ncurs_log_sysmsg("Chr \"%s\" info at %d", chr->name, index);
+	// DEBUG?: ncurs_log_sysmsg("Chr \"%s\" info at %d", chr->name, index);
 	WINDOW *win = fight_stat_win[index];
 	werase(win);
 	box(win, 0, 0);

@@ -12,15 +12,11 @@ ui:
 		- less hardcoding and magic numbers
 		- right align second column of stats
 		- be smarter about stat box width
+		- fix elemental alignment attacks
 	- input
 		- make a line input function
 		- async with zmq
 
 random stuff:
-	- ask for lesson 
-		-> '0' cancels action?! (also in shop. bug in listselect?)
-		-> Heavy attack should not replace previous skill
-			-> player should choose which slot new skill is placed?
 	- death -> game freeze?
-	- loot/exp gain should be logged
-	- dungeons->return to town quits game (after a fight)
+	- DOES THIS REALLY HAPPEN: dungeons->return to town quits game (after a fight)

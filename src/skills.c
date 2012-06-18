@@ -32,7 +32,6 @@ int check_for_skill_slots(int skillnumber) {
 int i;
 for (i = 0; i <= 3; i++) { /* go through all available slots first */
         if (strcmp(player.skill[i]->name,"Unused") == 0) {
-		ncurs_log_sysmsg("found");
 		player.skill[i] = &skills_list[skillnumber];
 		ncurs_skills();
 		return i;

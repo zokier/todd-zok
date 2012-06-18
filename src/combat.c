@@ -12,7 +12,7 @@ Character enemy;
 
 extern void set_player_location(Location* loc);
 
-void fight_check_dead() {
+int fight_check_dead() {
 
 	/* TODO: figure out the order of checking deaths: attacks are simultaneous. Iniative? */
 
@@ -31,10 +31,12 @@ void fight_check_dead() {
 		int exp = 10;
 		player.money += money;
 		player.experience += exp;
+		werase(game_win);
+		ncurs_log_sysmsg("%s has killed %s!",player.name,enemy.name);
+		ncurs_log_sysmsg("%s received %d coins and %d XP",player.name,money,exp);
 		ncurs_modal_msg(
 			"%s is slain!\n\n"
-			"You find %d coins on the corpse, and gain %d experience\n", 
-			enemy.name, money, exp);
+			"You find %d coins on the corpse, and gain %d experience\n", enemy.name, money, exp);
 		set_player_location(&loc_dungeons);
 	}
 
@@ -59,7 +61,10 @@ void fight_check_dead() {
 		getch();
 		playing = false;
 	}
-
+if (enemy_dead)
+	return 1; /* if enemy is dead, don't redraw stuff anymore */
+else
+	return 0;
 }
 
 void create_enemy()
@@ -136,13 +141,17 @@ void use_skill(int keypress)
 		// Enemy attack
 		skill_effect(&enemy, &player, enemy.skill[0]);
 
-		/* 3. update stats and display them */
-		ncurs_fightinfo(&player, 0);
-		ncurs_fightinfo(&enemy, 3);
+		/* 3. check for dead player/enemy */
+		int enemy_dead = fight_check_dead();
 
-		/* 4. check for dead player/enemy */
-		fight_check_dead();
+		/* 4. update stats and display them IF THE ENEMY DIDN'T DIE */
+		if (!enemy_dead) {
+			ncurs_fightinfo(&player, 0);
+			ncurs_fightinfo(&enemy, 3);
+			}
 		wrefresh(game_win);
+
+
 	}
 	else
 	{
