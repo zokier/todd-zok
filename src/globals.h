@@ -18,6 +18,7 @@ extern Weapons weapons_list[];
 extern Weapons weapons_enemy[];
 extern Character enemylist[2][ENEMY_COUNT];
 extern Skills skills_list[];
+extern Skills unused_skill;
 extern WINDOW *game_win;
 extern WINDOW *input_win;
 extern WINDOW *background_win;

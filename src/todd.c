@@ -126,9 +126,9 @@ void load_player_data()
 	}
 	player.weapon = &weapons_list[0];
 	player.skill[0] = &skills_list[1];
-	player.skill[1] = NULL;
-	player.skill[2] = NULL;
-	player.skill[3] = NULL;
+	player.skill[1] = &unused_skill;
+	player.skill[2] = &unused_skill;
+	player.skill[3] = &unused_skill;
 	player.dungeon_lvl = 0;
 }
 

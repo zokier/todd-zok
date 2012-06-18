@@ -119,22 +119,29 @@ void ac_list_players()
 
 void ac_view_stats()
 {
-	// TODO prettify
+	// It looks ugly here, but correct ingame
 	werase(game_win);
 	wrefresh(game_win);
-	wprintw(game_win,"Name:         %s\n", player.name);
-	wprintw(game_win,"Stamina / AP: %d\n", player.action_points);
-	wprintw(game_win,"XP:           %d\n", player.experience);
-	wprintw(game_win,"Money:        %d\n",player.money);
-	wprintw(game_win,"Health:	%d/%d\n",player.health,player.max_health);
+	wprintw(game_win,"Name:		%s\n", player.name);
+	wprintw(game_win,"Stamina:	%d\n", player.action_points);
+	wprintw(game_win,"XP:		%d\n", player.experience);
+	wprintw(game_win,"Money:		%d\n",player.money);
+	wprintw(game_win,"Health:		%d/%d\n",player.health,player.max_health);
 	wattron(game_win,A_BOLD);
 	wprintw(game_win,"\nElements:\n");
 	wattroff(game_win,A_BOLD);
-	wprintw(game_win,"Wood:         %d\n",player.elements[ELEM_WOOD]);
-	wprintw(game_win,"Fire:         %d\n",player.elements[ELEM_FIRE]);
-	wprintw(game_win,"Earth:        %d\n",player.elements[ELEM_EARTH]);
-	wprintw(game_win,"Metal:        %d\n",player.elements[ELEM_METAL]);
-	wprintw(game_win,"Water:        %d\n",player.elements[ELEM_WATER]);
+	wprintw(game_win,"Wood:		%d\n",player.elements[ELEM_WOOD]);
+	wprintw(game_win,"Fire:		%d\n",player.elements[ELEM_FIRE]);
+	wprintw(game_win,"Earth:		%d\n",player.elements[ELEM_EARTH]);
+	wprintw(game_win,"Metal:		%d\n",player.elements[ELEM_METAL]);
+	wprintw(game_win,"Water:		%d\n",player.elements[ELEM_WATER]);
+
+	wprintw(game_win,"\nWeapon:		%s\n",player.weapon->name);
+	wprintw(game_win,"Skill 1:	%s\n",player.skill[0]->name);
+	wprintw(game_win,"Skill 2:	%s\n",player.skill[1]->name);
+	wprintw(game_win,"Skill 3:	%s\n",player.skill[2]->name);
+	wprintw(game_win,"Skill 4:	%s\n",player.skill[3]->name);
+
 	wrefresh(game_win);
 }
 
@@ -171,20 +178,6 @@ void ac_tavern_info()
 	ncurs_modal_msg("TODO: Implement\n");
 }
 
-void ac_tavern_shout()
-{
-	puts("What do you want to yell?");
-	// TODO line input widget
-	int len = 80;
-	char *line = malloc(len); // more dynamic memory allocation would be nice
-	if (getnstr(line, len) != ERR)
-	{
-		send_chatmsg(line, strlen(line));
-		ncurs_log_chatmsg(line, player.name);
-	}
-	free(line);
-}
-
 void ac_warena()
 {
 	set_player_location(&loc_warena);
@@ -217,12 +210,15 @@ void ac_shop()
 void ac_shop_buy()
 {
 	wprintw(game_win,"\nThe poor man is selling these items:\n\n");
-	int selection = ncurs_listselect(&(weapons_list[0].name), sizeof(Weapons), WEAPON_COUNT);
-	if (selection > 0)
+	int selection = ncurs_listselect(&(weapons_list[1].name), sizeof(Weapons), WEAPON_COUNT-1) +1;
+	wprintw(game_win,"selection: %d\n",selection);
+	wrefresh(game_win);
+	if (selection > 0 && selection <= WEAPON_COUNT)
 	{
 		/* see if player has the money for it */
 		if (player.money >= weapons_list[selection].price) {
 			player.weapon = &weapons_list[selection];
+			player.money = player.money - weapons_list[selection].price;
 			ncurs_log_sysmsg("%s bought %s\n for %d",player.name,player.weapon->name,player.weapon->price);
 			ncurs_modal_msg("YOU JUST BOUGHT: %s",player.weapon->name);
 		}
@@ -232,7 +228,7 @@ void ac_shop_buy()
 		}
 
 	}
-	else
+	else /* listselect should allow this only on x) Nevermind */
 	{
 		ncurs_modal_msg("May the gods curse you for wasting my time, mutters the old man.");
 	}

@@ -42,7 +42,7 @@ Weapons weapons_list[WEAPON_COUNT] = {
 		"Stick of mayhem",
 		ELEM_WOOD,
 		3,
-		50
+		9
 	},
 
 	{

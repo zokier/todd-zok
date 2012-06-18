@@ -331,6 +331,7 @@ int ncurs_listselect(char **first_item, size_t stride, size_t count)
 	while (true)
 	{
 		getch_res = getch();
+		/* TODO: only accept numbers <= WEAPON_COUNT */
 		if (getch_res >= '0' && getch_res <= '9')
 		{
 			getch_res -= '0';

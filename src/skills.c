@@ -1,5 +1,6 @@
 #include "skills.h"
 
+Skills unused_skill = { "Unused",0,0,0 };
 Skills skills_list[SKILLS_COUNT] = {
 
 	{
