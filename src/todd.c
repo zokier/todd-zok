@@ -122,7 +122,7 @@ void load_player_data()
 	player.health = player.max_health;
 	for (int i = 0; i < ELEM_COUNT; i++)
 	{
-		player.elements[i] = 5;
+		player.elements[i] = 3;
 	}
 	player.weapon = &weapons_list[0];
 	player.skill[0] = &skills_list[0];
