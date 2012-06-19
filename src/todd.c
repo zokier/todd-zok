@@ -265,9 +265,34 @@ bool create_player()
 	const char *params[2] = {player.name, passwd};
 	PGresult *res;
 	res = PQexecPrepared(conn, "new_login", 2, params, NULL, NULL, 0);
-	if (PQresultStatus(res) == PGRES_COMMAND_OK)
+	if (PQresultStatus(res) == PGRES_TUPLES_OK)
 	{
-		ret = true;
+		int row_count = PQntuples(res);
+		if (row_count == 1)
+		{
+			player.id = atoi(PQgetvalue(res, 0, 0));
+			PQclear(res);
+			char *player_id = itoa(player.id);
+			const char *params_stats[1] = {player_id};
+			res = PQexecPrepared(conn, "new_player_stats", 1, params_stats, NULL, NULL, 0);
+			if (PQresultStatus(res) == PGRES_COMMAND_OK)
+			{
+				ret = true;
+			}
+			else
+			{
+				syslog(LOG_WARNING, "Player data create failed: %s", PQresultErrorMessage(res));
+			}
+			free(player_id);
+		}
+		else
+		{
+			syslog(LOG_WARNING, "Player create failed: no id returned");
+		}
+	}
+	else
+	{
+		syslog(LOG_WARNING, "Player create failed: %s", PQresultErrorMessage(res));
 	}
 	PQclear(res);
 	free(passwd);
@@ -417,13 +442,19 @@ bool init_pq()
 		goto pq_cleanup;
 	}
 	PQclear(res);
-	res = PQprepare(conn, "new_login", "insert into player_logins (name, passwd) values ($1, crypt(cast($2 as text), gen_salt('bf')));", 2, NULL);
+	res = PQprepare(conn, "new_login", "insert into player_logins (name, passwd) values ($1, crypt(cast($2 as text), gen_salt('bf'))) returning player_logins.id;", 2, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;
 	}
 	PQclear(res);
 	res = PQprepare(conn, "save_player", "update player_stats set (action_points, experience, money, health, max_health, wood, fire, earth, metal, water, weapon, skill_0, skill_1, skill_2, skill_3, dungeon_level) = ($2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) where id = $1;", 17, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear(res);
+	res = PQprepare(conn, "new_player_stats", "insert into player_stats (id) values ($1);", 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;
