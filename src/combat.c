@@ -58,6 +58,7 @@ int fight_check_dead() {
 		mvwprintw(game_win,8,0,"You are dead.");
 		wattroff(game_win,A_BOLD);
 		wattroff(game_win,A_UNDERLINE);
+		wrefresh(game_win);
 		getch();
 		playing = false;
 	}
