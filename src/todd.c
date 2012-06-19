@@ -113,23 +113,119 @@ bool check_passwd()
 
 void load_player_data()
 {
-	// TODO fetch data from DB
-	player.location = &loc_town;
-	player.action_points = 100;
-	player.experience = 0;
-	player.money = 10;
-	player.max_health = 10;
-	player.health = player.max_health;
-	for (int i = 0; i < ELEM_COUNT; i++)
+	char *player_id = itoa(player.id);
+	const char *params[1] = {player_id};
+	PGresult *res;
+	res = PQexecPrepared(conn, "load_player", 1, params, NULL, NULL, 0);
+	if (PQresultStatus(res) == PGRES_TUPLES_OK)
 	{
-		player.elements[i] = 5;
+		int row_count = PQntuples(res);
+		int col_count = PQnfields(res);
+		if (row_count > 0)
+		{
+			if (row_count > 1)
+			{
+				syslog(LOG_WARNING, "Duplicate player data found. id = %d, name = %s, row count %d", player.id, player.name, row_count);
+			}
+			// load data from first row even if there is multiple rows
+			player.location = &loc_town; // TODO should location be fetched from db??
+			int col_cursor = 0;
+			player.action_points = atoi(PQgetvalue(res, 0, col_cursor++));
+			player.experience = atoi(PQgetvalue(res, 0, col_cursor++));
+			player.money = atoi(PQgetvalue(res, 0, col_cursor++));
+			player.health = atoi(PQgetvalue(res, 0, col_cursor++));
+			player.max_health = atoi(PQgetvalue(res, 0, col_cursor++));
+			for (int i = 0; i < ELEM_COUNT; i++)
+			{
+				player.elements[i] = atoi(PQgetvalue(res, 0, col_cursor++));
+			}
+			player.weapon = &weapons_list[atoi(PQgetvalue(res, 0, col_cursor++))];
+			for (int i = 0; i < 4; i++)
+			{
+				player.skill[i] = &skills_list[atoi(PQgetvalue(res, 0, col_cursor++))];
+			}
+			player.dungeon_lvl = atoi(PQgetvalue(res, 0, col_cursor++));
+			if (col_cursor != col_count)
+			{
+				syslog(LOG_WARNING, "col_cursor: %d != col_count: %d", col_cursor, col_count);
+			}
+		}
+		else
+		{
+			syslog(LOG_WARNING, "Player data not found. Player id = %d, name = %s", player.id, player.name);
+		}
 	}
-	player.weapon = &weapons_list[0];
-	player.skill[0] = &skills_list[0];
-	player.skill[1] = &unused_skill;
-	player.skill[2] = &unused_skill;
-	player.skill[3] = &unused_skill;
-	player.dungeon_lvl = 0;
+	else
+	{
+		syslog(LOG_WARNING, "Player data load failed: %s", PQresultErrorMessage(res));
+	}
+	free(player_id);
+	PQclear(res);
+}
+
+void save_player_data()
+{
+	char *player_id = itoa(player.id);
+	char *action_points = itoa(player.action_points);
+	char *experience = itoa(player.experience);
+	char *money = itoa(player.money);
+	char *health = itoa(player.health);
+	char *max_health = itoa(player.max_health);
+	char *elem_0 = itoa(player.elements[0]);
+	char *elem_1 = itoa(player.elements[1]);
+	char *elem_2 = itoa(player.elements[2]);
+	char *elem_3 = itoa(player.elements[3]);
+	char *elem_4 = itoa(player.elements[4]);
+	// TODO get correct indices
+	char *weapon = "0";
+	char *skill_0 = "0";
+	char *skill_1 = "0";
+	char *skill_2 = "0";
+	char *skill_3 = "0";
+	char *dungeon_lvl = itoa(player.dungeon_lvl);
+	const char *params[17] = {
+		player_id,
+		action_points,
+		experience,
+		money,
+		health,
+		max_health,
+		elem_0,
+		elem_1,
+		elem_2,
+		elem_3,
+		elem_4,
+		weapon,
+		skill_0,
+		skill_1,
+		skill_2,
+		skill_3,
+		dungeon_lvl
+	};
+	PGresult *res;
+	res = PQexecPrepared(conn, "save_player", 17, params, NULL, NULL, 0);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		syslog(LOG_WARNING, "Player data save failed: %s", PQresultErrorMessage(res));
+	}
+	free(player_id);
+	free(action_points);
+	free(experience);
+	free(money);
+	free(health);
+	free(max_health);
+	free(elem_0);
+	free(elem_1);
+	free(elem_2);
+	free(elem_3);
+	free(elem_4);
+//	free(weapon);
+//	free(skill_0);
+//	free(skill_1);
+//	free(skill_2);
+//	free(skill_3);
+	free(dungeon_lvl);
+	PQclear(res);
 }
 
 bool check_name()
@@ -191,12 +287,12 @@ bool get_player()
 	{
 		for (int retries = 0; retries < RETRY_LIMIT; retries++)
 		{
+			sleep(1);
 			if (check_passwd())
 			{
 				return true;
 			}
 			puts("Incorrect password.");
-			sleep(1);
 		}
 		return false;
 	}
@@ -327,6 +423,18 @@ bool init_pq()
 		goto pq_cleanup;
 	}
 	PQclear(res);
+	res = PQprepare(conn, "save_player", "update player_stats set (action_points, experience, money, health, max_health, wood, fire, earth, metal, water, weapon, skill_0, skill_1, skill_2, skill_3, dungeon_level) = ($2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) where id = $1;", 17, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear(res);
+	res = PQprepare(conn, "load_player", "select action_points, experience, money, heath, max_health, wood, fire, earth, metal, water, weapon, skill_0, skill_1, skill_2, skill_3, dungeon_level from player_stats where id = $1;", 1, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear(res);
 	res = PQprepare(conn, "view_messageboard", "select name, timestamp, body from messageboard, player_logins where player_logins.id = messageboard.player_id order by messageboard.id desc limit 10;", 0, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
@@ -384,6 +492,7 @@ int main(int argc, char *argv[])
 
 	init_ui();
 	enter_game();
+	save_player_data();
 
 	return_code = EXIT_SUCCESS; // returned from game, success
 
