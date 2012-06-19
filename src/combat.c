@@ -51,6 +51,7 @@ int fight_check_dead() {
 		player_dead = true;
 	if (player_dead)
 	{
+		ncurs_log_sysmsg("%s has killed %s!",enemy.name,player.name);
 		wclear (game_win);
 		mvwprintw(game_win,6,0,"The world fades around you as you fall to the ground,\nbleeding.");
 		wattron(game_win,A_BOLD);
@@ -113,7 +114,7 @@ void skill_effect(Character *source, Character *dest, Skills *skill)
 	}
 	else
 	{ /* don't do negative damage */
-		ncurs_log_sysmsg("%s blcked attack from %s.", dest->name, source->name);
+		ncurs_log_sysmsg("%s blocked attack from %s.", dest->name, source->name);
 	}
 	source->action_points -= skill->ap_cost; /* spend action points on the attack */
 }
