@@ -8,7 +8,7 @@ Skills skills_list[SKILLS_COUNT] = {
 	{
 		"Basic Attack",	/* name */
 		ELEM_EARTH,	/* element */
-		3,		/* damage */
+		0,		/* damage */
 		1		/* ap cost */
 	},
 
@@ -21,7 +21,7 @@ Skills skills_list[SKILLS_COUNT] = {
 
 	{
 		"Heavy attack",
-		ELEM_EARTH,
+		ELEM_METAL,
 		5,
 		2
 	}

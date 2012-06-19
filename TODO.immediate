@@ -12,7 +12,6 @@ ui:
 		- less hardcoding and magic numbers
 		- right align second column of stats
 		- be smarter about stat box width
-		- fix elemental alignment attacks
 	- input
 		- make a line input function
 		- async with zmq

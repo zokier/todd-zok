@@ -6,7 +6,7 @@ Weapons weapons_enemy[3] = {
 		0,
 		"Claw",
 		ELEM_EARTH,
-		2,
+		5,
 		0
 	},
 
@@ -14,7 +14,7 @@ Weapons weapons_enemy[3] = {
 		1,
 		"Fire breath",
 		ELEM_FIRE,
-		4,
+		8,
 		0
 	},
 
