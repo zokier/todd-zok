@@ -1,6 +1,5 @@
 ui:
 	- listselect
-		- show prices
 		- only allow keyboard selection for numbers between 0 and WEAPON_COUNT
 	- input
 		- make a line input function

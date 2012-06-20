@@ -199,7 +199,8 @@ void ac_warena_skills()
 {
 	/* The function is exactly the same than in shop_buy, could these be combined? */
 	wprintw(game_win,"\nBren can teach you one of these skills:\n");
-	int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), SKILLS_COUNT);
+	//int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), (void*)&(skills_list[0].price) - (void*)&(skills_list[0].name), SKILLS_COUNT);
+	int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), 0, SKILLS_COUNT);
 	if (selection >= 0 && selection < SKILLS_COUNT)
 	{
 		int slot = check_for_skill_slots(selection);
@@ -224,7 +225,7 @@ void ac_shop()
 void ac_shop_buy()
 {
 	wprintw(game_win,"\nThe poor man is selling these items:\n\n");
-	int selection = ncurs_listselect(&(weapons_list[1].name), sizeof(Weapons), WEAPON_COUNT-1) +1;
+	int selection = ncurs_listselect(&(weapons_list[1].name), sizeof(Weapons), (void*)&(weapons_list[1].price) - (void*)&(weapons_list[1].name), WEAPON_COUNT-1) +1;
 	wprintw(game_win,"selection: %d\n",selection);
 	wrefresh(game_win);
 	if (selection > 0 && selection <= WEAPON_COUNT)

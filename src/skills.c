@@ -36,7 +36,7 @@ int check_for_skill_slots(int skillnumber) {
 		"Skill slot 3",
 		"Skill slot 4"
 	};
-	int slot_number = ncurs_listselect(slots, sizeof(char*), 4);
+	int slot_number = ncurs_listselect(slots, sizeof(char*), 0, 4);
 	if (slot_number >= 0)
 	{
 		player.skill[slot_number] = &skills_list[skillnumber];
