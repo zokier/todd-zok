@@ -229,7 +229,7 @@ void ncurs_modal_msg(const char *fmt, ...)
 	va_start(argp, fmt);
 	vwprintw(game_win, fmt, argp);
 	va_end(argp);
-	wprintw(game_win, "\n\nContinue...\n");
+	wprintw(game_win, "\n\n%s\n", _("Continue..."));
 	wrefresh(game_win);
 	getch();
 	set_player_location(player.location); /* after getch, redraw command_win */
@@ -290,7 +290,7 @@ void ncurs_fightinfo(Character *chr, int index)
 	}
 	if (fight_statw_width < 20)
 	{
-		mvwprintw(win, 2, 1, "HP:%3d", chr->health);
+		mvwprintw(win, 2, 1, "%s:%3d", _("HP"), chr->health);
 		for (int i = 0; i < 3; i++)
 		{
 			mvwprintw(win, i+3, 1, "%c%c:%2d", element_names[i][0], element_names[i][1], chr->elements[i]);
@@ -302,7 +302,7 @@ void ncurs_fightinfo(Character *chr, int index)
 	}
 	else
 	{
-		mvwprintw(win, 2, 1, "Health:%3d", chr->health);
+		mvwprintw(win, 2, 1, "%s:%3d", _("Health"), chr->health);
 		for (int i = 0; i < 3; i++)
 		{
 			mvwprintw(win, i+3, 1, "%s:%2d", element_names[i], chr->elements[i]);
@@ -347,7 +347,7 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 {
 	// TODO support more than 16 items
 	// "Nevermind)
-	wprintw(game_win, "x) Nevermind\n");
+	wprintw(game_win, "x) %s\n", _("Nevermind"));
 	
 	for (size_t i = 0; i < count; i++)
 	{

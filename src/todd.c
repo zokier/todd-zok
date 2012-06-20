@@ -91,7 +91,7 @@ bool check_passwd()
 	bool ret = false;
 	char *passwd = NULL;
 	size_t passwd_len = 0;
-	printf("Welcome number %d, enter password: ", player.id);
+	printf(_("Welcome number %d, enter password: "), player.id);
 	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
 	passwd[line_len-1] = '\0'; // strip newline
 	char *player_id = itoa(player.id);
@@ -252,13 +252,13 @@ bool create_player()
 	bool ret = false;
 	if (!check_name())
 	{
-		puts("Invalid name. Allowed characters: A-Z, a-z, dash and space.");
-		printf("Minimum name length: %d characters.\n", NAME_MIN_LENGTH);
+		puts(_("Invalid name. Allowed characters: A-Z, a-z, dash and space."));
+		printf(_("Minimum name length: %d characters.\n"), NAME_MIN_LENGTH);
 		return ret;
 	}
 	char *passwd = NULL;
 	size_t passwd_len = 0;
-	printf("Welcome new player, enter password: ");
+	printf(_("Welcome new player, enter password: "));
 	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
 	passwd[line_len-1] = '\0'; // strip newline
 	// TODO ask password for a second time to avoid typos
@@ -317,7 +317,7 @@ bool get_player()
 			{
 				return true;
 			}
-			puts("Incorrect password.");
+			puts(_("Incorrect password."));
 		}
 		return false;
 	}

@@ -36,12 +36,12 @@ int fight_check_dead() {
 		player.experience += exp;
 		werase(game_win);
 		if (enemy_dead_elements)
-			ncurs_log_sysmsg("%s has caused an elemental imbalance in %s",player.name,enemy.name);		
-		ncurs_log_sysmsg("%s has killed %s!",player.name,enemy.name);
-		ncurs_log_sysmsg("%s received %d coins and %d XP",player.name,money,exp);
+			ncurs_log_sysmsg(_("%s has caused an elemental imbalance in %s"),player.name,enemy.name);		
+		ncurs_log_sysmsg(_("%s has killed %s!"),player.name,enemy.name);
+		ncurs_log_sysmsg(_("%s received %d coins and %d XP"),player.name,money,exp);
 		ncurs_modal_msg(
-			"%s is slain!\n\n"
-			"You find %d coins on the corpse, and gain %d experience\n", enemy.name, money, exp);
+			_("%s is slain!\n\nYou find %d coins on the corpse, and gain %d experience\n"), 
+			enemy.name, money, exp);
 		set_player_location(&loc_dungeons);
 	}
 
@@ -60,17 +60,17 @@ int fight_check_dead() {
 	if (player_dead)
 	{
 		if (player_dead_elements)
-			ncurs_log_sysmsg("%s has caused an elemental imbalance in %s",enemy.name,player.name);		
-		ncurs_log_sysmsg("%s has killed %s!",enemy.name,player.name);
+			ncurs_log_sysmsg(_("%s has caused an elemental imbalance in %s"),enemy.name,player.name);		
+		ncurs_log_sysmsg(_("%s has killed %s!"),enemy.name,player.name);
 		wclear (game_win);
 		if (player_dead_elements)
-			mvwprintw(game_win,6,0,"The world around you starts to spin.\nYou sense a great imbalance inside you.");
+			mvwprintw(game_win,6,0,_("The world around you starts to spin.\nYou sense a great imbalance inside you."));
 		else
-			mvwprintw(game_win,6,0,"The world fades around you as you fall to the ground,\nbleeding.");
+			mvwprintw(game_win,6,0,_("The world fades around you as you fall to the ground,\nbleeding."));
 
 		wattron(game_win,A_BOLD);
 		wattron(game_win,A_UNDERLINE);
-		mvwprintw(game_win,8,0,"You are dead.");
+		mvwprintw(game_win,8,0,_("You are dead."));
 		wattroff(game_win,A_BOLD);
 		wattroff(game_win,A_UNDERLINE);
 		wrefresh(game_win);
@@ -117,13 +117,13 @@ void skill_effect(Character *source, Character *dest, Skills *skill)
 	if (dmg > 0)
 	{
 		dest->health -= dmg;
-		ncurs_log_sysmsg("%s did %d damage to %s", source->name, dmg, dest->name);
+		ncurs_log_sysmsg(_("%s did %d damage to %s"), source->name, dmg, dest->name);
 
 		/* ONLY ALIGN ELEMENTS IF DAMAGE WAS DONE */
 		/* elements align == player skill type and weapon type are the same */
 		/* also, if elements align, changes to enemy elemental balance occur */
 		if (skill->dmg_type == source->weapon->dmg_type) {
-			ncurs_log_sysmsg("%s causes elemental damage to %s",source->name,dest->name);
+			ncurs_log_sysmsg(_("%s causes elemental damage to %s"),source->name,dest->name);
 			dmg += source->elements[skill->dmg_type];
 			align_elements(dest, skill->dmg_type); // TODO is this correct?
 	}
@@ -132,7 +132,7 @@ void skill_effect(Character *source, Character *dest, Skills *skill)
 	}
 	else
 	{ /* don't do negative damage */
-		ncurs_log_sysmsg("%s blocked attack from %s.", dest->name, source->name);
+		ncurs_log_sysmsg(_("%s blocked attack from %s."), dest->name, source->name);
 	}
 	source->action_points -= skill->ap_cost; /* spend action points on the attack */
 }
@@ -176,7 +176,7 @@ void use_skill(int keypress)
 	}
 	else
 	{
-		ncurs_log_sysmsg("You dont have a skill in slot %d", keypress+1);
+		ncurs_log_sysmsg(_("You dont have a skill in slot %d"), keypress+1);
 	}
 }
 

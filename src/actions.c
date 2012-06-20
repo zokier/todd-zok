@@ -39,7 +39,7 @@ void ac_dungeons_action()
 		if (check_rnd_events() != 1) {/* return 1 => a random event occurred, don't fight */
 			set_player_location(&loc_fight);
 			create_enemy();
-			ncurs_log_sysmsg("You encounter a %s!", enemy.name);
+			ncurs_log_sysmsg(_("You encounter a %s!"), enemy.name);
 
 			ncurs_fightinfo(&player, 0);
 			ncurs_fightinfo(&enemy, 3);
@@ -47,7 +47,7 @@ void ac_dungeons_action()
 	}
 	else
 	{
-		ncurs_log_sysmsg("You feel too tired to fight\n");
+		ncurs_log_sysmsg(_("You feel too tired to fight"));
 	}
 }
 
@@ -81,16 +81,16 @@ void ac_shrine_heal_1()
 		{
 			player.health++;
 			player.money--;
-			ncurs_modal_msg("The coin disappears into the slot with a clink. The crystal brightens for a moment and you step away from it feeling slightly better.");
+			ncurs_modal_msg(_("The coin disappears into the slot with a clink. The crystal brightens for a moment and you step away from it feeling slightly better."));
 		}
 		else
 		{
-			ncurs_modal_msg("You search your pockets for coin, but find none.");
+			ncurs_modal_msg(_("You search your pockets for coin, but find none."));
 		}
 	}
 	else
 	{
-		ncurs_modal_msg("You try to insert a coin into the slot but to your surprise the crystal repels your coin.");
+		ncurs_modal_msg(_("You try to insert a coin into the slot but to your surprise the crystal repels your coin."));
 	}
 }
 
@@ -106,14 +106,14 @@ void ac_shrine_heal_all()
 		money = 0;
 	}
 	player.money = money;
-	ncurs_modal_msg("The crystal dazes you with blindingly bright light. As you regain control, you notice that all your wounds have mended.");
+	ncurs_modal_msg(_("The crystal dazes you with blindingly bright light. As you regain control, you notice that all your wounds have mended."));
 	set_player_location(&loc_dungeons);
 }
 
 void ac_list_players()
 {
 	// TODO fetch player list
-	ncurs_modal_msg("The wind is howling in the empty streets of this god forsaken town. You are all alone here.");
+	ncurs_modal_msg(_("The wind is howling in the empty streets of this god forsaken town. You are all alone here."));
 	set_player_location(&loc_town);
 }
 
@@ -122,25 +122,25 @@ void ac_view_stats()
 	// It looks ugly here, but correct ingame
 	werase(game_win);
 	wrefresh(game_win);
-	wprintw(game_win,"Name:		%s\n", player.name);
-	wprintw(game_win,"Stamina:	%d\n", player.action_points);
-	wprintw(game_win,"XP:		%d\n", player.experience);
-	wprintw(game_win,"Money:		%d\n",player.money);
-	wprintw(game_win,"Health:		%d/%d\n",player.health,player.max_health);
+	wprintw(game_win,"%8s: %10s\n", _("Name"), player.name);
+	wprintw(game_win,"%8s: %10d\n", _("Stamina"), player.action_points);
+	wprintw(game_win,"%8s: %10d\n", _("XP"), player.experience);
+	wprintw(game_win,"%8s: %10d\n", _("Money"), player.money);
+	wprintw(game_win,"%8s: %7d/%2d\n", _("Health"), player.health,player.max_health);
 	wattron(game_win,A_BOLD);
-	wprintw(game_win,"\nElements:\n");
+	wprintw(game_win,"\n%s:\n", _("Elements"));
 	wattroff(game_win,A_BOLD);
-	wprintw(game_win,"Wood:		%d\n",player.elements[ELEM_WOOD]);
-	wprintw(game_win,"Fire:		%d\n",player.elements[ELEM_FIRE]);
-	wprintw(game_win,"Earth:		%d\n",player.elements[ELEM_EARTH]);
-	wprintw(game_win,"Metal:		%d\n",player.elements[ELEM_METAL]);
-	wprintw(game_win,"Water:		%d\n",player.elements[ELEM_WATER]);
+	for (int i = 0; i < ELEM_COUNT; i++)
+	{
+		wprintw(game_win,"%8s: %10d\n", element_names[i], player.elements[i]);
+	}
+	wprintw(game_win,"\n");
 
-	wprintw(game_win,"\nWeapon:		%s\n",player.weapon->name);
-	wprintw(game_win,"Skill 1:	%s\n",player.skill[0]->name);
-	wprintw(game_win,"Skill 2:	%s\n",player.skill[1]->name);
-	wprintw(game_win,"Skill 3:	%s\n",player.skill[2]->name);
-	wprintw(game_win,"Skill 4:	%s\n",player.skill[3]->name);
+	wprintw(game_win,"%8s: %10s\n", _("Weapon"), player.weapon->name);
+	for (int i = 0; i < 4; i++)
+	{
+		wprintw(game_win,"%6s %d: %10s\n", _("Skill"), i+1, player.skill[i]->name);
+	}
 
 	wrefresh(game_win);
 
@@ -154,7 +154,7 @@ void ac_view_stats()
 		wrefresh(game_win);
 		ncurs_fightinfo(&player, 0);
 		ncurs_fightinfo(&enemy, 3);
-		}
+	}
 }
 
 void ac_tavern()
@@ -198,7 +198,7 @@ void ac_warena()
 void ac_warena_skills()
 {
 	/* The function is exactly the same than in shop_buy, could these be combined? */
-	wprintw(game_win,"\nBren can teach you one of these skills:\n");
+	wprintw(game_win,"\n%s\n", _("Bren can teach you one of these skills:"));
 	//int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), (void*)&(skills_list[0].price) - (void*)&(skills_list[0].name), SKILLS_COUNT);
 	int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), 0, SKILLS_COUNT);
 	if (selection >= 0 && selection < SKILLS_COUNT)
@@ -207,13 +207,13 @@ void ac_warena_skills()
 
 		if (slot >= 0)
 		{
-			ncurs_log_sysmsg("%s learned a new skill: %s\n",player.name, player.skill[slot]->name);
-			ncurs_modal_msg("YOU JUST LEARNED: %s",player.skill[slot]->name);
+			ncurs_log_sysmsg(_("%s learned a new skill: %s"), player.name, player.skill[slot]->name);
+			ncurs_modal_msg(_("YOU JUST LEARNED: %s"), player.skill[slot]->name);
 		}
 	}
 	else
 	{
-		ncurs_modal_msg("Your loss, buddy!\n");
+		ncurs_modal_msg(_("Your loss, buddy!"));
 	}
 }	
 
@@ -224,35 +224,32 @@ void ac_shop()
 
 void ac_shop_buy()
 {
-	wprintw(game_win,"\nThe poor man is selling these items:\n\n");
+	wprintw(game_win,"\n%s\n", _("The poor man is selling these items:"));
 	int selection = ncurs_listselect(&(weapons_list[1].name), sizeof(Weapons), (void*)&(weapons_list[1].price) - (void*)&(weapons_list[1].name), WEAPON_COUNT-1) +1;
-	wprintw(game_win,"selection: %d\n",selection);
-	wrefresh(game_win);
 	if (selection > 0 && selection <= WEAPON_COUNT)
 	{
 		/* see if player has the money for it */
 		if (player.money >= weapons_list[selection].price) {
 			player.weapon = &weapons_list[selection];
 			player.money = player.money - weapons_list[selection].price;
-			ncurs_log_sysmsg("%s bought %s\n for %d",player.name,player.weapon->name,player.weapon->price);
-			ncurs_modal_msg("YOU JUST BOUGHT: %s",player.weapon->name);
+			ncurs_log_sysmsg(_("%s bought %s\n for %d"),player.name,player.weapon->name,player.weapon->price);
+			ncurs_modal_msg(_("YOU JUST BOUGHT: %s"), player.weapon->name);
 		}
 		else
 		{
-			ncurs_modal_msg("Come back when you have the money for it!\n");
+			ncurs_modal_msg(_("Come back when you have the money for it!"));
 		}
 
 	}
 	else /* listselect should allow this only on x) Nevermind */
 	{
-		ncurs_modal_msg("May the gods curse you for wasting my time, mutters the old man.");
+		ncurs_modal_msg(_("May the gods curse you for wasting my time, mutters the old man."));
 	}
 }
 
 void ac_shop_sell()
 {
-	ncurs_modal_msg("The poor man has no coins to buy anything from you.\n"
-	                "you have: %s",player.weapon->name);
+	ncurs_modal_msg("The poor man has no coins to buy anything from you.\nyou have: %s",player.weapon->name);
 }
 
 void ac_messageboard()
@@ -307,7 +304,7 @@ ncurs_bold_input(1);
 	ncurs_bold_input(0);
 	
 	werase(game_win);
-	ncurs_modal_msg("\n\nYour message has been written.\nYou start to wonder if it was worth it.\n");
+	ncurs_modal_msg(_("Your message has been written.\nYou start to wonder if it was worth it."));
 }
 
 void ac_return_to_town()
@@ -321,24 +318,23 @@ void ac_quit()
 	werase(game_win);
 	/* using modal_msg here would force the user to waste a keypress */
 //	ncurs_modal_msg("You leave the town, wondering what treasures you left behind in the dungeons\n");
-	wprintw(game_win,"You leave the town, wondering what treasures you left behind in the dungeons\n");
+	wprintw(game_win,_("You leave the town, wondering what treasures you left behind in the dungeons\n"));
 	wrefresh(game_win);
 	playing = false;
 }
 
 void ncurs_chat(Character player) {
-int len = 80;
-char *line = malloc(len); // more dynamic memory allocation would be nice
-echo();
-/* TODO: make bolding a specified window title a function */
-ncurs_bold_input(1);
+	int len = 80;
+	char *line = malloc(len); // more dynamic memory allocation would be nice
+	echo();
+	/* TODO: make bolding a specified window title a function */
+	ncurs_bold_input(1);
 
-if (wgetnstr(input_win,line, len) != ERR) // TODO a better way to get input
-	ncurs_log_chatmsg(line,player.name); 
-noecho();
-wrefresh(input_win);
-/* draw the title again, this time with no bolding */
-ncurs_bold_input(0);
-
+	if (wgetnstr(input_win,line, len) != ERR) // TODO a better way to get input
+		ncurs_log_chatmsg(line,player.name); 
+	noecho();
+	wrefresh(input_win);
+	/* draw the title again, this time with no bolding */
+	ncurs_bold_input(0);
 }
 

@@ -81,16 +81,15 @@ Location loc_ev_oldman = {
 
 void ac_ev_oldman_help()
 {
-        ncurs_modal_msg("Thank you kind sir! Here take this for your trouble.\n\n"
-                        "The old man shoves a purse in your hands.\n");
-        ncurs_log_sysmsg("You gain 100 gold!");
+        ncurs_modal_msg(_("Thank you kind sir! Here take this for your trouble.\n\nThe old man shoves a purse in your hands."));
+        ncurs_log_sysmsg(_("You gain 100 gold!"));
         player.money += 100;
         set_player_location(&loc_dungeons);
 }
 
 void ac_ev_oldman_nohelp()
 {
-        ncurs_log_chatmsg("May the gods curse you.", "Old man"); // just for fun
+        ncurs_log_chatmsg(_("May the gods curse you."), "Old man"); // just for fun
         player.action_points++;
         set_player_location(&loc_dungeons);
 }
@@ -100,7 +99,7 @@ void ac_ev_oldman_nohelp()
 /* A BAG OF GOLD */
 int ev_bag_of_gold()
 {
-	ncurs_modal_msg("You find a bag of gold with 100 gold pieces in it!\n");
+	ncurs_modal_msg(_("You find a bag of gold with 100 gold pieces in it!\n"));
 	player.money = player.money +100;
 	return 1;
 }
@@ -130,7 +129,7 @@ int ev_found_item()
 
 	/* The drawing routine is done like this to add excitement */
 	werase(game_win);
-	wprintw(game_win,"Buried under a pile of rocks, you find...\n");
+	wprintw(game_win,_("Buried under a pile of rocks, you find...\n"));
 	wprintw(game_win,"<MORE>");
 	wrefresh(game_win);
 	getch();
@@ -140,7 +139,7 @@ int ev_found_item()
 	mvwprintw(game_win,1,0,buffer);
 	
 	if (item_found) { /* found an item */
-	wprintw(game_win,"\nFor some odd reason, you discard your %s and take the newly found %s\n",player.weapon->name,buffer);
+	wprintw(game_win,_("\nFor some odd reason, you discard your %s and take the newly found %s\n"),player.weapon->name,buffer);
 	wprintw(game_win,"\nEVENT TODO: randomize for more items once you have them\n");
 	wprintw(game_win,"EVENT TODO: make a function that gives player a choice to discard the new weapon\n");
 	player.weapon = &weapons_list[i];
