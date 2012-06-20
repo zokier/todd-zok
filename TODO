@@ -1,9 +1,25 @@
 * Persistance
-	* stats
+	* Player data
+		* skills
+		* items (weapon)
+		* location
+		* last login time
 	* Configuration data
 		* Vendor items/prices
 		* Enemy types
 		* ...
+* Recovery
+	* stamina/ap:
+		* recovery faster in inn/tavern
+		* recovery slows down over time
+	* health:
+		* cheaper in larger blocks
+	* Daily script
+		- C
+		- Python
+		- In-database
+		- sh+psql
+		- other?
 * Multiplayer communication
 	* Recreate input.{h,c}
 	* pvp combat
@@ -14,7 +30,14 @@
 	* verify reliability
 * Combat
 	* Special skills
+		* More interesting effects?
+			- Healing
+			- Poison (damage over time)
+			- Buff/debuff
+			- Multiple targets
 	* Items
+		- Potions
+		- Armor
 	* Dungeon levels
 	* Combat system
 		* Fine tuning the principles
@@ -25,12 +48,6 @@
 				* predictable
 				* multiple users could get same seed
 			* /dev/random
-* Recovery
-	* stamina/ap:
-		* recovery faster in inn/tavern
-		* recovery slows down over time
-	* health:
-		* cheaper in larger blocks
 * Configurable/translatable strings
 	* gettext
 	* most strings need replacement to fit game theme
@@ -38,6 +55,7 @@
 * Validate user input
 	* Messges
 		* Printable characters only 
+		* needs probably ICU for unicode support
 * Configuration
 	* Config files
 		* Parsing (library)?
@@ -45,13 +63,10 @@
 	* In database
 		* Database login info etc needs to be somewhere too
 * Vendors
-	* Buy/sell stuff
-	* Items
-		* Armor
-		* Weapons
-		* Potions?
-		* ...
-	* improve ui
+	* sell stuff
+	* limited supply
+		* replenishes eventually
+	* more items
 * Loot
 	* Creeps drop stuff to sell to vendors
 		* need skills to recover
