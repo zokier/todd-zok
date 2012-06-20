@@ -347,7 +347,7 @@ int ncurs_listselect(char **first_item, size_t stride, size_t count)
 	{
 		// print index as hex to get larger single character range
 		// pointer is cast to void and back to calculate the position of next string
-		wprintw(game_win, "%x) %s\n", i&0xF, *(char**)(((void*)first_item)+(stride*i)));
+		wprintw(game_win, "%x) %s\n", (i+1)&0xF, *(char**)(((void*)first_item)+(stride*i)));
 	}
 	wrefresh(game_win);
 	int getch_res = ERR;
@@ -355,13 +355,14 @@ int ncurs_listselect(char **first_item, size_t stride, size_t count)
 	{
 		getch_res = getch();
 		/* TODO: only accept numbers <= WEAPON_COUNT */
-		if (getch_res >= '0' && getch_res <= '9')
+		if (getch_res >= '1' && getch_res <= '9')
 		{
-			getch_res -= '0';
+			getch_res -= '1';
 			break;
 		}
 		else if (getch_res >= 'a' && getch_res <= 'f')
 		{
+			// TODO ensure that there is no off by one bug here
 			getch_res -= 'a';
 			getch_res += 10;
 			break;

@@ -29,21 +29,20 @@ Skills skills_list[SKILLS_COUNT] = {
 };
 
 int check_for_skill_slots(int skillnumber) {
-int i;
-for (i = 0; i <= 3; i++) { /* go through all available slots first */
-        if (strcmp(player.skill[i]->name,"Unused") == 0) {
-		player.skill[i] = &skills_list[skillnumber];
+	wprintw(game_win, "Select skill slot:\n");
+	char *slots[4] = {
+		"Skill slot 1",
+		"Skill slot 2",
+		"Skill slot 3",
+		"Skill slot 4"
+	};
+	int slot_number = ncurs_listselect(slots, sizeof(char*), 4);
+	if (slot_number >= 0)
+	{
+		player.skill[slot_number] = &skills_list[skillnumber];
 		ncurs_skills();
-		return i;
-		}
 	}
-
-/* No Unused skill slot found */
-/* TODO: create a function to ask player what skill will be overwritten */
-	ncurs_log_chatmsg("Looks like you've got to forget something to learn something. (TODO)", "Bren");
-	player.skill[0] = &skills_list[skillnumber];
-	ncurs_skills();
-	return 0;
+	return slot_number;
 
 }
 
