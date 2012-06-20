@@ -193,7 +193,7 @@ void draw_background(int x_size, int y_size)
 	mvwaddstr(background_win, 0, gamew_logw_sep+2, "Log");
 	mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
 	wattron(background_win, A_DIM);
-	mvwaddstr(background_win, y_size-1, 20 + (gamew_width/2) - 5, "ToDD 0.8.62");
+	mvwprintw(background_win, y_size-1, 20 + (gamew_width/2) - 5, "ToDD %s", REVID);
 	wattroff(background_win, A_DIM);
 }
 

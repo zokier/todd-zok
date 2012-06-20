@@ -1,17 +1,7 @@
-database:
-	- save/restore char data
-		- create table
-		- prepare queries
-
 ui:
 	- listselect
 		- show prices
 		- only allow keyboard selection for numbers between 0 and WEAPON_COUNT
-	- combat
-		- show hp
-		- less hardcoding and magic numbers
-		- right align second column of stats
-		- be smarter about stat box width
 	- input
 		- make a line input function
 		- async with zmq

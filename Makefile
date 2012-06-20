@@ -8,9 +8,10 @@ _OBJS    = $(_SRCS:.c=.o)
 OBJS     = $(addprefix $(OBJDIR)/, $(_OBJS))
 LIBS	 = -lzmq -lpq -lncursesw
 INCPATHS = -I/usr/include/postgresql
+REVID    = $(shell git describe --always --dirty=*)
 
 CC      ?= gcc
-CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -g -std=gnu99
+CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -g -std=gnu99 -DREVID="\"$(REVID)\""
 
 PREFIX    = /usr/local
 
