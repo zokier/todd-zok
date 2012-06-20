@@ -4,7 +4,3 @@ ui:
 	- input
 		- make a line input function
 		- async with zmq
-
-random stuff:
-	- death -> game freeze?
-	- DOES THIS REALLY HAPPEN: dungeons->return to town quits game (after a fight)
