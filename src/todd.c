@@ -178,10 +178,18 @@ void save_player_data()
 	char *elem_4 = itoa(player.elements[4]);
 	// TODO get correct indices
 	char *weapon = "0";
-	char *skill_0 = "0";
-	char *skill_1 = "0";
-	char *skill_2 = "0";
-	char *skill_3 = "0";
+	int skill_id = player.skill[0] - &skills_list[0];
+	if (skill_id < 0 || skill_id >= SKILLS_COUNT) skill_id = -1;
+	char *skill_0 = itoa(skill_id);
+	skill_id = player.skill[1] - &skills_list[0];
+	if (skill_id < 0 || skill_id >= SKILLS_COUNT) skill_id = -1;
+	char *skill_1 = itoa(skill_id);
+	skill_id = player.skill[2] - &skills_list[0];
+	if (skill_id < 0 || skill_id >= SKILLS_COUNT) skill_id = -1;
+	char *skill_2 = itoa(skill_id);
+	skill_id = player.skill[3] - &skills_list[0];
+	if (skill_id < 0 || skill_id >= SKILLS_COUNT) skill_id = -1;
+	char *skill_3 = itoa(skill_id);
 	char *dungeon_lvl = itoa(player.dungeon_lvl);
 	const char *params[17] = {
 		player_id,
@@ -220,10 +228,10 @@ void save_player_data()
 	free(elem_3);
 	free(elem_4);
 //	free(weapon);
-//	free(skill_0);
-//	free(skill_1);
-//	free(skill_2);
-//	free(skill_3);
+	free(skill_0);
+	free(skill_1);
+	free(skill_2);
+	free(skill_3);
 	free(dungeon_lvl);
 	PQclear(res);
 }
