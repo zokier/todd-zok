@@ -177,7 +177,9 @@ void save_player_data()
 	char *elem_3 = itoa(player.elements[3]);
 	char *elem_4 = itoa(player.elements[4]);
 	// TODO get correct indices
-	char *weapon = "0";
+	int weapon_id = player.weapon - &weapons_list[0];
+	if (weapon_id < 0 || weapon_id >= WEAPON_COUNT) weapon_id = -1;
+	char *weapon = itoa(weapon_id);
 	int skill_id = player.skill[0] - &skills_list[0];
 	if (skill_id < 0 || skill_id >= SKILLS_COUNT) skill_id = -1;
 	char *skill_0 = itoa(skill_id);
@@ -227,7 +229,7 @@ void save_player_data()
 	free(elem_2);
 	free(elem_3);
 	free(elem_4);
-//	free(weapon);
+	free(weapon);
 	free(skill_0);
 	free(skill_1);
 	free(skill_2);
