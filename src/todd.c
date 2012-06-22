@@ -18,9 +18,6 @@
 #include "globals.h"
 #include "character.h"
 
-#define NAME_QUERY "What's your name, adventurer?  "
-#define WELCOME_NEW "The bards have not heard of you before.\nWelcome to Tales of Deep Dungeons, "
-#define WELCOME_OLD "Welcome back to Tales of Deep Dungeons, "
 #define RETRY_LIMIT 3
 #define NAME_MIN_LENGTH 4
 #define NAME_MAX_LENGTH 16
@@ -47,7 +44,7 @@ bool get_name()
 {
 	char *name = NULL;
 	size_t name_len = 0;
-	fputs(NAME_QUERY, stdout);
+	fputs(_("What's your name, adventurer? "), stdout);
 	ssize_t line_len = getline(&name, &name_len, stdin);
 	if (line_len < 0)
 	{
