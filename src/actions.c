@@ -149,7 +149,7 @@ void ac_view_stats()
 	if (player.location == &loc_fight) {
 		wprintw(game_win,"\n\n<MORE>");
 		wrefresh(game_win);
-		getch();
+		todd_getchar(NULL);
 		werase(game_win);
 		wrefresh(game_win);
 		ncurs_fightinfo(&player, 0);

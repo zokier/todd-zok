@@ -51,7 +51,7 @@ void init_ui()
 		printw("You currently have: %dx%d\n", x_size, y_size);
 		printw("Enlarge your screen and press a key or this program might segfault.\n");
 		refresh();
-		getch();
+		todd_getchar(NULL);
 	}
 
 	/* checks that terminal supports color */
@@ -63,7 +63,7 @@ void init_ui()
 		printw("You might experience problems\n");
 		printw("Press a key to continue\n");
 		refresh();
-		getch();
+		todd_getchar(NULL);
 	}
 
 	/*
@@ -231,7 +231,7 @@ void ncurs_modal_msg(const char *fmt, ...)
 	va_end(argp);
 	wprintw(game_win, "\n\n%s\n", _("Continue..."));
 	wrefresh(game_win);
-	getch();
+	todd_getchar(NULL);
 	set_player_location(player.location); /* after getch, redraw command_win */
 }
 
@@ -367,10 +367,16 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 		}
 	}
 	wrefresh(game_win);
-	int getch_res = ERR;
+	int getch_res;
 	while (true)
 	{
-		getch_res = getch();
+		char ch;
+		if (!todd_getchar(&ch))
+		{
+			getch_res = -1;
+			break;
+		}
+		getch_res = ch;
 		/* TODO: only accept numbers <= WEAPON_COUNT */
 		if (getch_res >= '1' && getch_res <= '9')
 		{
@@ -384,7 +390,7 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 			getch_res += 10;
 			break;
 		}
-		else if (getch_res == 'x' || getch_res == ERR)
+		else if (getch_res == 'x')
 		{
 			/* "Nevermind */
 			getch_res = -1;

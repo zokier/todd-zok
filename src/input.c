@@ -38,6 +38,8 @@ bool todd_getchar(char *c)
 			free(msg);
 		}
 	} while (!(items[1].revents & ZMQ_POLLIN));
+	char dummy;
+	if (c == NULL) c = &dummy;
 	return (read(fileno(stdin), c, sizeof(char)) > 0);
 }
 
@@ -45,7 +47,7 @@ bool todd_getline(char **line, size_t *len)
 {
 	ncurs_bold_input(1);
 	bool ret = false;
-	int buf_len = 20;
+	size_t buf_len = 20;
 	*line = malloc(buf_len);
 	*len = 0;
 	char c;

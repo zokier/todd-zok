@@ -74,7 +74,7 @@ int fight_check_dead() {
 		wattroff(game_win,A_BOLD);
 		wattroff(game_win,A_UNDERLINE);
 		wrefresh(game_win);
-		getch();
+		todd_getchar(NULL);
 		playing = false;
 	}
 if (enemy_dead)

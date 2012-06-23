@@ -132,7 +132,7 @@ int ev_found_item()
 	wprintw(game_win,_("Buried under a pile of rocks, you find...\n"));
 	wprintw(game_win,"<MORE>");
 	wrefresh(game_win);
-	getch();
+	todd_getchar(NULL);
 	
 
 	/* print out what you got */
@@ -146,7 +146,7 @@ int ev_found_item()
 	}
 	wprintw(game_win,"\nContinue...");
 	wrefresh(game_win);
-	getch();
+	todd_getchar(NULL);
 
 	set_player_location(player.location); /* redraw commands */
 	return 1;
