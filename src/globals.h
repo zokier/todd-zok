@@ -7,6 +7,8 @@
 #include "character.h"
 
 #define _(x) gettext(x)
+#define NAME_MIN_LENGTH 4
+#define NAME_MAX_LENGTH 16
 
 // ugly globals go here
 extern int playing;

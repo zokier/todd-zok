@@ -19,8 +19,6 @@
 #include "character.h"
 
 #define RETRY_LIMIT 3
-#define NAME_MIN_LENGTH 4
-#define NAME_MAX_LENGTH 16
 
 // ugly globals go here
 int playing;

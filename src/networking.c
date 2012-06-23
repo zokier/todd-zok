@@ -9,14 +9,18 @@
 
 void send_chatmsg(char *msg, size_t len)
 {
-	size_t blob_len = sizeof(CHATMSG_PREFIX) + len + 40; // 40 bytes for name
+	size_t buf_len = sizeof(CHATMSG_PREFIX) + len + NAME_MAX_LENGTH + 2;
+	char *buf = malloc(buf_len);
+	snprintf(buf, buf_len, "%s|%s|%s", CHATMSG_PREFIX, player.name, msg);
+	size_t blob_len = strnlen(buf, buf_len);
 	int rc;
 	zmq_msg_t zmq_message;
 	zmq_msg_init_size (&zmq_message, blob_len);
 	char *blob = zmq_msg_data(&zmq_message);
-	snprintf(blob, blob_len, "%s|%s|%s", CHATMSG_PREFIX, player.name, msg);
+	memcpy(blob, buf, blob_len);
 	rc = zmq_send (push_socket, &zmq_message, 0);
 	zmq_msg_close (&zmq_message);
+	free(buf);
 }
 
 char *try_recv_chatmsg()

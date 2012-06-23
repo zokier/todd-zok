@@ -43,11 +43,36 @@ bool todd_getchar(char *c)
 
 bool todd_getline(char **line, size_t *len)
 {
-	ssize_t line_len = getline(line, len, stdin);
-	if (line_len < 0)
+	ncurs_bold_input(1);
+	bool ret = false;
+	int buf_len = 20;
+	*line = malloc(buf_len);
+	*len = 0;
+	char c;
+	do
 	{
-		return false;
-	}
-	*len = line_len;
-	return true;
+		if (!todd_getchar(&c))
+		{
+			free(*line);
+			*line = NULL;
+			*len = 0;
+			goto cleanup;
+		}
+		if (buf_len <= *len)
+		{
+			buf_len += 20;
+			*line = realloc(*line, buf_len);
+		}
+		(*line)[*len] = c;
+		(*len)++;
+		wechochar(input_win, c);
+	} while (c != '\r');
+	(*len)--; // strip trailing newline
+	(*line)[*len] = '\0'; // insert null terminator
+	ret = true;
+cleanup:
+	werase(input_win);
+	wrefresh(input_win);
+	ncurs_bold_input(0);
+	return ret;
 }
