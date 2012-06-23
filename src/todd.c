@@ -368,18 +368,22 @@ void enter_game()
 	playing = true;
 	while (playing)
 	{
-		int getch_res = getch();
-		if (getch_res == ERR)
+		char cmd_char;
+		bool getch_res = todd_getchar(&cmd_char);
+		if (getch_res == false)
 		{
 			//eof or other read error
 			playing = false;
 			break;
 		}
-		if (getch_res == 9) { /* chat window */
+		if (cmd_char == '\t')
+		{ /* chat window */
 			ncurs_chat(player);
 		}
 		else
-			execute_action(getch_res & 0xFF);
+		{
+			execute_action(cmd_char);
+		}
 	}
 }
 

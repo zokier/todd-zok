@@ -323,7 +323,8 @@ void ac_quit()
 	playing = false;
 }
 
-void ncurs_chat(Character player) {
+// wtf is this doing here? ncurs_* functions should probably be in ui.c?
+void ncurs_chat() {
 	int len = 80;
 	char *line = malloc(len); // more dynamic memory allocation would be nice
 	echo();
@@ -331,7 +332,9 @@ void ncurs_chat(Character player) {
 	ncurs_bold_input(1);
 
 	if (wgetnstr(input_win,line, len) != ERR) // TODO a better way to get input
-		ncurs_log_chatmsg(line,player.name); 
+	{
+		send_chatmsg(line, len);
+	}
 	noecho();
 	wrefresh(input_win);
 	/* draw the title again, this time with no bolding */
