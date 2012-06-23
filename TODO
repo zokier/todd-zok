@@ -21,7 +21,6 @@
 		- sh+psql
 		- other?
 * Multiplayer communication
-	* Recreate input.{h,c}
 	* pvp combat
 	* privmsg
 	* party
@@ -50,6 +49,7 @@
 			* /dev/random
 * Configurable/translatable strings
 	* gettext
+		* modify makefile to create/update po/mo files
 	* most strings need replacement to fit game theme
 		* Objective is to have everything seem like ingame
 * Validate user input
