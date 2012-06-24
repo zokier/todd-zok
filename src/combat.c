@@ -77,7 +77,7 @@ int fight_check_dead() {
 		todd_getchar(NULL);
 		playing = false;
 	}
-if (enemy_dead)
+if (enemy_dead || player_dead)
 	return 1; /* if enemy is dead, don't redraw stuff anymore */
 else
 	return 0;
