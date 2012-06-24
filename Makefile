@@ -1,3 +1,7 @@
+# TODO: fix dailybot
+DAILYBOT = dailybot
+$(DAILYBOT):
+	gcc -o bin/dailybot src/dailybot.c
 BINDIR   = bin
 OBJDIR   = obj
 SRCDIR   = src
