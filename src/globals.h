@@ -10,6 +10,10 @@
 #define NAME_MIN_LENGTH 4
 #define NAME_MAX_LENGTH 16
 
+extern int init_pq();
+extern void cleanup_pq();
+extern char *itoa();
+
 // ugly globals go here
 extern int playing;
 extern void *push_socket;

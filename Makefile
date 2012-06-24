@@ -1,7 +1,3 @@
-# TODO: fix dailybot
-DAILYBOT = dailybot
-$(DAILYBOT):
-	gcc -o bin/dailybot src/dailybot.c
 BINDIR   = bin
 OBJDIR   = obj
 SRCDIR   = src
@@ -34,6 +30,12 @@ $(TARGET): $(OBJS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/*.h Makefile
 	$(CC) $(CFLAGS) $(INCPATHS) -o $@ -c $<
+
+# TODO: fix dailybot
+DAILYBOT = dailybot
+$(DAILYBOT): dailybot/dailybot.c
+	gcc $(CFLAGS) $(INCPATHS) $(LIBS) -o bin/dailybot dailybot/dailybot.c src/database.c
+
 
 clean:
 	rm $(OBJS) $(TARGET) || true
