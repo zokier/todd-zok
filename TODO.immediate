@@ -1,3 +1,12 @@
 ui:
 	- input
 		- fix line input unicode
+
+new location: 
+	Admin Hideout
+		* used for debugging, basically codes
+			* 999 money
+			* 999 elements
+			* etc
+		* reset databases (also, start counting player ids from 0 to speed up the database)
+				

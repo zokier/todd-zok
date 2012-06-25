@@ -17,6 +17,10 @@ WINDOW *log_win;
 WINDOW *input_win;
 WINDOW *fight_stat_win[6];
 
+/* TODO: zokier doesn't like defines, jaacoppi does.. */
+/* SKILLS_Y is used to calculate Weapon & Skills -window height */
+#define SKILLS_Y 7
+
 void draw_background(int x_size, int y_size);
 int y_size, x_size; /* used for bolding titles, must be global */
 int fight_statw_width;
@@ -106,7 +110,7 @@ void init_ui()
 	inputw_width -= 2; // margin for prompt
 
 	// calculate heights
-	int skillsw_height = 4;
+	int skillsw_height = 5;
 	int cmdw_height = y_size;
 	cmdw_height -= 2; // outer borders
 	cmdw_height -= 1; // horiz line between cmdw and skillsw
@@ -172,7 +176,7 @@ void draw_background(int x_size, int y_size)
 	// line between game_win and log_win
 	mvwvline(background_win, 1, gamew_logw_sep, ACS_VLINE, y_size-2);
 	// line between cmd_win and skills_win 
-	mvwhline(background_win, y_size-6, 1, ACS_HLINE, 20-1);
+	mvwhline(background_win, y_size-SKILLS_Y, 1, ACS_HLINE, 20-1);
 	// line between log_win and input_win
 	mvwhline(background_win, y_size-3, gamew_logw_sep+1, ACS_HLINE, x_size-(gamew_logw_sep+2));
 	// corner characters
@@ -180,22 +184,26 @@ void draw_background(int x_size, int y_size)
 	mvwaddch(background_win, 0, gamew_logw_sep, ACS_TTEE);
 	mvwaddch(background_win, y_size-1, 20, ACS_BTEE);
 	mvwaddch(background_win, y_size-1, gamew_logw_sep, ACS_BTEE);
-	mvwaddch(background_win, y_size-6, 0, ACS_LTEE);
-	mvwaddch(background_win, y_size-6, 20, ACS_RTEE);
+	mvwaddch(background_win, y_size-SKILLS_Y, 0, ACS_LTEE); /* Skills window horizontal line */
+	mvwaddch(background_win, y_size-SKILLS_Y, 20, ACS_RTEE); /* Skills window horizontal line */
 	mvwaddch(background_win, y_size-3, gamew_logw_sep, ACS_LTEE);
 	mvwaddch(background_win, y_size-3, x_size-1, ACS_RTEE);
 
-	// skill numbers
-	for (int i = 0; i < 4; i++)
+	
+	/* 'W' for WEAPON in Weapon & Skills */
+	mvwaddch(background_win, (y_size-SKILLS_Y+1), 2, ('W') | A_BOLD);
+
+	// skill numbers for Weapon & Skills
+	for (int i = 1; i < 5; i++)
 	{
-		mvwaddch(background_win, (y_size-5)+i, 2, ('1' + i) | A_BOLD);
+		mvwaddch(background_win, (y_size-SKILLS_Y+1)+i, 2, ('0' + i) | A_BOLD);
 	}
 	// input prompt
 	mvwaddch(background_win, y_size-2, gamew_logw_sep+1, ACS_RARROW | A_BOLD);
 
 	//window titles
 	mvwaddstr(background_win, 0, 2, "Actions");
-	mvwaddstr(background_win, y_size-6, 2, "Skills");
+	mvwaddstr(background_win, y_size-7, 2, "Weapon & Skills");
 	mvwaddstr(background_win, 0, 22, "GameW");
 	mvwaddstr(background_win, 0, gamew_logw_sep+2, "Log");
 	mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
@@ -328,6 +336,7 @@ void ncurs_fightinfo(Character *chr, int index)
 void ncurs_skills()
 {
 	werase(skills_win);
+	wprintw(skills_win,"%s\n",player.weapon->name);
 	for (int i = 0; i < 4; i++)
 	{
 		if (player.skill[i] != NULL)
@@ -376,7 +385,7 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 		}
 	}
 	wrefresh(game_win);
-	int getch_res;
+	unsigned int getch_res;
 	while (true)
 	{
 		char ch;

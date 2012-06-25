@@ -1,3 +1,8 @@
+/* NOTE: maximum weapon name length is currently 14 characters:
+max_weapon_nam
+-------------
+axe of assault
+*/
 #include "weapons.h"
 #include "skills.h"
 
@@ -39,7 +44,7 @@ Weapons weapons_list[WEAPON_COUNT] = {
 
 	{
 		1,
-		"Stick of mayhem",
+		"Stick of doom",
 		ELEM_WOOD,
 		3,
 		9
