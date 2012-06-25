@@ -224,8 +224,15 @@ void ac_shop()
 
 void ac_shop_buy()
 {
-	wprintw(game_win,"\n%s\n", _("The poor man is selling these items:"));
+	werase(command_win);
+	wrefresh(command_win);
+	wprintw(game_win,"\n%s\n", _("\nThe poor man is selling these items:\n\n"));
+	wattron(game_win, A_BOLD);
+	wprintw(game_win,"Weapon\t\t\tPrice\n");
+	wattroff(game_win, A_BOLD);
+	
 	int selection = ncurs_listselect(&(weapons_list[1].name), sizeof(Weapons), (void*)&(weapons_list[1].price) - (void*)&(weapons_list[1].name), WEAPON_COUNT-1) +1;
+	wprintw(game_win,"\n");
 	if (selection > 0 && selection <= WEAPON_COUNT)
 	{
 		/* see if player has the money for it */
