@@ -377,27 +377,21 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 			break;
 		}
 		getch_res = ch;
-		/* TODO: only accept numbers <= WEAPON_COUNT */
-		if (getch_res >= '1' && getch_res <= '9')
-		{
-			getch_res -= '1';
-			break;
-		}
-		else if (getch_res >= 'a' && getch_res <= 'f')
-		{
-			// TODO ensure that there is no off by one bug here
-			getch_res -= 'a';
-			getch_res += 10;
-			break;
-		}
-		else if (getch_res == 'x')
+		if (getch_res == 'x')  
 		{
 			/* "Nevermind */
-			getch_res = -1;
-			break;
+			return getch_res;
+		}
+
+		/* only accept numbers between 1 and count */
+		getch_res = getch_res - '0';
+		if (getch_res >= 1 && getch_res <= count)
+		{
+			getch_res -= 1;
+			return getch_res;
 		}
 	}
-	return getch_res;
+return getch_res; /* control should never reach this point */
 }
 
 void ncurs_bold_input(int yes) {

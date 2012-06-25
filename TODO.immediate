@@ -1,7 +1,3 @@
 ui:
 	- input
 		- fix line input unicode
-	- listselect
-		- only allow keyboard selection for numbers between 0 and WEAPON_COUNT
-general:
-	- fix compiler warnings (add #include "input.h" to everywhere)
