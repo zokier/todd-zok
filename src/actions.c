@@ -171,8 +171,8 @@ void ac_view_stats()
 		wprintw(game_win,"%8s: %10d\n", element_names[i], player.elements[i]);
 	}
 	wprintw(game_win,"\n");
-
-	wprintw(game_win,"%8s: %10s\n", _("Weapon"), player.weapon->name);
+	
+	wprintw(game_win,"%8s: %10s (%s)\n", _("Weapon"), player.weapon->name,element_names[player.weapon->dmg_type]);
 	for (int i = 0; i < 4; i++)
 	{
 		wprintw(game_win,"%6s %d: %10s\n", _("Skill"), i+1, player.skill[i]->name);

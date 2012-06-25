@@ -307,6 +307,8 @@ void ncurs_fightinfo(Character *chr, int index)
 	}
 	if (fight_statw_width < 20)
 	{
+		/* TODO: this is ugly! */
+		mvwprintw(win, 1, 1, "%s", chr->weapon->name);
 		mvwprintw(win, 2, 1, "%s:%3d", _("HP"), chr->health);
 		for (int i = 0; i < 3; i++)
 		{
@@ -319,6 +321,7 @@ void ncurs_fightinfo(Character *chr, int index)
 	}
 	else
 	{
+		mvwprintw(win, 1, 1, "%s (%s)", chr->weapon->name, element_names[chr->weapon->dmg_type]);
 		mvwprintw(win, 2, 1, "%s:%3d", _("Health"), chr->health);
 		for (int i = 0; i < 3; i++)
 		{
