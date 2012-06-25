@@ -36,14 +36,6 @@ Weapons weapons_list[WEAPON_COUNT] = {
 
 	{
 		0,
-		"Bare hands",
-		ELEM_EARTH,
-		1,
-		0
-	},
-
-	{
-		1,
 		"Stick of doom",
 		ELEM_WOOD,
 		3,
@@ -51,12 +43,20 @@ Weapons weapons_list[WEAPON_COUNT] = {
 	},
 
 	{
-		2,
+		1,
 		"Axe of assault",
 		ELEM_METAL,
 		5,
 		100
 	},
+	{
+		999,
+		"Bare hands",
+		ELEM_EARTH,
+		1,
+		0
+	}
+
 
 };
 

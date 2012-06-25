@@ -38,13 +38,14 @@ int check_for_skill_slots(int skillnumber) {
 		"Skill slot 4"
 	};
 	int slot_number = ncurs_listselect(slots, sizeof(char*), 0, 4);
-	if (slot_number >= 0)
+	/* ncurs_listselect returns a letter, convert it to a number */
+	if (slot_number == 'x')
+		return slot_number;
+	else
 	{
-		player.skill[slot_number] = &skills_list[skillnumber];
-		ncurs_skills();
-	}
+	slot_number -= 'a';
 	return slot_number;
-
+	}
 }
 
 /********************

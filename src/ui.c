@@ -367,13 +367,15 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 	// "Nevermind)
 	wprintw(game_win, "x) %s\n", _("Nevermind"));
 	
-	for (size_t i = 0; i < count; i++)
+	int j = 0; /* used for struct data type offsets; i is used for displaying letters */
+	for (char i = 'a'; i < (count + 'a'); i++)
 	{
 		// print index as hex to get larger single character range
 		// pointer is cast to void and back to calculate the position of next string
 		void *base = first_item;
-		base += stride*i;
-		wprintw(game_win, "%x) %s", (i+1)&0xF, *(char**)base);
+		base += stride*j;
+		j++;
+		wprintw(game_win, "%c) %s", i, *(char**)base);
 		if (price_offset > 0)
 		{
 			base += price_offset;
@@ -402,10 +404,8 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 		}
 
 		/* only accept numbers between 1 and count */
-		getch_res = getch_res - '0';
-		if (getch_res >= 1 && getch_res <= count)
+		if (getch_res >= 'a' && getch_res < 'a' + count)
 		{
-			getch_res -= 1;
 			return getch_res;
 		}
 	}

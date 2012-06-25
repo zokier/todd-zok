@@ -199,19 +199,22 @@ void ac_warena_skills()
 {
 	/* The function is exactly the same than in shop_buy, could these be combined? */
 	wprintw(game_win,"\n%s\n", _("Bren can teach you one of these skills:"));
-	//int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), (void*)&(skills_list[0].price) - (void*)&(skills_list[0].name), SKILLS_COUNT);
 	int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), 0, SKILLS_COUNT);
 	if (selection == 'x')
 		ncurs_modal_msg(_("Your loss, buddy!"));
 	else
-	if (selection >= 0 && selection < SKILLS_COUNT)
+	if (selection >= 'a' && selection < ('a' + SKILLS_COUNT))
 	{
+		/* slot contains 'x' on cancel/nevermind, a number otherwise */
 		int slot = check_for_skill_slots(selection);
-		
-		/* check_for_skill_slots should check for valid input */
+		/* check_for_skill_slots should check for valid input and return a number */
 		if (slot == 'x')
 			ncurs_modal_msg("%s",_("Your loss, buddy!\n"));
 		else {
+			/* listselect has returned selection as a letter, convert to a number */
+			selection = selection - 'a';
+	                player.skill[slot] = &skills_list[selection];
+        	        ncurs_skills();
 			ncurs_log_sysmsg(_("%s learned a new skill: %s"), player.name, player.skill[slot]->name);
 			ncurs_modal_msg(_("YOU JUST LEARNED: %s"), player.skill[slot]->name);
 		}
@@ -233,17 +236,16 @@ void ac_shop_buy()
 	wattroff(game_win, A_BOLD);
 	wprintw(game_win,"\n");
 
-	
-	int selection = ncurs_listselect(&(weapons_list[1].name), sizeof(Weapons), (void*)&(weapons_list[1].price) - (void*)&(weapons_list[1].name), WEAPON_COUNT-1);
-	ncurs_log_sysmsg("here 2: %c\n",selection);
+ 	int selection = ncurs_listselect(&(weapons_list[0].name), sizeof(Weapons), (void*)&(weapons_list[0].price) - (void*)&(weapons_list[0].name), WEAPON_COUNT);
 	if (selection == 'x')
 		ncurs_modal_msg(_("May the gods curse you for wasting my time, mutters the old man."));
 	else
-	if (selection >= 0 && selection < WEAPON_COUNT)
-	{
+        if (selection >= 'a' && selection < ('a' + WEAPON_COUNT)) 
+	{ 	
+
 		/* Shop differs from warrior arena: It uses a hack to remove "Bare hands" from weapons listing.
 		This here selection += 1; adjusts the numbers so the player keypress is in sync with what is printed in listselect */
-		selection += 1; 
+		selection -= 'a';
 		/* see if player has the money for it */
 		if (player.money >= weapons_list[selection].price) {
 			player.weapon = &weapons_list[selection];

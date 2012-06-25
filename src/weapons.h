@@ -3,7 +3,7 @@
 
 #include "element.h"
 
-#define WEAPON_COUNT 3 /* amount of weapons, 0 is the first. TODO: 2 here means 2 weapons, not 3. Why? */
+#define WEAPON_COUNT 2
 
 typedef struct Weapons Weapons;
 struct Weapons {
