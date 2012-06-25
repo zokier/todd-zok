@@ -246,7 +246,15 @@ void ac_tavern_info()
 	3. random stuff
 	*/
 	werase(game_win);
-	ncurs_modal_msg("TODO: Implement\n");
+	ncurs_modal_msg("TODO: Implement\nNOTE THAT STATS HAVE BEEN UPDATED");
+ 	player.health = 50;
+	player.elements[0] = 10;
+	player.elements[1] = 10;
+	player.elements[2] = 10;
+	player.elements[3] = 10;
+	player.elements[4] = 10;
+	player.money = 100;
+ 
 }
 
 void ac_warena()

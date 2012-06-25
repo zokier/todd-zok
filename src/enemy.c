@@ -12,6 +12,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2,
 			2
 		},
+		.action_points = 10,
 		.weapon = &weapons_enemy[0],
 		.skill[0] = &skills_list[1]
 	},
@@ -26,6 +27,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2,
 			2
 		},
+		.action_points = 10,
 		.weapon = &weapons_enemy[0],
 		.skill[0] = &skills_list[0]
 	},
@@ -40,6 +42,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2,
 			2
 		},
+		.action_points = 10,
 		.weapon = &weapons_enemy[0],
 		.skill[0] = &skills_list[0]
 	},
@@ -54,6 +57,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			3,
 			3,
 		},
+		.action_points = 10,
 		.weapon = &weapons_enemy[0],
 		.skill[0] = &skills_list[0]
 	},
@@ -68,6 +72,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			1,
 			1
 		},
+		.action_points = 10,
 		.weapon = &weapons_enemy[0],
 		.skill[0] = &skills_list[0]
 	},
@@ -82,6 +87,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			4,
 			4
 		},
+		.action_points = 10,
 		.weapon = &weapons_enemy[0],
 		.skill[0] = &skills_list[0]
 	}
@@ -98,6 +104,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2,
 			2
 		},
+		.action_points = 10,
 		.weapon = &weapons_enemy[0],
 		.skill[0] = &skills_list[1]
 	},
@@ -112,6 +119,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2,
 			2
 		},
+		.action_points = 10,
 		.weapon = &weapons_enemy[1],
 		.skill[0] = &skills_list[0]
 	},
@@ -126,6 +134,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2,
 			2
 		},
+		.action_points = 10,
 		.weapon = &weapons_list[0],
 		.skill[0] = &skills_list[0]
 	},
@@ -140,6 +149,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			5,
 			2
 		},
+		.action_points = 10,
 		.weapon = &weapons_list[0],
 		.skill[0] = &skills_list[0]
 	},
@@ -154,6 +164,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			2,
 			5
 		},
+		.action_points = 10,
 		.weapon = &weapons_list[0],
 		.skill[0] = &skills_list[0]
 	},
@@ -168,6 +179,7 @@ Character enemylist[2][ENEMY_COUNT] = {{
 			99,
 			99
 		},
+		.action_points = 10,
 		.weapon = &weapons_enemy[2],
 		.skill[0] = &skills_list[0]
 	}
