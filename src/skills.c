@@ -30,7 +30,7 @@ Skills skills_list[SKILLS_COUNT] = {
 };
 
 int check_for_skill_slots(int skillnumber) {
-	wprintw(game_win, _("Select skill slot:\n"));
+	wprintw(game_win, _("\nSelect skill slot:\n"));
 	char *slots[4] = {
 		"Skill slot 1",
 		"Skill slot 2",

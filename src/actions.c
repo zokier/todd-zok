@@ -207,9 +207,11 @@ void ac_warena_skills()
 	if (selection >= 0 && selection < SKILLS_COUNT)
 	{
 		int slot = check_for_skill_slots(selection);
-
-		if (slot >= 0)
-		{
+		
+		/* check_for_skill_slots should check for valid input */
+		if (slot == 'x')
+			ncurs_modal_msg("%s",_("Your loss, buddy!\n"));
+		else {
 			ncurs_log_sysmsg(_("%s learned a new skill: %s"), player.name, player.skill[slot]->name);
 			ncurs_modal_msg(_("YOU JUST LEARNED: %s"), player.skill[slot]->name);
 		}
