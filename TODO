@@ -12,8 +12,6 @@
 	* stamina/ap:
 		* recovery faster in inn/tavern
 		* recovery slows down over time
-	* health:
-		* cheaper in larger blocks
 	* Daily script
 		- C
 		- Python

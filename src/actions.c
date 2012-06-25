@@ -182,13 +182,15 @@ void ac_tavern_bartender()
 
 void ac_tavern_room()
 {
-	/* TODO:
-	1. pay for the room
-	POSSIBLE RANDOM EVENTS: someone robbing you OR a prostitute
-	2. go to sleep -> quit game
-	*/
+	set_player_location(&loc_room_offline);
 	werase(game_win);
-	ncurs_modal_msg("TODO: Implement\n");
+	wprintw(game_win,_("TODO: add player location to the database\n"));
+	wprintw(game_win,_("TODO: pay for the room\n"));
+	wprintw(game_win,_("TODO: possible random events: robbers / prostitutes\n"));
+	wprintw(game_win,"\n");
+	
+	ncurs_modal_msg(_("You leave your %s by your bed and go to sleep.."),player.weapon->name);
+	playing = false;
 }
 
 void ac_tavern_info()
@@ -345,7 +347,6 @@ void ac_quit()
 {
 	werase(game_win);
 	/* using modal_msg here would force the user to waste a keypress */
-//	ncurs_modal_msg("You leave the town, wondering what treasures you left behind in the dungeons\n");
 	wprintw(game_win,_("You leave the town, wondering what treasures you left behind in the dungeons\n"));
 	wrefresh(game_win);
 	playing = false;

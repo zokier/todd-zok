@@ -117,7 +117,7 @@ void load_player_data()
 				syslog(LOG_WARNING, "Duplicate player data found. id = %d, name = %s, row count %d", player.id, player.name, row_count);
 			}
 			// load data from first row even if there is multiple rows
-			player.location = &loc_town; // TODO should location be fetched from db??
+			player.location = &loc_town; // TODO location _should_ be fetched from db!
 			int col_cursor = 0;
 			player.action_points = atoi(PQgetvalue(res, 0, col_cursor++));
 			player.experience = atoi(PQgetvalue(res, 0, col_cursor++));
@@ -181,7 +181,7 @@ void save_player_data()
 	skill_id = player.skill[3] - &skills_list[0];
 	if (skill_id < 0 || skill_id >= SKILLS_COUNT) skill_id = -1;
 	char *skill_3 = itoa(skill_id);
-	char *dungeon_lvl = itoa(player.dungeon_lvl);
+	char *dungeon_lvl = itoa(player.dungeon_lvl); /* TODO: permadeath, this shouldn't be needed */
 	const char *params[17] = {
 		player_id,
 		action_points,
@@ -225,6 +225,8 @@ void save_player_data()
 	free(skill_3);
 	free(dungeon_lvl);
 	PQclear(res);
+	wprintw(game_win,_("\nThe bards succesfully recorded your heroic deeds today.\n"));
+	wrefresh(game_win);
 }
 
 bool check_name()

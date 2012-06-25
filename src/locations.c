@@ -165,6 +165,12 @@ Location loc_tavern_bartender = {
 	}
 };
 
+/* used when player gets a room and quits */
+Location loc_room_offline = {
+	"",
+	0,
+	{}
+};
 Location loc_warena = {
 	"You enter Bren's Warrior arena.\n\nThe place is populated with warriors-to-be, training in all aspects of fighting.",
 	2,
