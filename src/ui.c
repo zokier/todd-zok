@@ -19,7 +19,6 @@ WINDOW *fight_stat_win[6];
 
 void draw_background(int x_size, int y_size);
 int y_size, x_size; /* used for bolding titles, must be global */
-int gamew_width; 
 int fight_statw_width;
 int gamew_logw_sep; 
 
@@ -162,14 +161,21 @@ void init_ui()
 void draw_background(int x_size, int y_size)
 {
 	// TODO use same calculations as the actual windows
-	gamew_width = (x_size - 20)/2;
+	// cmd_win uses 20 characters, divide the rest of the screen between game_win and log_win
+	int gamew_width = (x_size - 20)/2;
+	// the position of the line between game_win and log_win
 	gamew_logw_sep = gamew_width + 20;
 	wclear(background_win);
 	box(background_win, 0, 0);
+	// line between cmd_win and game_win
 	mvwvline(background_win, 1, 20, ACS_VLINE, y_size-2);
+	// line between game_win and log_win
 	mvwvline(background_win, 1, gamew_logw_sep, ACS_VLINE, y_size-2);
+	// line between cmd_win and skills_win 
 	mvwhline(background_win, y_size-6, 1, ACS_HLINE, 20-1);
+	// line between log_win and input_win
 	mvwhline(background_win, y_size-3, gamew_logw_sep+1, ACS_HLINE, x_size-(gamew_logw_sep+2));
+	// corner characters
 	mvwaddch(background_win, 0, 20, ACS_TTEE);
 	mvwaddch(background_win, 0, gamew_logw_sep, ACS_TTEE);
 	mvwaddch(background_win, y_size-1, 20, ACS_BTEE);
@@ -178,9 +184,10 @@ void draw_background(int x_size, int y_size)
 	mvwaddch(background_win, y_size-6, 20, ACS_RTEE);
 	mvwaddch(background_win, y_size-3, gamew_logw_sep, ACS_LTEE);
 	mvwaddch(background_win, y_size-3, x_size-1, ACS_RTEE);
+
+	// skill numbers
 	for (int i = 0; i < 4; i++)
 	{
-		// skill numbers
 		mvwaddch(background_win, (y_size-5)+i, 2, ('1' + i) | A_BOLD);
 	}
 	// input prompt
@@ -192,6 +199,8 @@ void draw_background(int x_size, int y_size)
 	mvwaddstr(background_win, 0, 22, "GameW");
 	mvwaddstr(background_win, 0, gamew_logw_sep+2, "Log");
 	mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
+
+	// version number
 	wattron(background_win, A_DIM);
 	mvwprintw(background_win, y_size-1, 20 + (gamew_width/2) - 5, "ToDD %s", REVID);
 	wattroff(background_win, A_DIM);
