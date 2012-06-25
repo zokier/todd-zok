@@ -12,12 +12,6 @@
 	* stamina/ap:
 		* recovery faster in inn/tavern
 		* recovery slows down over time
-	* Daily script
-		- C
-		- Python
-		- In-database
-		- sh+psql
-		- other?
 * Multiplayer communication
 	* pvp combat
 	* privmsg

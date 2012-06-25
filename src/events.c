@@ -10,17 +10,20 @@
 
 extern void set_player_location(Location* loc);
 
-int prob_max = 0;
 #define PROB(x) (i < (prob_max += x))
+int prob_max = 0;
+
 // PROB(1) means 1 out 1000. PROB(500) means 500/1000 and so on
 
 
 int check_rnd_events() {
 // TODO: write the rest of the events, adjust probabilities
 	
+	
         /* calculate probabilities to random events and then switch to the proper function */
         /* this part is only meant to make switching */
 
+	prob_max = 0;	/* reset the function */
 	int i = rand() % 1000;
 
 	/* events are based on dungeon levels. Some events can occur in many levels */
@@ -54,30 +57,20 @@ int check_rnd_events() {
 /* OLD MAN */
 int ev_old_man()
 {
-	set_player_location(&loc_ev_oldman);
-	return 1;
+	wclear(game_win);
+	wprintw(game_win,_("An old man is wandering along the path, looking confused and worried.\n"));
+	wprintw(game_win,_("-It seems I have managed to lose my way to the town.\nWould you be so kind to escort me there?\n"));
+	wprintw(game_win,_("\nHelp the old man?\n"));
+	wrefresh(game_win);
+	int rc = set_player_loc_yesno();
+	if (rc == 'y')
+		ac_ev_oldman_help();
+	if (rc == 'n')
+		ac_ev_oldman_nohelp();
+	
+return 1; /* no fights after this event */
 }
 
-Location loc_ev_oldman = {
-        "An old man is wandering along the path, looking confused and worried.\n"
-        "-It seems I have managed to lose my way to the town.\nWould you be so kind to escort me there?\n"
-        "\nHelp the old man?",
-        2,
-        {
-                {
-                        'y',
-                        "",
-                        "Yes",
-                        &ac_ev_oldman_help
-                },
-                {
-                        'n',
-                        "",
-                        "No",
-                        &ac_ev_oldman_nohelp
-                }
-        }
-};
 
 void ac_ev_oldman_help()
 {
@@ -89,6 +82,7 @@ void ac_ev_oldman_help()
 
 void ac_ev_oldman_nohelp()
 {
+        ncurs_modal_msg(_("May the gods curse you."), "Old man"); // just for fun
         ncurs_log_chatmsg(_("May the gods curse you."), "Old man"); // just for fun
         player.action_points++;
         set_player_location(&loc_dungeons);
