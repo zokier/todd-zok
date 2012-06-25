@@ -32,13 +32,13 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/*.h Makefile
 	$(CC) $(CFLAGS) $(INCPATHS) -o $@ -c $<
 
 # TODO: fix dailybot
-DAILYBOT = dailybot
-$(DAILYBOT): dailybot/dailybot.c
+DAILYBOT=dailybot
+$(DAILYBOT): dailybot/dailybot.c $(BINDIR)
 	gcc $(CFLAGS) $(INCPATHS) $(LIBS) -o bin/dailybot dailybot/dailybot.c src/database.c
 
 
 clean:
-	rm $(OBJS) $(TARGET) || true
+	rm $(OBJS) $(TARGET) bin/dailybot || true
 	test -d obj && rmdir obj || true
 	test -d bin && rmdir bin || true
 

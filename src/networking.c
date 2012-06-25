@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <syslog.h>
 #include <zmq.h>
 
 #include "networking.h"
@@ -19,6 +19,8 @@ void send_chatmsg(char *msg, size_t len)
 	char *blob = zmq_msg_data(&zmq_message);
 	memcpy(blob, buf, blob_len);
 	rc = zmq_send (push_socket, &zmq_message, 0);
+	if (rc != 0)
+		syslog(LOG_ERR, "send_chatmsg failure!");
 	zmq_msg_close (&zmq_message);
 	free(buf);
 }

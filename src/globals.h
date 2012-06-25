@@ -5,6 +5,7 @@
 #include <ncurses.h>
 #include <libintl.h>
 #include "character.h"
+#include "input.h"
 
 #define _(x) gettext(x)
 #define NAME_MIN_LENGTH 4

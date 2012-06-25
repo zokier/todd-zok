@@ -272,7 +272,7 @@ void ac_messageboard_view()
 	if (PQresultStatus(res) == PGRES_TUPLES_OK)
 	{
 		int row_count = PQntuples(res);
-		int col_count = PQnfields(res);
+		// int col_count = PQnfields(res); /* NOT USED ANYWHERE, IS THIS NEEDED? */
 		for (int i = 0; i < row_count; i++)
 		{
 			wprintw(game_win, "%s // ", PQgetvalue(res, i, 0));

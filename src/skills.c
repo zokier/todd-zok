@@ -1,6 +1,7 @@
 #include <string.h>
-#include "skills.h"
 #include "globals.h"
+#include "ui.h"
+#include "skills.h"
 
 Skills unused_skill = { "Unused",0,0,0 };
 Skills skills_list[SKILLS_COUNT] = {
