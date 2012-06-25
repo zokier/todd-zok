@@ -500,11 +500,8 @@ int zmq_python_up() {
         zmq_pollitem_t items [2];
         items[0].socket = chat_socket;
         items[0].events = ZMQ_POLLIN;
-        items[1].socket = NULL;
-        items[1].fd = fileno(stdin);
-        items[1].events = ZMQ_POLLIN;
 
-        int rc = zmq_poll (items, 2, 1000);
+        int rc = zmq_poll (items, 1, 1000);
         if (items[0].revents & ZMQ_POLLIN)
                         msg = try_recv_chatmsg();
 
