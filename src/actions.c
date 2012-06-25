@@ -81,33 +81,46 @@ void ac_shrine_heal_1()
 		{
 			player.health++;
 			player.money--;
-			ncurs_modal_msg(_("The coin disappears into the slot with a clink. The crystal brightens for a moment and you step away from it feeling slightly better."));
+			ncurs_log_sysmsg(_("%s was healed for 1 hitpoint"),player.name);
+			ncurs_modal_msg(_("\nYou flip the coin into the pond, wishing for world peace."));
 		}
 		else
 		{
-			ncurs_modal_msg(_("You search your pockets for coin, but find none."));
+			ncurs_modal_msg(_("\nYou search your pockets for coin, but find none."));
 		}
 	}
-	else
+	else /* hp full already */
 	{
-		ncurs_modal_msg(_("You try to insert a coin into the slot but to your surprise the crystal repels your coin."));
+		player.money--;
+		ncurs_modal_msg(_("\nYou flip a coin in the pond.\nA crow catches the coin mid-air. Damn.."));
+		ncurs_log_sysmsg(_("\nA crow stole a coin from %s"),player.name);
 	}
 }
 
 void ac_shrine_heal_all()
 {
-	int money = player.money;
-	money -= player.max_health - player.health;
-	player.health = player.max_health;
-	if (money < 0)
+	if (player.health < player.max_health)
 	{
-		// TODO print different messsage 
-		player.health += money;
-		money = 0;
+		if (player.money >= 5)
+		{
+			player.health += 10;
+			if (player.health > player.max_health)
+				player.health = player.max_health;
+			player.money -= 5;
+			ncurs_log_sysmsg(_("%s was healed for 10 hitpoints"),player.name);
+			ncurs_modal_msg(_("\nYou flip 5 coins into the pond, wishing for world peace."));
+		}
+		else
+		{
+			ncurs_modal_msg(_("\nYou search your pockets for coin, but find none."));
+		}
 	}
-	player.money = money;
-	ncurs_modal_msg(_("The crystal dazes you with blindingly bright light. As you regain control, you notice that all your wounds have mended."));
-	set_player_location(&loc_dungeons);
+	else /* hp full already */
+	{
+		player.money--;
+		ncurs_log_sysmsg(_("A crow stole a coin from %s"),player.name);
+		ncurs_modal_msg(_("\nYou flip a coin in the pond.\nA crow catches the coin mid-air. Damn.."));
+	}
 }
 
 void ac_list_players()
@@ -250,7 +263,7 @@ void ac_shop_buy()
 		if (player.money >= weapons_list[selection].price) {
 			player.weapon = &weapons_list[selection];
 			player.money = player.money - weapons_list[selection].price;
-			ncurs_log_sysmsg(_("%s bought %s\n for %d"),player.name,player.weapon->name,player.weapon->price);
+			ncurs_log_sysmsg(_("%s bought %s for %d"),player.name,player.weapon->name,player.weapon->price);
 			ncurs_modal_msg(_("YOU JUST BOUGHT: %s"), player.weapon->name);
 			ncurs_skills(); /* update Weapon & Skills -listing */
 		}

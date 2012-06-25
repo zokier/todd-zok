@@ -66,7 +66,7 @@ Location loc_dungeons = {
 	"\t| Beware of bugs |\n"
 	"\t+----------------+\n"
 	"\n"
-	"As you ponder how large bugs must be to threaten grown  men, you notice faint, strangely compelling, reddish\nglow emanating from nearby ruins."
+	"As you ponder how large bugs must be to threaten grown  men, you notice faint, strangely compelling, reddish glow emanating from nearby ruins."
 	"\n"
 	"You may enter the dungeons or look for action in the surrounding forest.",
 	4,
@@ -258,19 +258,19 @@ Location loc_fight = {
 };
 
 Location loc_shrine = {
-	"Inside the ruins you find a peaceful shrine.\n\nIn the middle of it you see a largish crystal faintly glowing red. Curiously the crystal has a neat slot in it, perfectly sized for a coin.",
+	"In the forest you find a peaceful pond.\n\nIn the middle of it you see a crystal faintly glowing red.\nThe pond is filled with coins.\n\nThere's a sign that says \"1 for 1, 10 for 5\".",
 	3,
 	{
 		{
-			'i',
-			"",
-			"Insert a coin",
+			'1',
+			"Throw ",
+			"1 coin",
 			&ac_shrine_heal_1
 		},
 		{
-			'a',
-			"Insert ",
-			"All the coins",
+			'5',
+			"Throw ",
+			"5 coins",
 			&ac_shrine_heal_all
 		},
 		{
