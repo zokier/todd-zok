@@ -313,3 +313,21 @@ Location loc_messageboard = {
 	}
 };
 
+Location loc_yesno = {
+	"", /* NULL here would mean there be dragons. Always have "" instead */
+	2,
+	{
+		{
+			'y',
+			"",
+			"Yes",
+			NULL
+		},
+		{
+			'n',
+			"",
+			"No",
+			NULL
+		}
+	}	
+};

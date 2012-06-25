@@ -15,4 +15,5 @@ extern Location loc_shop;
 extern Location loc_messageboard;
 extern Location loc_warena;
 extern Location loc_room_offline; /* used when player gets a room and quits */
+extern Location loc_yesno;
 #endif //LOCATIONS_H

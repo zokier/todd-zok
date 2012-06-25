@@ -19,6 +19,15 @@ void set_player_location(Location* loc)
 	ncurs_location();
 }
 
+/* a modified set_player_location, doesn't draw description -> doesn't empty the screen*/
+void set_player_loc_yesno() {
+	wattron(game_win,A_BOLD);
+	wprintw(game_win,_("Yes/No\n"));
+	wattroff(game_win,A_BOLD);
+	wrefresh(game_win);
+	player.location = &loc_yesno;
+	ncurs_commands();
+}
 void ac_dungeons()
 {
 	set_player_location(&loc_dungeons);
@@ -182,15 +191,44 @@ void ac_tavern_bartender()
 
 void ac_tavern_room()
 {
-	set_player_location(&loc_room_offline);
 	werase(game_win);
 	wprintw(game_win,_("TODO: add player location to the database\n"));
 	wprintw(game_win,_("TODO: pay for the room\n"));
 	wprintw(game_win,_("TODO: possible random events: robbers / prostitutes\n"));
 	wprintw(game_win,"\n");
+
+	wprintw(game_win,_("Would you like to rent a room?\n"));
+	wrefresh(game_win);
+
+	/* TODO: testing yesno -dialog, make this better if need be */
+	set_player_loc_yesno();
+	int loop = 1;
+	while (loop) 
+	{
+		int keypress = getch();
+		if (keypress == 'y') 
+		{
+			/* TODO: find out why modal_msg doesn't work here */
+			wprintw(game_win,_("You leave your weapon by your bed and go to sleep..\n"));
+			wprintw(game_win,_("Continue...\n"));
+			wrefresh(game_win);
+			getch();
+			/* TODO: set_player_location wclears game_win, does it matter? */
+			/* you could set_player_location in save_player_data (move the bard thing earlier */
+			/* etc etc */
+			set_player_location(&loc_room_offline);
+			playing = false;
+			loop = 0;
+		}
+
+		if (keypress == 'n') {
+			ncurs_modal_msg(_("Don't waste my time again!"));
+			set_player_location(&loc_tavern_bartender);
+			loop = 0;
+			}
+		
+	} 
 	
-	ncurs_modal_msg(_("You leave your %s by your bed and go to sleep.."),player.weapon->name);
-	playing = false;
 }
 
 void ac_tavern_info()

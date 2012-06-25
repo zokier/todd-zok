@@ -30,5 +30,5 @@ void ac_messageboard_write();
 void ac_return_to_town();
 void ac_quit();
 void set_player_location(Location* loc);
-
+void set_player_loc_yesno();
 #endif //ACTIONS_H
