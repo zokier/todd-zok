@@ -7,11 +7,11 @@
 #include "networking.h"
 #include "globals.h"
 
-void send_chatmsg(char *msg, size_t len)
+void send_msg(char *prefix,char *msg, size_t len)
 {
 	size_t buf_len = sizeof(CHATMSG_PREFIX) + len + NAME_MAX_LENGTH + 2;
 	char *buf = malloc(buf_len);
-	snprintf(buf, buf_len, "%s|%s|%s", CHATMSG_PREFIX, player.name, msg);
+	snprintf(buf, buf_len, "%s|%s|%s", prefix, player.name, msg);
 	size_t blob_len = strnlen(buf, buf_len);
 	int rc;
 	zmq_msg_t zmq_message;
@@ -20,7 +20,7 @@ void send_chatmsg(char *msg, size_t len)
 	memcpy(blob, buf, blob_len);
 	rc = zmq_send (push_socket, &zmq_message, 0);
 	if (rc != 0)
-		syslog(LOG_ERR, "send_chatmsg failure!");
+		syslog(LOG_ERR, "send_msg failure!");
 	zmq_msg_close (&zmq_message);
 	free(buf);
 }

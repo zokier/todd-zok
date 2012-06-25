@@ -10,9 +10,13 @@
 
 void parse_and_print_chatmsg(char *msg)
 {
-	msg += sizeof(CHATMSG_PREFIX);
+	
+	char *prefix = strtok_r(NULL, "|", &msg);
+
+	if (strcmp(prefix, "chat")  == 0) {
 	char *nick = strtok_r(NULL, "|", &msg);
 	ncurs_log_chatmsg(msg, nick);
+	}
 }
 
 bool todd_getchar(char *c)

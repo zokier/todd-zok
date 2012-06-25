@@ -408,11 +408,17 @@ bool init_zmq()
 	{
 		return false;
 	}
-	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE,
-			CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)-2)) // strip trailing space
+
+	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)-2)) // strip trailing space
 	{
 		return false;
 	}
+
+	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, DEBUGMSG_PREFIX, sizeof(CHATMSG_PREFIX)-2)) // strip trailing space
+	{
+		return false;
+	}
+
 	int linger_time = 250; // pending messages linger for 250 ms if socket is closed
 	if (zmq_setsockopt(chat_socket, ZMQ_LINGER, &linger_time, sizeof(linger_time))) // strip trailing space
 		syslog(LOG_WARNING, "Can not set ZMQ_LINGER: %s", zmq_strerror(errno));
@@ -484,11 +490,11 @@ cleanup:
 }
 
 /* Function checks if python chat server is running. It must be! */
-/* TODO: this is send as a chatmsg (because send_chatmsg does so) */
+/* TODO: this is send as a chatmsg (because send_msg does so) */
 /* TODO: send as a debug message prefix (don't show to online players */
 int zmq_python_up() {
 	player.name = "newplayer";
-	send_chatmsg("testing",15);
+	send_msg(DEBUGMSG_PREFIX,"testing",15);
 
 	char *msg ="debug"; /* can't be NULL or strcmp segfaults */
         zmq_pollitem_t items [2];
@@ -501,7 +507,8 @@ int zmq_python_up() {
         int rc = zmq_poll (items, 2, 1000);
         if (items[0].revents & ZMQ_POLLIN)
                         msg = try_recv_chatmsg();
-	if (strcmp("chat|newplayer|testing",msg) == 0) /* TODO???*/
+
+	if (strcmp("debu|newplayer|testing",msg) == 0) /* TODO???*/
 		return 1;
 return 0;
 }
