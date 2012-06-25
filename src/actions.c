@@ -401,9 +401,7 @@ void ncurs_chat() {
 	char *line = NULL;
 	size_t len = 0;
 	if (todd_getline(&line, &len))
-	{
 		send_chatmsg(line, len);
-	}
 	free(line);
 }
 
