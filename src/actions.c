@@ -201,6 +201,9 @@ void ac_warena_skills()
 	wprintw(game_win,"\n%s\n", _("Bren can teach you one of these skills:"));
 	//int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), (void*)&(skills_list[0].price) - (void*)&(skills_list[0].name), SKILLS_COUNT);
 	int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), 0, SKILLS_COUNT);
+	if (selection == 'x')
+		ncurs_modal_msg(_("Your loss, buddy!"));
+	else
 	if (selection >= 0 && selection < SKILLS_COUNT)
 	{
 		int slot = check_for_skill_slots(selection);
@@ -210,10 +213,6 @@ void ac_warena_skills()
 			ncurs_log_sysmsg(_("%s learned a new skill: %s"), player.name, player.skill[slot]->name);
 			ncurs_modal_msg(_("YOU JUST LEARNED: %s"), player.skill[slot]->name);
 		}
-	}
-	else
-	{
-		ncurs_modal_msg(_("Your loss, buddy!"));
 	}
 }	
 
@@ -230,27 +229,32 @@ void ac_shop_buy()
 	wattron(game_win, A_BOLD);
 	wprintw(game_win,"Weapon\t\t\tPrice\n");
 	wattroff(game_win, A_BOLD);
-	
-	int selection = ncurs_listselect(&(weapons_list[1].name), sizeof(Weapons), (void*)&(weapons_list[1].price) - (void*)&(weapons_list[1].name), WEAPON_COUNT-1) +1;
 	wprintw(game_win,"\n");
-	if (selection > 0 && selection <= WEAPON_COUNT)
+
+	
+	int selection = ncurs_listselect(&(weapons_list[1].name), sizeof(Weapons), (void*)&(weapons_list[1].price) - (void*)&(weapons_list[1].name), WEAPON_COUNT-1);
+	ncurs_log_sysmsg("here 2: %c\n",selection);
+	if (selection == 'x')
+		ncurs_modal_msg(_("May the gods curse you for wasting my time, mutters the old man."));
+	else
+	if (selection >= 0 && selection < WEAPON_COUNT)
 	{
+		/* Shop differs from warrior arena: It uses a hack to remove "Bare hands" from weapons listing.
+		This here selection += 1; adjusts the numbers so the player keypress is in sync with what is printed in listselect */
+		selection += 1; 
 		/* see if player has the money for it */
 		if (player.money >= weapons_list[selection].price) {
 			player.weapon = &weapons_list[selection];
 			player.money = player.money - weapons_list[selection].price;
 			ncurs_log_sysmsg(_("%s bought %s\n for %d"),player.name,player.weapon->name,player.weapon->price);
 			ncurs_modal_msg(_("YOU JUST BOUGHT: %s"), player.weapon->name);
+			ncurs_skills(); /* update Weapon & Skills -listing */
 		}
 		else
 		{
 			ncurs_modal_msg(_("Come back when you have the money for it!"));
 		}
 
-	}
-	else /* listselect should allow this only on x) Nevermind */
-	{
-		ncurs_modal_msg(_("May the gods curse you for wasting my time, mutters the old man."));
 	}
 }
 

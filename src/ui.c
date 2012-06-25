@@ -391,7 +391,7 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 		char ch;
 		if (!todd_getchar(&ch))
 		{
-			getch_res = -1;
+			getch_res = 0;
 			break;
 		}
 		getch_res = ch;
