@@ -372,15 +372,9 @@ void enter_game()
 			playing = false;
 			break;
 		}
-		if (cmd_char == '\t')
-		{ /* chat window */
-			ncurs_chat(player);
-		}
-		else
-		{
-			execute_action(cmd_char);
-		}
+		execute_action(cmd_char);
 	}
+
 }
 
 /*

@@ -404,12 +404,3 @@ void ac_quit()
 	playing = false;
 }
 
-// wtf is this doing here? ncurs_* functions should probably be in ui.c?
-void ncurs_chat() {
-	char *line = NULL;
-	size_t len = 0;
-	if (todd_getline(&line, &len))
-		send_msg(CHATMSG_PREFIX,line, len);
-	free(line);
-}
-

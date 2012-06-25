@@ -3,11 +3,14 @@
 #include <string.h>
 #include <syslog.h>
 #include <sys/param.h> // for MIN()
+#include <stdlib.h>
+
 #include "ui.h"
 #include "globals.h"
 #include "skills.h"
 #include "character.h"
 #include "actions.h"
+#include "networking.h"
 
 WINDOW *background_win;
 WINDOW *command_win;
@@ -418,20 +421,68 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 return getch_res; /* control should never reach this point */
 }
 
-void ncurs_bold_input(int yes) {
-if (yes) {
-        wattron(background_win,A_BOLD);
-        mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
-        wattroff(background_win,A_BOLD);
-        wrefresh(background_win);
-        }
-else {
+/* 
+if toggle_chat is 0, keypresses are "normal commands"
+toggle_chat 1 or 2 means party or global messages
+*/
+void ncurs_bold_input(int toggle_chat) {
+/* empty the string. TODO: calculate proper area to empty */
+/* TODO: redraw the border line */
+mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "                          ");
+
+if (toggle_chat == 0) {
         werase(input_win);
         mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
         wrefresh(background_win);
 	wrefresh(input_win);
         }
+
+if (toggle_chat == 1) {
+	werase(input_win);
+	wrefresh(input_win);
+        wattron(background_win,A_BOLD);
+        mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Whisper to party members");
+        wattroff(background_win,A_BOLD);
+        wrefresh(background_win);
+        }
+
+if (toggle_chat == 2) {
+	werase(input_win);
+	wrefresh(input_win);
+        wattron(background_win,A_BOLD);
+        mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Yell at patrons");
+        wattroff(background_win,A_BOLD);
+        wrefresh(background_win);
+        }
+
+
 }
 
 
 
+int toggle_chat = 0;
+int chat_typing = 0;
+void ncurs_chat() 
+{
+/* TODO: figure out this toggle mess */
+
+	toggle_chat += 1;
+	if (toggle_chat == 3)
+		toggle_chat = 0;
+
+	/* redraw the input line - chat toggle*/
+	ncurs_bold_input(toggle_chat);
+
+        char *line = NULL;
+	size_t len = 0;
+	if (toggle_chat != 0) 
+	{
+	        if (todd_getline(&line, &len)) { /* a chat message was succesfully input(ted) */
+        	        send_msg(CHATMSG_PREFIX,line, len);
+			/* return to basic input prompt -> press any key for game commands */
+			toggle_chat = 0;
+			ncurs_bold_input(0); 
+			}
+		free(line);
+	}
+}

@@ -8,6 +8,8 @@
 #include "networking.h"
 #include "globals.h"
 
+extern int chat_typing;
+extern int toggle_chat;
 void parse_and_print_chatmsg(char *msg)
 {
 	
@@ -44,12 +46,29 @@ bool todd_getchar(char *c)
 	} while (!(items[1].revents & ZMQ_POLLIN));
 	char dummy;
 	if (c == NULL) c = &dummy;
-	return (read(fileno(stdin), c, sizeof(char)) > 0);
+
+	/* if no events from network, return a local getch */
+	read(fileno(stdin), c, sizeof(char));
+
+	/* toggle chat window */
+	if (*c == '\t')
+	{ 
+	if (chat_typing == 0) /* if not typing yet, goto chat toggle */
+		ncurs_chat(player);
+	else
+	{
+		chat_typing = 0; /* if typing already, cancel it */
+		ncurs_chat(player);
+	}
+	return c;
+	}
+	else	
+		return c; 
 }
 
 bool todd_getline(char **line, size_t *len)
 {
-	ncurs_bold_input(1);
+	chat_typing = 1;
 	bool ret = false;
 	size_t buf_len = 20;
 	*line = malloc(buf_len);
@@ -69,16 +88,26 @@ bool todd_getline(char **line, size_t *len)
 			buf_len += 20;
 			*line = realloc(*line, buf_len);
 		}
-		(*line)[*len] = c;
-		(*len)++;
-		wechochar(input_win, c);
+
+		if (c != '\t')
+		{
+			(*line)[*len] = c;
+			(*len)++;
+			wechochar(input_win, c);
+		}
+		else /* tab pressed, abort */
+		{
+		goto cleanup;
+		}
+		
 	} while (c != '\r');
 	(*len)--; // strip trailing newline
 	(*line)[*len] = '\0'; // insert null terminator
 	ret = true;
-cleanup:
+
+	cleanup:
 	werase(input_win);
 	wrefresh(input_win);
-	ncurs_bold_input(0);
+	chat_typing = 0;
 	return ret;
 }
