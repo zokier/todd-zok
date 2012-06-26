@@ -4,8 +4,8 @@
 #include "skills.h"
 
 Skills unused_skill = { "Unused",0,0,0 };
-Skills skills_list[SKILLS_COUNT] = {
 
+Skills skills_list[SKILLS_COUNT] = {
 	{
 		"Basic Attack",	/* name */
 		ELEM_EARTH,	/* element */
@@ -38,14 +38,7 @@ int check_for_skill_slots(int skillnumber) {
 		"Skill slot 4"
 	};
 	int slot_number = ncurs_listselect(slots, sizeof(char*), 0, 4);
-	/* ncurs_listselect returns a letter, convert it to a number */
-	if (slot_number == 'x')
-		return slot_number;
-	else
-	{
-	slot_number -= 'a';
 	return slot_number;
-	}
 }
 
 /********************

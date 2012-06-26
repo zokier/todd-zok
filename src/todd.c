@@ -25,7 +25,7 @@ int playing;
 void *push_socket = NULL;
 void *chat_socket = NULL;
 void *zmq_context = NULL;
-int zmq_python_up();
+bool zmq_python_up();
  
 Character player;
 PGconn *conn;
@@ -403,21 +403,18 @@ bool init_zmq()
 		return false;
 	}
 
-	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)-2)) // strip trailing space
+	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)-1)) // strip null terminator
 	{
 		return false;
 	}
 
-	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, DEBUGMSG_PREFIX, sizeof(CHATMSG_PREFIX)-2)) // strip trailing space
+	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, DEBUGMSG_PREFIX, sizeof(DEBUGMSG_PREFIX)-1)) // strip null terminator 
 	{
 		return false;
 	}
 
 	int linger_time = 250; // pending messages linger for 250 ms if socket is closed
-	if (zmq_setsockopt(chat_socket, ZMQ_LINGER, &linger_time, sizeof(linger_time))) // strip trailing space
-		syslog(LOG_WARNING, "Can not set ZMQ_LINGER: %s", zmq_strerror(errno));
-
-	if (zmq_setsockopt(push_socket, ZMQ_LINGER, &linger_time, sizeof(linger_time))) // strip trailing space
+	if (zmq_setsockopt(push_socket, ZMQ_LINGER, &linger_time, sizeof(linger_time)))
 		syslog(LOG_WARNING, "Can not set ZMQ_LINGER: %s", zmq_strerror(errno));
 
 	return true;
@@ -484,22 +481,26 @@ cleanup:
 }
 
 /* Function checks if python chat server is running. It must be! */
-/* TODO: this is send as a chatmsg (because send_msg does so) */
-/* TODO: send as a debug message prefix (don't show to online players */
-int zmq_python_up() {
+bool zmq_python_up()
+{
 	player.name = "newplayer";
 	send_msg(DEBUGMSG_PREFIX,"testing",15);
 
-	char *msg ="debug"; /* can't be NULL or strcmp segfaults */
-        zmq_pollitem_t items [2];
-        items[0].socket = chat_socket;
-        items[0].events = ZMQ_POLLIN;
+	char *msg = NULL;
+	zmq_pollitem_t items [2];
+	items[0].socket = chat_socket;
+	items[0].events = ZMQ_POLLIN;
 
-        int rc = zmq_poll (items, 1, 1000);
-        if (items[0].revents & ZMQ_POLLIN)
-                        msg = try_recv_chatmsg();
+	int rc = zmq_poll (items, 1, 1000000);
+	if (items[0].revents & ZMQ_POLLIN)
+		msg = try_recv_chatmsg();
 
-	if (strcmp("debu|newplayer|testing",msg) == 0) /* TODO???*/
-		return 1;
-return 0;
+	if (msg == NULL)
+		return false;
+	if (strcmp("debu|newplayer|testing",msg) != 0) /* TODO???*/
+	{
+		syslog(LOG_WARNING, "received %s", msg);
+		return false;
+	}
+	return true;
 }

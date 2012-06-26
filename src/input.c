@@ -10,14 +10,14 @@
 
 extern int chat_typing;
 extern int toggle_chat;
+
 void parse_and_print_chatmsg(char *msg)
 {
-	
 	char *prefix = strtok_r(NULL, "|", &msg);
 
-	if (strcmp(prefix, "chat")  == 0) {
-	char *nick = strtok_r(NULL, "|", &msg);
-	ncurs_log_chatmsg(msg, nick);
+	if (strcmp(prefix, "chat") == 0) {
+		char *nick = strtok_r(NULL, "|", &msg);
+		ncurs_log_chatmsg(msg, nick);
 	}
 }
 
@@ -48,22 +48,29 @@ bool todd_getchar(char *c)
 	if (c == NULL) c = &dummy;
 
 	/* if no events from network, return a local getch */
-	read(fileno(stdin), c, sizeof(char));
+	int rc = read(fileno(stdin), c, sizeof(char));
 
 	/* toggle chat window */
-	if (*c == '\t')
-	{ 
-	if (chat_typing == 0) /* if not typing yet, goto chat toggle */
-		ncurs_chat(player);
-	else
+	if (rc == 1)
 	{
-		chat_typing = 0; /* if typing already, cancel it */
-		ncurs_chat(player);
-	}
-	return c;
+		if (*c == '\t')
+		{ 
+			if (chat_typing == 0) /* if not typing yet, goto chat toggle */
+			{
+				ncurs_chat(player);
+			}
+			else
+			{
+				chat_typing = 0; /* if typing already, cancel it */
+				ncurs_chat(player);
+			}
+		}
+		return true;
 	}
 	else	
-		return c; 
+	{
+		return false;
+	}
 }
 
 bool todd_getline(char **line, size_t *len)
@@ -76,36 +83,33 @@ bool todd_getline(char **line, size_t *len)
 	char c;
 	do
 	{
-		if (!todd_getchar(&c))
+		bool rc = todd_getchar(&c);
+		if (!rc || c == '\t')
 		{
 			free(*line);
 			*line = NULL;
 			*len = 0;
 			goto cleanup;
 		}
-		if (buf_len <= *len)
+		else
 		{
-			buf_len += 20;
-			*line = realloc(*line, buf_len);
-		}
+			if (buf_len <= *len)
+			{
+				buf_len += 20;
+				*line = realloc(*line, buf_len);
+			}
 
-		if (c != '\t')
-		{
 			(*line)[*len] = c;
 			(*len)++;
 			wechochar(input_win, c);
 		}
-		else /* tab pressed, abort */
-		{
-		goto cleanup;
-		}
-		
+
 	} while (c != '\r');
 	(*len)--; // strip trailing newline
 	(*line)[*len] = '\0'; // insert null terminator
 	ret = true;
 
-	cleanup:
+cleanup:
 	werase(input_win);
 	wrefresh(input_win);
 	chat_typing = 0;

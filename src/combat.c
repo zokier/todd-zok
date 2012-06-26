@@ -12,19 +12,21 @@ Character enemy;
 
 extern void set_player_location(Location* loc);
 
-int fight_check_dead() {
-
+int fight_check_dead()
+{
 	/* TODO: figure out the order of checking deaths: attacks are simultaneous. Iniative? */
+	// TODO enemy and player codes are almost identical, refactor into a function
+	// bool check_chr_dead(Character *chr); or something
 
 	/* check if enemy dies */
 	bool enemy_dead = false;
 	bool enemy_dead_elements = false;
 	for (size_t i = 0; i < ELEM_COUNT; i++)
 	{
-		if(enemy.elements[i] <= 0) {
+		if (enemy.elements[i] <= 0) {
 			enemy_dead = true;
 			enemy_dead_elements = true;
-			}
+		}
 	}
 	if (enemy.health <= 0)
 		enemy_dead = true;
@@ -36,12 +38,12 @@ int fight_check_dead() {
 		player.experience += exp;
 		werase(game_win);
 		if (enemy_dead_elements)
-			ncurs_log_sysmsg(_("%s has caused an elemental imbalance in %s"),player.name,enemy.name);		
-		ncurs_log_sysmsg(_("%s has killed %s!"),player.name,enemy.name);
-		ncurs_log_sysmsg(_("%s received %d coins and %d XP"),player.name,money,exp);
+			ncurs_log_sysmsg(_("%s has caused an elemental imbalance in %s"), player.name, enemy.name);
+		ncurs_log_sysmsg(_("%s has killed %s!"), player.name, enemy.name);
+		ncurs_log_sysmsg(_("%s received %d coins and %d XP"), player.name, money, exp);
 		ncurs_modal_msg(
-			_("%s is slain!\n\nYou find %d coins on the corpse, and gain %d experience\n"), 
-			enemy.name, money, exp);
+				_("%s is slain!\n\nYou find %d coins on the corpse, and gain %d experience\n"),
+				enemy.name, money, exp);
 		set_player_location(&loc_dungeons);
 	}
 
@@ -50,48 +52,49 @@ int fight_check_dead() {
 	bool player_dead_elements = false;
 	for (size_t i = 0; i < 5; i++)
 	{
-		if(player.elements[i] <= 0) {
+		if (player.elements[i] <= 0) {
 			player_dead = true;
 			player_dead_elements = true;
-			}
+		}
 	}
 	if (player.health <= 0)
 		player_dead = true;
 	if (player_dead)
 	{
 		if (player_dead_elements)
-			ncurs_log_sysmsg(_("%s has caused an elemental imbalance in %s"),enemy.name,player.name);		
-		ncurs_log_sysmsg(_("%s has killed %s!"),enemy.name,player.name);
+			ncurs_log_sysmsg(_("%s has caused an elemental imbalance in %s"), enemy.name, player.name);
+		ncurs_log_sysmsg(_("%s has killed %s!"), enemy.name, player.name);
 		wclear (game_win);
 		if (player_dead_elements)
-			mvwprintw(game_win,6,0,_("The world around you starts to spin.\nYou sense a great imbalance inside you."));
+			mvwprintw(game_win, 6, 0, _("The world around you starts to spin.\nYou sense a great imbalance inside you."));
 		else
-			mvwprintw(game_win,6,0,_("The world fades around you as you fall to the ground,\nbleeding."));
+			mvwprintw(game_win, 6, 0, _("The world fades around you as you fall to the ground, \nbleeding."));
 
-		wattron(game_win,A_BOLD);
-		wattron(game_win,A_UNDERLINE);
-		mvwprintw(game_win,8,0,_("You are dead."));
-		wattroff(game_win,A_BOLD);
-		wattroff(game_win,A_UNDERLINE);
+		wattron(game_win, A_BOLD);
+		wattron(game_win, A_UNDERLINE);
+		mvwprintw(game_win, 8, 0, _("You are dead."));
+		wattroff(game_win, A_BOLD);
+		wattroff(game_win, A_UNDERLINE);
 		wrefresh(game_win);
 		todd_getchar(NULL);
 		playing = false;
 	}
-if (enemy_dead || player_dead)
-	return 1; /* if enemy is dead, don't redraw stuff anymore */
-else
-	return 0;
+	if (enemy_dead || player_dead)
+		return 1; /* if enemy is dead, don't redraw stuff anymore */
+	else
+		return 0;
 }
 
 void create_enemy()
 {
 	/* randomly choose an enemy from enemylist, based on player dungeon level */
 	int random_enemy = rand() % ENEMY_COUNT;
-	memcpy(&enemy,&enemylist[player.dungeon_lvl][random_enemy], sizeof(enemy));
+	memcpy(&enemy, &enemylist[player.dungeon_lvl][random_enemy], sizeof(enemy));
 }
 
 
-void align_elements(Character *dest, Element type) {
+void align_elements(Character *dest, Element type)
+{
 	dest->elements[(type+1) % ELEM_COUNT]++;
 	dest->elements[(type+2) % ELEM_COUNT]--;
 }
@@ -100,7 +103,6 @@ int dmg_calc_blocking(Character *dest, Element dmg_type)
 {
 	return dest->elements[(dmg_type+3) % ELEM_COUNT];
 }
-
 
 void skill_effect(Character *source, Character *dest, Skills *skill)
 {
@@ -123,12 +125,10 @@ void skill_effect(Character *source, Character *dest, Skills *skill)
 		/* elements align == player skill type and weapon type are the same */
 		/* also, if elements align, changes to enemy elemental balance occur */
 		if (skill->dmg_type == source->weapon->dmg_type) {
-			ncurs_log_sysmsg(_("%s causes elemental damage to %s"),source->name,dest->name);
+			ncurs_log_sysmsg(_("%s causes elemental damage to %s"), source->name, dest->name);
 			dmg += source->elements[skill->dmg_type];
 			align_elements(dest, skill->dmg_type); // TODO is this correct?
-	}
-
-
+		}
 	}
 	else
 	{ /* don't do negative damage */
@@ -155,7 +155,7 @@ void use_skill(int keypress)
 	   Water causes +WOOD, -FIRE
 	   */
 
-	if (keypress <= 4 && strcmp(player.skill[keypress]->name,"Unused") != 0)
+	if (keypress <= 4 && player.skill[keypress] != &unused_skill)
 	{
 		// Player attacks
 		skill_effect(&player, &enemy, player.skill[keypress]);
@@ -169,10 +169,8 @@ void use_skill(int keypress)
 		if (!enemy_dead) {
 			ncurs_fightinfo(&player, 0);
 			ncurs_fightinfo(&enemy, 3);
-			}
+		}
 		wrefresh(game_win);
-
-
 	}
 	else
 	{

@@ -33,7 +33,6 @@ Weapons weapons_enemy[3] = {
 };
 
 Weapons weapons_list[WEAPON_COUNT] = {
-
 	{
 		0,
 		"Stick of doom",
@@ -56,7 +55,5 @@ Weapons weapons_list[WEAPON_COUNT] = {
 		1,
 		0
 	}
-
-
 };
 

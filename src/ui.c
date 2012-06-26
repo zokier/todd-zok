@@ -372,19 +372,12 @@ void ncurs_skills()
  * count      - number of items */
 int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t count)
 {
-	// TODO support more than 16 items
-	// "Nevermind)
-	wprintw(game_win, "x) %s\n", _("Nevermind"));
-	
-	int j = 0; /* used for struct data type offsets; i is used for displaying letters */
-	for (char i = 'a'; i < (count + 'a'); i++)
+	for (int i = 0; i < count; i++)
 	{
-		// print index as hex to get larger single character range
 		// pointer is cast to void and back to calculate the position of next string
 		void *base = first_item;
-		base += stride*j;
-		j++;
-		wprintw(game_win, "%c) %s", i, *(char**)base);
+		base += stride*i;
+		wprintw(game_win, "%c) %s", i+'a', *(char**)base);
 		if (price_offset > 0)
 		{
 			base += price_offset;
@@ -395,67 +388,67 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 			wprintw(game_win, "\n");
 		}
 	}
+	// "Nevermind)
+	wprintw(game_win, "x) %s\n", _("Nevermind"));
 	wrefresh(game_win);
-	unsigned int getch_res;
+
+	char ch;
 	while (true)
 	{
-		char ch;
 		if (!todd_getchar(&ch))
 		{
-			getch_res = 0;
-			break;
-		}
-		getch_res = ch;
-		if (getch_res == 'x')  
-		{
-			/* "Nevermind */
-			return getch_res;
+			return -1;
 		}
 
-		/* only accept numbers between 1 and count */
-		if (getch_res >= 'a' && getch_res < 'a' + count)
+		if (ch == 'x')  
 		{
-			return getch_res;
+			/* "Nevermind */
+			return -1;
+		}
+
+		/* only accept numbers between 0 and count */
+		if (ch >= 'a' && ch < 'a' + count)
+		{
+			return ch - 'a';
 		}
 	}
-return getch_res; /* control should never reach this point */
+	return -1; /* control should never reach this point */
 }
 
 /* 
 if toggle_chat is 0, keypresses are "normal commands"
 toggle_chat 1 or 2 means party or global messages
 */
-void ncurs_bold_input(int toggle_chat) {
-/* empty the string. TODO: calculate proper area to empty */
-/* TODO: redraw the border line */
-mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "                          ");
+void ncurs_bold_input(int toggle_chat)
+{
+	/* empty the string. TODO: calculate proper area to empty */
+	/* TODO: redraw the border line */
+	mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "                          ");
 
-if (toggle_chat == 0) {
-        werase(input_win);
-        mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
-        wrefresh(background_win);
-	wrefresh(input_win);
-        }
+	if (toggle_chat == 0) {
+		werase(input_win);
+		mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
+		wrefresh(background_win);
+		wrefresh(input_win);
+	}
 
-if (toggle_chat == 1) {
-	werase(input_win);
-	wrefresh(input_win);
-        wattron(background_win,A_BOLD);
-        mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Whisper to party members");
-        wattroff(background_win,A_BOLD);
-        wrefresh(background_win);
-        }
+	if (toggle_chat == 1) {
+		werase(input_win);
+		wrefresh(input_win);
+		wattron(background_win,A_BOLD);
+		mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Whisper to party members");
+		wattroff(background_win,A_BOLD);
+		wrefresh(background_win);
+	}
 
-if (toggle_chat == 2) {
-	werase(input_win);
-	wrefresh(input_win);
-        wattron(background_win,A_BOLD);
-        mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Yell at patrons");
-        wattroff(background_win,A_BOLD);
-        wrefresh(background_win);
-        }
-
-
+	if (toggle_chat == 2) {
+		werase(input_win);
+		wrefresh(input_win);
+		wattron(background_win,A_BOLD);
+		mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Yell at patrons");
+		wattroff(background_win,A_BOLD);
+		wrefresh(background_win);
+	}
 }
 
 
