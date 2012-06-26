@@ -12,7 +12,7 @@ $(BIN) --daily = daily events
 #include <syslog.h>
 #include <stdbool.h>
 #include <libpq-fe.h>
-#include "../src/globals.h" /* TODO...*/
+#include "globals.h"
 
 PGconn *conn;
 
