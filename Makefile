@@ -12,7 +12,7 @@ INCPATHS = -I/usr/include/postgresql -I./include
 REVID    = $(shell git describe --always --dirty=*)
 
 CC      ?= gcc
-CFLAGS ?= -Wall -Wextra -g -std=gnu99 -DREVID="\"$(REVID)\""
+CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -g -std=gnu99 -DREVID="\"$(REVID)\""
 
 PREFIX    = /usr/local
 

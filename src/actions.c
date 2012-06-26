@@ -303,7 +303,7 @@ void ac_shop_buy()
 	wattroff(game_win, A_BOLD);
 	wprintw(game_win,"\n");
 
- 	int selection = ncurs_listselect(&(weapons_list[0].name), sizeof(Weapons), (void*)&(weapons_list[0].price) - (void*)&(weapons_list[0].name), WEAPON_COUNT-1);
+ 	int selection = ncurs_listselect(&(weapons_list[0].name), sizeof(Weapons), (void*)&(weapons_list[0].price) - (void*)&(weapons_list[0].name), WEAPON_COUNT);
 	if (selection >= 0)
 	{ 	
 		/* see if player has the money for it */

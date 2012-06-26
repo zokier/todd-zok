@@ -492,6 +492,8 @@ bool zmq_python_up()
 	items[0].events = ZMQ_POLLIN;
 
 	int rc = zmq_poll (items, 1, 1000000);
+	if (rc < 0)
+		return false;
 	if (items[0].revents & ZMQ_POLLIN)
 		msg = try_recv_chatmsg();
 

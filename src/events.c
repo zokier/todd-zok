@@ -9,6 +9,7 @@
 #include "locations.h"
 
 extern void set_player_location(Location* loc);
+extern int set_player_loc_yesno();
 
 #define PROB(x) (i < (prob_max += x))
 

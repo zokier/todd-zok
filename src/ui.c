@@ -372,7 +372,7 @@ void ncurs_skills()
  * count      - number of items */
 int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t count)
 {
-	for (int i = 0; i < count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
 		// pointer is cast to void and back to calculate the position of next string
 		void *base = first_item;
@@ -407,7 +407,7 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 		}
 
 		/* only accept numbers between 0 and count */
-		if (ch >= 'a' && ch < 'a' + count)
+		if (ch >= 'a' && ch < (char)(('a' + count)&0xFF))
 		{
 			return ch - 'a';
 		}
