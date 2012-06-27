@@ -486,7 +486,7 @@ bool zmq_python_up()
 {
 	/* send a magic line, if you don't receive it, python server doesn't work correctly */
 	#define MAGIC "ToDD-MAGIC321"
-	send_msg(15,DEBUGMSG_PREFIX,MAGIC);
+	send_dbg_msg(MAGIC, sizeof(MAGIC));
 
 	char *msg = NULL;
 	zmq_pollitem_t items [2];

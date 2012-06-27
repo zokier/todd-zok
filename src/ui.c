@@ -490,11 +490,13 @@ void ncurs_chat()
 	size_t len = 0;
 	if (toggle_chat != 0) 
 	{
-	        if (todd_getline(&line, &len)) { /* a chat message was succesfully input(ted) */
-        	        send_msg(len,CHATMSG_PREFIX,line);
-			/* return to basic input prompt -> press any key for game commands */
-			toggle_chat = 0;
-			ncurs_bold_input(0); 
+	        if (todd_getline(&line, &len))
+			{
+				/* a chat message was succesfully input(ted) */
+				send_chat_msg(line, len);
+				/* return to basic input prompt -> press any key for game commands */
+				toggle_chat = 0;
+				ncurs_bold_input(0); 
 			}
 		free(line);
 	}
