@@ -313,7 +313,7 @@ void ncurs_fightinfo(Character *chr, int index)
 		/* TODO: this is ugly! */
 		mvwprintw(win, 1, 1, "%s", chr->weapon->name);
 		mvwprintw(win, 2, 1, "%s:%3d", _("HP"), chr->health);
-		mvwprintw(win, 2, 5, "%s:%3d", _("Sta"), chr->action_points);
+		mvwprintw(win, 2, 5, "%s:%3d", _("Sta"), chr->stamina);
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -328,7 +328,7 @@ void ncurs_fightinfo(Character *chr, int index)
 	{
 		mvwprintw(win, 1, 1, "%s (%s)", chr->weapon->name, element_names[chr->weapon->dmg_type]);
 		mvwprintw(win, 2, 1, "%s:%3d", _("Health"), chr->health);
-		mvwprintw(win, 2, 15, "%11s:%d", _("Stamina"), chr->action_points);
+		mvwprintw(win, 2, 15, "%11s:%d", _("Stamina"), chr->stamina);
 		for (int i = 0; i < 3; i++)
 		{
 			mvwprintw(win, i+3, 1, "%s:%2d", element_names[i], chr->elements[i]);

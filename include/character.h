@@ -12,7 +12,7 @@ struct Character {
 	int id;
 	char *name;
 	Location *location;
-	int action_points;
+	int stamina;
 	int experience;
 	int money;
 	// TODO add more stats 

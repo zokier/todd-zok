@@ -78,7 +78,7 @@ void ac_ev_oldman_nohelp()
 {
 	ncurs_modal_msg(_("May the gods curse you."), "Old man"); // just for fun
 	ncurs_log_chatmsg(_("May the gods curse you."), "Old man"); // just for fun
-	player.action_points++;
+	player.stamina++;
 	set_player_location(&loc_dungeons);
 }
 

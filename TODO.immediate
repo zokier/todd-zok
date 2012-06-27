@@ -14,5 +14,3 @@ dailybot:
 	* last_logout time for the game -> store in database
 	* these two in the same format!
 
-misc:
-	* replace "action_points" with stamina, also from the database!

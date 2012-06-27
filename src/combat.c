@@ -134,7 +134,7 @@ void skill_effect(Character *source, Character *dest, Skills *skill)
 	{ /* don't do negative damage */
 		ncurs_log_sysmsg(_("%s blocked attack from %s."), dest->name, source->name);
 	}
-	source->action_points -= skill->ap_cost; /* spend action points on the attack */
+	source->stamina -= skill->ap_cost; /* spend action points on the attack */
 }
 
 void use_skill(int keypress)

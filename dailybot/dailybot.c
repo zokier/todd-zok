@@ -11,6 +11,7 @@ $(BIN) --daily = daily events
 #include <stdio.h>
 #include <syslog.h>
 #include <stdbool.h>
+#include <time.h>
 #include <libpq-fe.h>
 #include "globals.h"
 
@@ -22,10 +23,19 @@ void stamina();
 void random_daily();
 void time_dependent();
 void quests();
+void get_current_time();
 extern int init_pq(); /* from todd.c */
+
+/* time related stuff */
+time_t result;
+struct tm broken_time;
+
+
+
 
 int main(int argc,char *argv[]) {
 init_pq(); /* found in src/database.c */
+get_current_time(); /* needed for cronjobs: broken_time now contains the time in struct tm, use it for comparisons */
 
 if (argc != 1) { /* there's arguments, act on them */
 	if (strcmp(argv[1], "--hourly") == 0)
@@ -51,7 +61,7 @@ void stamina() {
 /* TODO: this function should loop through players and increase stamina
 requires: 
 	* player location in database (In a room  versus ..somewhere else)
-	* player last login time in database
+	* player last logout time in database
 
 For the first 24 hours after login:
 if the player is in a room (and thus offline), increase stamina by 3
@@ -124,3 +134,39 @@ examples:
 	* weather
 */
 }
+
+void get_current_time()
+{
+/* get current time */
+// format in database: 
+// 2012-06-27 15:25:50.342019     
+// format by the following lines of code:
+// Wed Jun 27 15:44:14 2012
+
+result  = time(NULL); /* current time set to result in time_t format (seconds since epoch) */
+
+/* broken_time contains the time in struct tm -format */
+/*
+//           struct tm {
+               int tm_sec;         //  seconds 
+               int tm_min;         //  minutes 
+               int tm_hour;        //  hours 
+               int tm_mday;        //  day of the month 
+               int tm_mon;         //  month 
+               int tm_year;        //  year 
+               int tm_wday;        //  day of the week 
+               int tm_yday;        //  day in the year 
+               int tm_isdst;       //  daylight saving time 
+//           };
+*/
+localtime_r(&result,&broken_time);
+printf("%d\n", broken_time.tm_sec);
+
+/* text string has a human readable format, but no use to use */
+char *text_string = asctime(localtime(&result)); 
+printf("%s\n", text_string);
+ 
+/* DEBUG: end of get local time stuff */
+
+}
+

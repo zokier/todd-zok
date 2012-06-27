@@ -121,7 +121,7 @@ void load_player_data()
 			// load data from first row even if there is multiple rows
 			player.location = &loc_town; // TODO location _should_ be fetched from db!
 			int col_cursor = 0;
-			player.action_points = atoi(PQgetvalue(res, 0, col_cursor++));
+			player.stamina = atoi(PQgetvalue(res, 0, col_cursor++));
 			player.experience = atoi(PQgetvalue(res, 0, col_cursor++));
 			player.money = atoi(PQgetvalue(res, 0, col_cursor++));
 			player.health = atoi(PQgetvalue(res, 0, col_cursor++));
@@ -157,7 +157,7 @@ void load_player_data()
 void save_player_data()
 {
 	char *player_id = itoa(player.id);
-	char *action_points = itoa(player.action_points);
+	char *stamina = itoa(player.stamina);
 	char *experience = itoa(player.experience);
 	char *money = itoa(player.money);
 	char *health = itoa(player.health);
@@ -186,7 +186,7 @@ void save_player_data()
 	char *dungeon_lvl = itoa(player.dungeon_lvl); /* TODO: permadeath, this shouldn't be needed */
 	const char *params[17] = {
 		player_id,
-		action_points,
+		stamina,
 		experience,
 		money,
 		health,
@@ -210,7 +210,7 @@ void save_player_data()
 		syslog(LOG_WARNING, "Player data save failed: %s", PQresultErrorMessage(res));
 	}
 	free(player_id);
-	free(action_points);
+	free(stamina);
 	free(experience);
 	free(money);
 	free(health);

@@ -35,10 +35,11 @@ $ psql todd todd
 psql (9.1.3)
 Type "help" for help.
 
-todd=>  create table player_logins (id serial primary key , name varchar not null unique, passwd text not null);
-todd=>  create table player_stats (id integer references player_logins(id), location integer default 0, action_points integer default 100, experience integer default 0, money integer default 10, health integer default 10, max_health integer default 10, wood integer default 3, fire integer default 3, earth integer default 3, metal integer default 3, water integer default 3, weapon integer, skill_0 integer, skill_1 integer, skill_2 integer, skill_3 integer, dungeon_level integer default 0);
-CREATE TABLE
+latest tables by jaacoppi:
+todd=> create table player_logins (id serial primary key , name varchar not null unique, passwd text not null,last_logout timestamp);
+todd=> create table player_stats (id integer references player_logins(id), location integer default 0, stamina integer default 100, experience integer default 0, money integer default 10, health integer default 10, max_health integer default 10, wood integer default 3, fire integer default 3, earth integer default 3, metal integer default 3, water integer default 3, weapon integer, skill_0 integer, skill_1 integer, skill_2 integer, skill_3 integer, dungeon_level integer default 0);
 todd=> create table messageboard (id serial primary key, timestamp timestamp default now() not null, player_id integer references player_logins(id) on update cascade not null, body text not null);
+
 todd=> \q
 
 === Combat system description ===
@@ -55,3 +56,4 @@ For example, player attacks with a metal type skill. Damage = Damage - enemy.met
 If the elements are aligned when attacking, the blocking player elements get realigned.
 
 Player / enemy dies if any elements OR hitpoins reach 0
+

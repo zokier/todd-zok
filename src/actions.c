@@ -55,9 +55,9 @@ void ac_dungeons_enter() {
 
 void ac_dungeons_action()
 {
-	if (player.action_points > 0)
+	if (player.stamina > 0)
 	{
-		player.action_points--;
+		player.stamina--;
 
 		if (check_rnd_events() != 1) {/* return 1 => a random event occurred, don't fight */
 			set_player_location(&loc_fight);
@@ -159,7 +159,7 @@ void ac_view_stats()
 	werase(game_win);
 	wrefresh(game_win);
 	wprintw(game_win,"%8s: %10s\n", _("Name"), player.name);
-	wprintw(game_win,"%8s: %10d\n", _("Stamina"), player.action_points);
+	wprintw(game_win,"%8s: %10d\n", _("Stamina"), player.stamina);
 	wprintw(game_win,"%8s: %10d\n", _("XP"), player.experience);
 	wprintw(game_win,"%8s: %10d\n", _("Money"), player.money);
 	wprintw(game_win,"%8s: %7d/%2d\n", _("Health"), player.health,player.max_health);
