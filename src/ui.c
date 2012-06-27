@@ -425,30 +425,50 @@ void ncurs_bold_input(int toggle_chat)
 	/* TODO: redraw the border line */
 	mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "                          ");
 
-	if (toggle_chat == 0) {
-		werase(input_win);
-		mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
-		wrefresh(background_win);
-		wrefresh(input_win);
-	}
+	/* pressing tab always erase the current line */
+	werase(input_win);
+	/* note that erasing must be done in todd_getline also */
 
-	if (toggle_chat == 1) {
-		werase(input_win);
-		wrefresh(input_win);
-		wattron(background_win,A_BOLD);
-		mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Whisper to party members");
-		wattroff(background_win,A_BOLD);
-		wrefresh(background_win);
-	}
+	switch (toggle_chat) 
+	{
+		case 0: /* INPUT - "normal mode" */
+		{
+			mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, _("Input"));
+			break;
+		}
 
-	if (toggle_chat == 2) {
-		werase(input_win);
-		wrefresh(input_win);
-		wattron(background_win,A_BOLD);
-		mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Yell at patrons");
-		wattroff(background_win,A_BOLD);
-		wrefresh(background_win);
+		case 1: /* party chat */
+		{
+			wattron(background_win,A_BOLD);
+			mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, _("Whisper to party members"));
+			wattroff(background_win,A_BOLD);
+			break;
+		}
+
+		case 2: /* global chat */
+		{
+			wattron(background_win,A_BOLD);
+			mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, _("Yell at patrons"));
+			wattroff(background_win,A_BOLD);
+			break;
+		}
+
+		case 999: /* Messageboard - NEVER LOOP THIS WITH A TAB KEYPRESS */
+		{
+			wattron(background_win,A_BOLD);
+			mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, _("Write to messageboard"));
+			wattroff(background_win,A_BOLD);
+			break;
+		}
+		default:
+			break;
+
 	}
+wrefresh(background_win);
+wrefresh(input_win);
+
+
+
 }
 
 
@@ -460,7 +480,7 @@ void ncurs_chat()
 /* TODO: figure out this toggle mess */
 
 	toggle_chat += 1;
-	if (toggle_chat == 3)
+	if (toggle_chat >= 3) /* never loop messageboard */
 		toggle_chat = 0;
 
 	/* redraw the input line - chat toggle*/

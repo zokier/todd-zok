@@ -9,7 +9,7 @@
 #define DEBUGMSG_PREFIX "debug"
 
 void send_msg(int len, const char *fmt, ...);
-{char *parse_debugmsg(char *buffer);
+char *parse_debugmsg(char *buffer);
 char *parse_chatmsg(char *nick, char *line);
 void zmq_sendmsg(char *buf, int buf_len);
 

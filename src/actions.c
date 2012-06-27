@@ -360,7 +360,7 @@ void ac_messageboard_view()
 extern char* itoa(int i);
 void ac_messageboard_write()
 {
-ncurs_bold_input(1);
+ncurs_bold_input(999);
 /* echo, noecho and wgetnstr(input_win) enable users to see what they write */
 	int len = 80;
 	char *line = malloc(len); // more dynamic memory allocation would be nice
