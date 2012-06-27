@@ -4,9 +4,9 @@
 #include <string.h>
 #include <zmq.h>
 #include <ncurses.h>
+#include "globals.h"
 #include "ui.h"
 #include "networking.h"
-#include "globals.h"
 
 extern int chat_typing;
 extern int toggle_chat;

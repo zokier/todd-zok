@@ -5,11 +5,15 @@
 #define PUSH_PORT 5558
 #define CHAT_PORT 5559
 
-/* all net msg prefixes must be 4 letters */
 #define CHATMSG_PREFIX "chat"
-#define DEBUGMSG_PREFIX "debu"
+#define DEBUGMSG_PREFIX "debug"
 
-void send_msg(char *prefix, char *msg, size_t len);
+void send_msg(int len, const char *fmt, ...);
+{char *parse_debugmsg(char *buffer);
+char *parse_chatmsg(char *nick, char *line);
+void zmq_sendmsg(char *buf, int buf_len);
+
+void send_msg(int len, const char *fmt, ...);
 char *try_recv_chatmsg();
 
 #endif //NETWORKING_H

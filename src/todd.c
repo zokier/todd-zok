@@ -483,8 +483,9 @@ cleanup:
 /* Function checks if python chat server is running. It must be! */
 bool zmq_python_up()
 {
-	player.name = "newplayer";
-	send_msg(DEBUGMSG_PREFIX,"testing",15);
+	/* send a magic line, if you don't receive it, python server doesn't work correctly */
+	#define MAGIC "ToDD-MAGIC321"
+	send_msg(15,DEBUGMSG_PREFIX,MAGIC);
 
 	char *msg = NULL;
 	zmq_pollitem_t items [2];
@@ -499,9 +500,11 @@ bool zmq_python_up()
 
 	if (msg == NULL)
 		return false;
-	if (strcmp("debu|newplayer|testing",msg) != 0) /* TODO???*/
+	char buffer[18] = "";
+	sprintf(buffer, "%s|%s", DEBUGMSG_PREFIX,MAGIC);
+	if (strcmp(buffer,msg) != 0) /* TODO???*/
 	{
-		syslog(LOG_WARNING, "received %s", msg);
+		syslog(LOG_WARNING, "ERROR received %s", msg);
 		return false;
 	}
 	return true;
