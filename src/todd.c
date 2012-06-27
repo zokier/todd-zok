@@ -451,6 +451,7 @@ int main(int argc, char *argv[])
 	if (!zmq_python_up())
 	{
 		syslog(LOG_ERR, "Python chat server not responding!");
+		syslog(LOG_ERR, "Ensure that server is running and try again!");
 		goto cleanup;
 	}
 

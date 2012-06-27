@@ -17,21 +17,21 @@ void send_msg(int len, const char *fmt, ...)
 	va_list argp;
 	va_start(argp, fmt);
 
-	char *prefix = fmt;
-	char *buf; /* first argument */
-	char *buf2; /* second argument */
+	char *prefix = fmt; /* TODO: fix the compiler warning here */
+	char *buf;
+
 	/* it's a debug message */
         if (strcmp(prefix, DEBUGMSG_PREFIX) == 0) 
 	{ /* *buf is not malloc'ed, is this bad? */
 		buf = va_arg (argp, char *);
-		buf = parse_debugmsg(buf);
+		buf = parse_debugmsg(len,buf);
         }
 	
 	/* it's a chat message */
         if (strcmp(prefix, CHATMSG_PREFIX) == 0) 
 	{ /* *buf is not malloc'ed, is this bad? */
 		buf = va_arg (argp, char *);
-		buf = parse_chatmsg(buf);
+		buf = parse_chatmsg(len,buf);
         }
 
 	/* send the message to the network */
@@ -40,18 +40,18 @@ void send_msg(int len, const char *fmt, ...)
 	va_end(argp);
 }
 
-char *parse_debugmsg(char *buffer) {
+char *parse_debugmsg(int len, char *buffer) {
 /* put the complete message to buf and length to buf_len */
-size_t  buf_len = strlen(DEBUGMSG_PREFIX) + 1 + strlen(buffer) +1; /* + 1 = |, the second +1 is ??? */
+size_t  buf_len = sizeof(DEBUGMSG_PREFIX) + 1 + len +1; /* + 1 = |, the second +1 is ??? */
 char *buf = malloc(buf_len);
 snprintf(buf, buf_len, "%s|%s", DEBUGMSG_PREFIX, buffer);
 return buf;
 }
 
-char *parse_chatmsg(char *line) {
+char *parse_chatmsg(int len,char *line) {
 /* put the complete message to buf and length to buf_len */
 char *nick = player.name;
-size_t  buf_len = strlen(CHATMSG_PREFIX) + 2 + strlen(nick) + strlen(line) +1; /* + 1 = |, the second +1 is ??? */
+size_t  buf_len = sizeof(CHATMSG_PREFIX) + 2 + sizeof(NAME_MAX_LENGTH) + len +1; /* + 1 = |, the second +1 is ??? */
 
 char *buf = malloc(buf_len);
 snprintf(buf, buf_len, "%s|%s|%s", CHATMSG_PREFIX, nick,line);
