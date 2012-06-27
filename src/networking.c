@@ -8,55 +8,28 @@
 #include "networking.h"
 #include "globals.h"
 
-/* flow of messages: send_msg starts formatting, parse_PREFIX formats the correct message, zmq_sendmsg sends it */
-
-void send_msg(int len, const char *fmt, ...) 
+void send_chat_msg(char *msg, size_t len)
 {
-	/* TODO: rewrite the code, at the moment variable argument list usage is a bubblegum hack */
-	/* at the moment this function doesn't recognise if an argument is missing */
-	va_list argp;
-	va_start(argp, fmt);
-
-	char *prefix = fmt; /* TODO: fix the compiler warning here */
-	char *buf;
-
-	/* it's a debug message */
-        if (strcmp(prefix, DEBUGMSG_PREFIX) == 0) 
-	{ /* *buf is not malloc'ed, is this bad? */
-		buf = va_arg (argp, char *);
-		buf = parse_debugmsg(len,buf);
-        }
-	
-	/* it's a chat message */
-        if (strcmp(prefix, CHATMSG_PREFIX) == 0) 
-	{ /* *buf is not malloc'ed, is this bad? */
-		buf = va_arg (argp, char *);
-		buf = parse_chatmsg(len,buf);
-        }
-
-	/* send the message to the network */
-	zmq_sendmsg(buf, (strlen(buf) + 1)); /* lazy coding, no idea where that +1 comes from */
+	size_t buf_len = len + NAME_MAX_LENGTH + sizeof('|') + sizeof('\0');
+	char *buf = malloc(buf_len);
+	snprintf(buf, buf_len, "%s|%s", player.name, msg);
+	send_msg(CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX), buf, buf_len);
 	free(buf);
-	va_end(argp);
 }
 
-char *parse_debugmsg(int len, char *buffer) {
-/* put the complete message to buf and length to buf_len */
-size_t  buf_len = sizeof(DEBUGMSG_PREFIX) + 1 + len +1; /* + 1 = |, the second +1 is ??? */
-char *buf = malloc(buf_len);
-snprintf(buf, buf_len, "%s|%s", DEBUGMSG_PREFIX, buffer);
-return buf;
+void send_dbg_msg(char *msg, size_t len)
+{
+	send_msg(DEBUGMSG_PREFIX, sizeof(DEBUGMSG_PREFIX), msg, len);
 }
 
-char *parse_chatmsg(int len,char *line) {
-/* put the complete message to buf and length to buf_len */
-char *nick = player.name;
-size_t  buf_len = sizeof(CHATMSG_PREFIX) + 2 + sizeof(NAME_MAX_LENGTH) + len +1; /* + 1 = |, the second +1 is ??? */
-
-char *buf = malloc(buf_len);
-snprintf(buf, buf_len, "%s|%s|%s", CHATMSG_PREFIX, nick,line);
-return buf;
+void send_msg(char *prefix, size_t prefix_len, char *msg, size_t len)
+{
+	size_t buf_len = len + prefix_len + sizeof('|');
+	char *buf = malloc(buf_len);
+	snprintf(buf, buf_len, "%s|%s", prefix, msg);
+	zmq_sendmsg(buf, buf_len);
 }
+
 /* handles the actual sending of messages */
 void zmq_sendmsg(char *buf, int buf_len) {
 	size_t blob_len = strnlen(buf, buf_len);
@@ -71,7 +44,6 @@ void zmq_sendmsg(char *buf, int buf_len) {
 	zmq_msg_close (&zmq_message);
 
 }
-
 
 char *try_recv_chatmsg()
 {

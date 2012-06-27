@@ -8,12 +8,11 @@
 #define CHATMSG_PREFIX "chat"
 #define DEBUGMSG_PREFIX "debug"
 
-void send_msg(int len, const char *fmt, ...);
-char *parse_debugmsg(int len, char *buffer);
-char *parse_chatmsg(int len, char *line);
+void send_chat_msg(char *msg, size_t len);
+void send_dbg_msg(char *msg, size_t len);
+void send_msg(char *prefix, size_t prefix_len, char *msg, size_t len);
 void zmq_sendmsg(char *buf, int buf_len);
 
-void send_msg(int len, const char *fmt, ...);
 char *try_recv_chatmsg();
 
 #endif //NETWORKING_H
