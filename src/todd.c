@@ -213,6 +213,13 @@ void save_player_data()
 	{
 		syslog(LOG_WARNING, "Player data save failed: %s", PQresultErrorMessage(res));
 	}
+
+	const char *logout[1] = { player_id };
+	res = PQexecPrepared(conn, "save_player_logout_time", 1, logout, NULL, NULL, 0);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		syslog(LOG_WARNING, "Player data save failed: %s", PQresultErrorMessage(res));
+	}
 	free(player_id);
 	free(stamina);
 	free(experience);

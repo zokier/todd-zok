@@ -57,6 +57,13 @@ int init_pq()
 		goto pq_cleanup;
 	}
 
+	res = PQprepare(conn, "save_player_logout_time", "update player_logins set (last_logout) = (now()) where id = $1;", 2, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+
+	
 	PQclear(res);
 	res = PQprepare(conn, "new_player_stats", "insert into player_stats (id) values ($1);", 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)

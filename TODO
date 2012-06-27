@@ -1,8 +1,5 @@
 * Persistance
 	* Player data
-		* skills
-		* items (weapon)
-		* location
 		* last login time
 	* Configuration data
 		* Vendor items/prices
@@ -29,9 +26,6 @@
 	* Items
 		- Potions
 		- Armor
-	* Dungeon levels
-	* Combat system
-		* Fine tuning the principles
 	* Random numbers
 		* dSFMT (is rand()%n good enough?)
 		* seeding
