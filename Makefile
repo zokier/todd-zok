@@ -32,9 +32,8 @@ $(TARGET): $(OBJS)
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(wildcard include/*.h) Makefile
 	$(CC) $(CFLAGS) $(INCPATHS) -o $@ -c $<
 
-# TODO: fix dailybot
-$(DAILYBOT): dailybot/dailybot.c $(OBJDIR)/database.o
-	gcc $(CFLAGS) $(INCPATHS) $(LIBS) -o $@ dailybot/dailybot.c $(OBJDIR)/database.o
+$(DAILYBOT): dailybot/dailybot.c $(OBJDIR)/database.o $(OBJDIR)/globals.o
+	gcc $(CFLAGS) $(INCPATHS) $(LIBS) -o $@ dailybot/dailybot.c $(OBJDIR)/database.o $(OBJDIR)/globals.o
 
 
 clean:

@@ -28,7 +28,6 @@ void *chat_socket = NULL;
 void *zmq_context = NULL;
 bool zmq_python_up();
  
-Character player;
 PGconn *conn;
 
 
