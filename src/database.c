@@ -9,15 +9,15 @@
 #include <zmq.h>
 #include <libpq-fe.h>
 
+#include "globals.h"
 #include "action.h"
 #include "location.h"
 #include "locations.h"
 #include "networking.h"
 #include "ui.h"
 #include "weapons.h"
-#include "globals.h"
+#include "database.h"
 #include "character.h"
-
 
 int init_pq()
 {
@@ -50,6 +50,13 @@ int init_pq()
 	{
 		goto pq_cleanup;
 	}
+
+	res = PQprepare(conn, "player_onlinestatus", "update player_stats set (location) = ($2) where id = $1;", 2, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+
 	PQclear(res);
 	res = PQprepare(conn, "new_player_stats", "insert into player_stats (id) values ($1);", 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
@@ -95,4 +102,20 @@ char *itoa(int i)
         char *str = malloc(20); // should be enough?
         snprintf(str, 20, "%d", i);
         return str;
+}
+
+/* sets the player location in the database. Knowledge is used by dailybot, at the moment ToDD has no use for this info */
+void db_player_location(int location) 
+{
+	PGresult *res;
+	char *player_id = itoa(player.id);
+	char *player_location = itoa(location);
+
+	const char *locparams[2] = {player_id, player_location };
+	res = PQexecPrepared(conn, "player_onlinestatus", 2, locparams, NULL, NULL, 0);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+		{
+		syslog(LOG_WARNING, "Player online status save failed: %s", PQresultErrorMessage(res));
+		}
+
 }

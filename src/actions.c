@@ -12,7 +12,7 @@
 #include "skills.h"
 #include "character.h"
 #include "combat.h"
-
+#include "database.h"
 void set_player_location(Location* loc)
 {
 	player.location = loc;
@@ -228,6 +228,12 @@ void ac_tavern_room()
 		/* etc etc */
 		set_player_location(&loc_room_offline);
 		playing = false;
+
+		/* store info to database: player_stats.location should now be LOC_OFFLINE_ROOM */
+		/* this knowledge is used by dailybot */
+
+		db_player_location(LOC_OFFLINE_ROOM);
+
 	}
 
 	if (keypress == 'n') 
@@ -398,6 +404,9 @@ void ac_quit()
 	/* using modal_msg here would force the user to waste a keypress */
 	wprintw(game_win,_("You leave the town, wondering what treasures you left behind in the dungeons\n"));
 	wrefresh(game_win);
+
+	/* set player location in database to LOC_OFFLINE_FIELDS */
+	db_player_location(LOC_OFFLINE_FIELDS);
 	playing = false;
 }
 

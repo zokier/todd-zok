@@ -17,6 +17,7 @@
 #include "weapons.h"
 #include "globals.h"
 #include "character.h"
+#include "database.h"
 
 #define RETRY_LIMIT 3
 
@@ -104,9 +105,13 @@ bool check_passwd()
 
 void load_player_data()
 {
+
+	/* first, set the player location to "ONLINE" */
+	db_player_location(LOC_ONLINE); 
+
+        PGresult *res;
 	char *player_id = itoa(player.id);
 	const char *params[1] = {player_id};
-	PGresult *res;
 	res = PQexecPrepared(conn, "load_player", 1, params, NULL, NULL, 0);
 	if (PQresultStatus(res) == PGRES_TUPLES_OK)
 	{
