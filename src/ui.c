@@ -491,7 +491,7 @@ void ncurs_chat()
 	if (toggle_chat != 0) 
 	{
 	        if (todd_getline(&line, &len)) { /* a chat message was succesfully input(ted) */
-        	        send_msg(len,CHATMSG_PREFIX,player.name,line); /* player.name always the same, since it's the local player */
+        	        send_msg(len,CHATMSG_PREFIX,line);
 			/* return to basic input prompt -> press any key for game commands */
 			toggle_chat = 0;
 			ncurs_bold_input(0); 

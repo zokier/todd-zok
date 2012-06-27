@@ -31,8 +31,7 @@ void send_msg(int len, const char *fmt, ...)
         if (strcmp(prefix, CHATMSG_PREFIX) == 0) 
 	{ /* *buf is not malloc'ed, is this bad? */
 		buf = va_arg (argp, char *);
-		buf2 = va_arg (argp, char *);
-		buf = parse_chatmsg(buf,buf2);
+		buf = parse_chatmsg(buf);
         }
 
 	/* send the message to the network */
@@ -49,8 +48,9 @@ snprintf(buf, buf_len, "%s|%s", DEBUGMSG_PREFIX, buffer);
 return buf;
 }
 
-char *parse_chatmsg(char *nick, char *line) {
+char *parse_chatmsg(char *line) {
 /* put the complete message to buf and length to buf_len */
+char *nick = player.name;
 size_t  buf_len = strlen(CHATMSG_PREFIX) + 2 + strlen(nick) + strlen(line) +1; /* + 1 = |, the second +1 is ??? */
 
 char *buf = malloc(buf_len);
