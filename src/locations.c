@@ -122,13 +122,19 @@ Location loc_dungeons_level1 = {
 
 Location loc_tavern = {
 	"The tavern is eerlily quiet.\n\nBartender Willie is alphabetically ordering his beer bottles.",
-	2,
+	3,
 	{
 		{
 			't',
 			"",
 			"Talk to Willie",
 			&ac_tavern_bartender
+		},
+		{
+			'p',
+			"Gather a ",
+			"party",
+			&ac_tavern_party
 		},
 		{
 			'r',

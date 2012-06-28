@@ -177,6 +177,8 @@ void ac_view_stats()
 	{
 		wprintw(game_win,"%6s %d: %10s\n", _("Skill"), i+1, player.skill[i]->name);
 	}
+	wprintw(game_win,"\n");
+	wprintw(game_win, "Party id: %d\n", player_party.id);
 
 	wrefresh(game_win);
 
@@ -261,6 +263,17 @@ void ac_tavern_info()
 	player.elements[4] = 10;
 	player.money = 100;
  
+}
+
+void ac_tavern_party()
+{
+	ncurs_log_sysmsg("Enter new partyid");
+	char *line = NULL;
+	size_t len = 0;
+	if(!todd_getline(&line, &len)) return;
+	int id = atoi(line);
+	set_party(id);
+	ncurs_log_sysmsg("Subscribed to %d", player_party.id);
 }
 
 void ac_warena()

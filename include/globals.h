@@ -14,14 +14,17 @@
 
 extern int init_pq();
 extern void cleanup_pq();
+extern void set_party();
 extern char *itoa();
 
 // ugly globals go here
 extern int playing;
 extern void *push_socket;
 extern void *chat_socket;
+extern void *party_socket;
 extern void *zmq_context;
 extern Character player;
+extern Party player_party;
 extern Character enemy;
 extern PGconn *conn;
 

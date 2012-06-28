@@ -24,4 +24,10 @@ struct Character {
 	int dungeon_lvl; 
 };
 
+typedef struct Party Party;
+struct Party {
+	int id;
+	Character *characters[3];
+};
+
 #endif //CHARACTER_H
