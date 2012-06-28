@@ -25,6 +25,7 @@
 int playing;
 void *push_socket = NULL;
 void *chat_socket = NULL;
+void *party_socket = NULL;
 void *zmq_context = NULL;
 bool zmq_python_up();
  
@@ -413,6 +414,14 @@ bool init_zmq()
 	{
 		return false;
 	}
+	if (!(party_socket = zmq_socket(zmq_context, ZMQ_SUB)))
+	{
+		return false;
+	}
+	if (zmq_connect(party_socket, "tcp://localhost:5559"))
+	{
+		return false;
+	}
 
 	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)-1)) // strip null terminator
 	{
@@ -435,7 +444,50 @@ void cleanup_zmq()
 {
 	zmq_close(chat_socket);
 	zmq_close(push_socket);
+	zmq_close(party_socket);
 	zmq_term(zmq_context);
+}
+
+bool unsub_party(unsigned int id)
+{
+	size_t len = 0;
+	char buf[20];
+	len = snprintf(buf, 20, "p%d", id);
+	if (zmq_setsockopt(chat_socket, ZMQ_UNSUBSCRIBE, buf, len))
+	{
+		syslog(LOG_WARNING, "Party unsubscription failed: %s", zmq_strerror(errno));
+		return false;
+	}
+	return true;
+}
+
+bool sub_party(unsigned int id)
+{
+	size_t len = 0;
+	char buf[20];
+	len = snprintf(buf, 20, "p%d", id);
+	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, buf, len))
+	{
+		syslog(LOG_WARNING, "Party subscription failed: %s", zmq_strerror(errno));
+		return false;
+	}
+	return true;
+}
+
+/*
+ * Unsubscribe from current party in party socket and subscribe to new party id
+ */
+void set_party(unsigned int id)
+{
+	if (!unsub_party(player_party.id))
+	{
+		return;
+	}
+	if (!sub_party(id))
+	{
+		return;
+	}
+	player_party.id = id;
 }
 
 /*
@@ -446,6 +498,7 @@ int main(int argc, char *argv[])
 {
 	int return_code = EXIT_FAILURE;
 	openlog("ToDD", LOG_PID|LOG_PERROR, LOG_USER);
+	srand((unsigned int)time(NULL));
 
 	if (!init_pq())
 	{
@@ -457,7 +510,6 @@ int main(int argc, char *argv[])
 		syslog(LOG_ERR, "ZeroMQ init failure: %s", zmq_strerror(errno));
 		goto cleanup;
 	}
-	srand((unsigned int)time(NULL));
 
 	if (!zmq_python_up())
 	{
@@ -472,8 +524,9 @@ int main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-
 	load_player_data();
+	player_party.id = rand();
+	sub_party(player_party.id);
 
 	init_ui();
 	enter_game();

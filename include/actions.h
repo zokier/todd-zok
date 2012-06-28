@@ -19,6 +19,7 @@ void ac_tavern();
 void ac_tavern_bartender();
 void ac_tavern_room();
 void ac_tavern_info();
+void ac_tavern_party();
 void ac_warena();
 void ac_warena_skills();
 void ac_shop();
