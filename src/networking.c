@@ -50,7 +50,10 @@ char *try_recv_chatmsg()
     zmq_msg_t message;
     zmq_msg_init (&message);
     if (zmq_recv (chat_socket, &message, ZMQ_NOBLOCK))
+	{
+		syslog(LOG_WARNING, "ZMQ receive failure: %s", zmq_strerror(errno));
         return (NULL);
+	}
     int size = zmq_msg_size (&message);
     char *string = malloc (size + 1);
     memcpy (string, zmq_msg_data (&message), size);
