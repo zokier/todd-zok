@@ -10,6 +10,7 @@
 #define _(x) gettext(x)
 #define NAME_MIN_LENGTH 4
 #define NAME_MAX_LENGTH 16
+#define STAMINA_MAX 100	/* game configuration variable. Sleeping in a room recovers 72 in 24 hours */
 
 extern int init_pq();
 extern void cleanup_pq();

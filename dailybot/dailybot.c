@@ -14,6 +14,7 @@ $(BIN) --daily = daily events
 #include <time.h>
 #include <libpq-fe.h>
 #include "globals.h"
+#include "database.h"
 
 PGconn *conn;
 
@@ -23,7 +24,9 @@ void stamina();
 void random_daily();
 void time_dependent();
 void quests();
-void get_current_time();
+int get_current_time();
+int calc_hours(char *asciidate);
+
 extern int init_pq(); /* from todd.c */
 
 /* time related stuff */
@@ -35,7 +38,6 @@ struct tm broken_time;
 
 int main(int argc,char *argv[]) {
 init_pq(); /* found in src/database.c */
-get_current_time(); /* needed for cronjobs: broken_time now contains the time in struct tm, use it for comparisons */
 
 if (argc != 1) { /* there's arguments, act on them */
 	if (strcmp(argv[1], "--hourly") == 0)
@@ -59,55 +61,104 @@ time_dependent();
 
 void stamina() {
 /* TODO: this function should loop through players and increase stamina
-requires: 
-	* player location in database (In a room  versus ..somewhere else)
-	* player last logout time in database
 
 For the first 24 hours after login:
-if the player is in a room (and thus offline), increase stamina by 3
-otherwise, increase by 2
+if the player is in a room,  increase stamina by 3
+in fields, increase by 2
 
 After that:
-if the player is in a room (and thus offline), increase stamina by 2
-otherwise, increase by 1
-
-NOTE: player stamina maximum is not decided, I think. let it be 100?
-	* configuration variable MAX_STAMINA */
+increase by 2 in the room, 1 in the fields
+*/
 
 	/* Loop through all the players and update stamina for them */
-	/* TODO_FINDOUTMAXPLAYERS should contain number of players in table player_logins */
-	int TODO_FINDOUTMAXPLAYERS = 50;
-	for (int i = 0; i < TODO_FINDOUTMAXPLAYERS; i++) {
-	int stamina = 0;
-	        char *player_id = itoa(i);
-	        const char *params[1] = {player_id};
-	        PGresult *res;
-	        res = PQexecPrepared(conn, "load_player", 1, params, NULL, NULL, 0);
-	        if (PQresultStatus(res) == PGRES_TUPLES_OK)
-	        {
- 	               int row_count = PQntuples(res);
-	                if (row_count > 0)
-	                {
-        	                if (row_count > 1)
-                	        {
-                        	        syslog(LOG_WARNING, "Duplicate player data found!\nTODO: bug message\n");
-	                        }
 
-        	                // load data from first row even if there is multiple rows
-	                        int col_cursor = 0;
-                	        stamina = atoi(PQgetvalue(res, 0, col_cursor++));
+	PGresult *res;
+	res = PQexecPrepared(conn, "load_player_logout_time_stamina", 0, NULL, NULL, NULL, 0);
 
-				/* Code for updating stamina is here */
-				/* TODO: last_login should contain last login time */
-				int last_login = 0;
-				/* TODO: current_time should contain current time */
-				int current_time = 0;
+	/* TODO: error handling */
+	if (PQresultStatus(res) == PGRES_TUPLES_OK)
+	{
+                int row_count = PQntuples(res);
+ 		printf("players found: %d\n",row_count);
+		for (int i = 0; i < row_count; i++) /* loop through all the players */
+		{
+		int player_id = atoi(PQgetvalue(res,i,0));
+		int player_location = atoi(PQgetvalue(res,i,2));
+		int player_stamina = atoi(PQgetvalue(res,i,3));
+		int newstamina = 0; /* helper int */
+
+		/* compare last_logout to current time  and update stamina if needed */
+
+		/* Loop conditions */
+		/* 1. if stamina >= 100, don't update at all */
+
+		if (player_stamina < STAMINA_MAX) 
+ 		{
+			/* if time since last_logout <= 24 hours */
+			int hours_since_logout = calc_hours(PQgetvalue(res,i,1));
+			
+			/* >= 0 means the first run of dailybot will update stamina, is it good? */
+			/* (>= 0 is always true) */
+			if (hours_since_logout >= 0 && hours_since_logout < 24) 
+				newstamina = 1;
 				
-				/* TODO: actual update code here */
+			
+	
+			/* stamina recovery depends on the place */
+			switch (player_location)
+			{
+				case LOC_ONLINE:
+				{
+					printf("Player #%d is online, no recovery!\n", player_id);
+					break;
+				}
 
+				case LOC_OFFLINE_ROOM:
+				{
+					/* within 24 hours from last logout this would be 3, otherwise 1*/
+					newstamina += 2; 
+					break;
+				}
+
+				case LOC_OFFLINE_FIELDS:
+				{
+					/* within 24 hours from last logout this would be 2, otherwise 1*/
+					newstamina++; 
+					break;
+				}
+
+				default:
+					break;
 			}
- 		}
+
+		/* do the actual update */
+		if (player_location != LOC_ONLINE) /* don' update online players */
+			{
+			int old_stamina = player_stamina;
+			player_stamina += newstamina;
+			if (player_stamina > STAMINA_MAX) /* don't go over STAMINA_MAX */
+				player_stamina = STAMINA_MAX;
+
+			/* TODO: database update */
+ 			char *id = itoa(player_id);
+			char *stamina = itoa(player_stamina);
+ 
+			const char *params[2] = {id,stamina};
+			PGresult *res;
+			res = PQexecPrepared(conn, "update_stamina", 2, params, NULL, NULL, 0);
+			if (PQresultStatus(res) != PGRES_COMMAND_OK)
+			{ /* TODO: since it's a cronjob nobody will ever see this error message..*/
+				printf("Dailybot database update failed!\n");
+			}
+
+			printf("Player #%d stamina updated from %d to %d\n",player_id, old_stamina, player_stamina);
+			}
+		} /* don't update, since stamina is at max already */
+		else
+			printf("Player #%d stamina is already at STAMINA_MAX (%d)\n",player_id,STAMINA_MAX);
+		}
 	}
+        PQclear(res);
 }
 
 
@@ -135,38 +186,68 @@ examples:
 */
 }
 
-void get_current_time()
+int calc_hours(char *asciidate)
 {
-/* get current time */
-// format in database: 
-// 2012-06-27 15:25:50.342019     
-// format by the following lines of code:
-// Wed Jun 27 15:44:14 2012
+/* this function calculates how many hours since last logout */
 
-result  = time(NULL); /* current time set to result in time_t format (seconds since epoch) */
+// TODO: don't use struct tm but time_t for seconds..
+// 1. convert the ascii presentation of last_logout from database to a struct tm
+// WARNING: UGLY CODE AHEAD
+char year[4] = "";
+year[0] = asciidate[0];
+year[1] = asciidate[1];
+year[2] = asciidate[2];
+year[3] = asciidate[3];
+year[4] = '\0';
+char *year_ptr = year;
+int year_int = atoi(year_ptr);
 
-/* broken_time contains the time in struct tm -format */
-/*
-//           struct tm {
-               int tm_sec;         //  seconds 
-               int tm_min;         //  minutes 
-               int tm_hour;        //  hours 
-               int tm_mday;        //  day of the month 
-               int tm_mon;         //  month 
-               int tm_year;        //  year 
-               int tm_wday;        //  day of the week 
-               int tm_yday;        //  day in the year 
-               int tm_isdst;       //  daylight saving time 
-//           };
+char month[1] = "";
+month[0] = asciidate[5];
+month[1] = asciidate[6];
+month[2] = '\0';
+char *mon_ptr = month;
+int mon_int = atoi(mon_ptr);
+
+char day[2] = "";
+day[0] = asciidate[8];
+day[1] = asciidate[9];
+day[2] = '\0';
+char *day_ptr = day;
+int day_int = atoi(day_ptr);
+
+char hour[2] = "";
+hour[0] = asciidate[11];
+hour[1] = asciidate[12];
+hour[2] = '\0';
+char *hour_ptr = hour;
+int hour_int = atoi(hour_ptr);
+
+/* debug 
+printf("year: %d\n",year_int);
+printf("month: %d\n",mon_int);
+printf("day: %d\n",day_int);
+printf("hour: %d\n",hour_int);
+printf("date here: %s\n",asciidate);
+// 2012-06-27 22:31:01
 */
-localtime_r(&result,&broken_time);
-printf("%d\n", broken_time.tm_sec);
 
-/* text string has a human readable format, but no use to use */
-char *text_string = asctime(localtime(&result)); 
-printf("%s\n", text_string);
- 
-/* DEBUG: end of get local time stuff */
 
+
+/* struct tm needs..
+year as year from 1900
+month as months from january 
+*/
+year_int -= 1900;
+mon_int -= 1;
+
+/* calculate how many total hours time has (forget minutes and so on) */
+struct tm logout = { 0,0,hour_int,day_int,mon_int,year_int,0,0,0,0,0 };
+time_t logout_seconds = mktime(&logout);
+time_t epoch = time(NULL);
+time_t since = difftime(epoch,logout_seconds);
+since = since/60/60; /* calculate how many FULL HOURS since last_logout, (remember, dailybot is run every even hour, so it's a bit off */
+
+/* return how many full hours has passed */
+return since;
 }
-

@@ -32,6 +32,7 @@ int init_pq()
 	{
 		goto pq_cleanup;
 	}
+
 	PQclear(res);
 	res = PQprepare(conn, "check_passwd", "select true from player_logins where id = $1 and passwd = crypt(cast($2 as text), passwd);", 2, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
@@ -64,6 +65,20 @@ int init_pq()
 	}
 
 	
+	/* select id, last_logout time and stamina */
+	res = PQprepare(conn, "load_player_logout_time_stamina", "select player_logins.id, player_logins.last_logout, player_stats.location, player_stats.stamina from player_logins, player_stats WHERE player_logins.id = player_stats.id;", 0, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+
+	PQclear(res);
+	res = PQprepare(conn, "update_stamina", "update player_stats set (stamina) = ($2) where id = $1;", 2, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+
 	PQclear(res);
 	res = PQprepare(conn, "new_player_stats", "insert into player_stats (id) values ($1);", 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)

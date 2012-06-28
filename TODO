@@ -1,14 +1,9 @@
 * Persistance
-	* Player data
-		* last login time
 	* Configuration data
 		* Vendor items/prices
 		* Enemy types
 		* ...
-* Recovery
-	* stamina/ap:
-		* recovery faster in inn/tavern
-		* recovery slows down over time
+
 * Multiplayer communication
 	* pvp combat
 	* privmsg
