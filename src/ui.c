@@ -180,8 +180,7 @@ void draw_background(int x_size, int y_size)
 	mvwvline(background_win, 1, gamew_logw_sep, ACS_VLINE, y_size-2);
 	// line between cmd_win and skills_win 
 	mvwhline(background_win, y_size-SKILLS_Y, 1, ACS_HLINE, 20-1);
-	// line between log_win and input_win
-	mvwhline(background_win, y_size-3, gamew_logw_sep+1, ACS_HLINE, x_size-(gamew_logw_sep+2));
+	logw_inputw_sep(); // line between logwindow and input window
 	// corner characters
 	mvwaddch(background_win, 0, 20, ACS_TTEE);
 	mvwaddch(background_win, 0, gamew_logw_sep, ACS_TTEE);
@@ -429,10 +428,12 @@ void ncurs_bold_input(int toggle_chat)
 	werase(input_win);
 	/* note that erasing must be done in todd_getline also */
 
+	logw_inputw_sep(); /* draw the log window / input window separator */
 	switch (toggle_chat) 
 	{
 		case 0: /* INPUT - "normal mode" */
 		{
+
 			mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, _("Input"));
 			break;
 		}
@@ -500,4 +501,10 @@ void ncurs_chat()
 			}
 		free(line);
 	}
+}
+
+// line between log_win and input_win
+void logw_inputw_sep()
+{
+	mvwhline(background_win, y_size-3, gamew_logw_sep+1, ACS_HLINE, x_size-(gamew_logw_sep+2));
 }
