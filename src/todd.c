@@ -497,27 +497,50 @@ bool zmq_python_up()
 {
 	/* send a magic line, if you don't receive it, python server doesn't work correctly */
 	#define MAGIC "ToDD-MAGIC321"
-	send_dbg_msg(MAGIC, sizeof(MAGIC));
 
 	char *msg = NULL;
+	int token = rand();
+	// TODO figure out correct length
+	char msg_out[40];
+	snprintf(&msg_out[0], 40, "%s:%x", MAGIC, token);
 	zmq_pollitem_t items [2];
 	items[0].socket = chat_socket;
 	items[0].events = ZMQ_POLLIN;
 
-	int rc = zmq_poll (items, 1, 1000000);
-	if (rc < 0)
-		return false;
-	if (items[0].revents & ZMQ_POLLIN)
-		msg = try_recv_chatmsg();
-
-	if (msg == NULL)
-		return false;
-	char buffer[18] = "";
-	sprintf(buffer, "%s|%s", DEBUGMSG_PREFIX,MAGIC);
-	if (strcmp(buffer,msg) != 0) /* TODO???*/
+	// retry three times, sometimes zmq is slow to start
+	for (int i = 0; i < 3; i++)
 	{
-		syslog(LOG_WARNING, "ERROR received %s", msg);
-		return false;
+		send_dbg_msg(msg_out, 40);
+		int rc = zmq_poll (items, 1, 1000000);
+		if (rc < 0)
+		{
+			syslog(LOG_WARNING, "ZMQ poll failure: %s", zmq_strerror(errno));
+			continue;
+		}
+		else if (rc != 1)
+		{
+			syslog(LOG_WARNING, "ZMQ poll failure: no events");
+			continue;
+		}
+		if (items[0].revents & ZMQ_POLLIN)
+			msg = try_recv_chatmsg();
+
+		if (msg == NULL)
+		{
+			syslog(LOG_WARNING, "ZMQ recv failure: %s", zmq_strerror(errno));
+			continue;
+		}
+		// TODO check the length of the msg
+		// maybe strtok should be used instead of +sizeof(DEBUGMSG_PREFIX)
+		if (strcmp(msg_out,msg+sizeof(DEBUGMSG_PREFIX)) != 0) /* TODO???*/
+		{
+			syslog(LOG_WARNING, "ERROR received %s", msg);
+			free(msg);
+			continue;
+		}
+		free(msg);
+		return true;
 	}
-	return true;
+	syslog(LOG_WARNING, "ZMQ chat test retry count exceeded");
+	return false;
 }
