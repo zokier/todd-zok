@@ -208,7 +208,7 @@ void draw_background(int x_size, int y_size)
 	mvwaddstr(background_win, y_size-7, 2, "Weapon & Skills");
 	mvwaddstr(background_win, 0, 22, "GameW");
 	mvwaddstr(background_win, 0, gamew_logw_sep+2, "Log");
-	mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Input");
+	mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, "Press TAB for Input");
 
 	// version number
 	wattron(background_win, A_DIM);
@@ -434,7 +434,7 @@ void ncurs_bold_input(int toggle_chat)
 		case 0: /* INPUT - "normal mode" */
 		{
 
-			mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, _("Input"));
+			mvwaddstr(background_win, y_size-3, gamew_logw_sep+2, _("Press TAB for Input"));
 			break;
 		}
 
