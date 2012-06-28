@@ -453,7 +453,7 @@ bool unsub_party(unsigned int id)
 	size_t len = 0;
 	char buf[20];
 	len = snprintf(buf, 20, "p%d", id);
-	if (zmq_setsockopt(chat_socket, ZMQ_UNSUBSCRIBE, buf, len))
+	if (zmq_setsockopt(party_socket, ZMQ_UNSUBSCRIBE, buf, len))
 	{
 		syslog(LOG_WARNING, "Party unsubscription failed: %s", zmq_strerror(errno));
 		return false;
@@ -466,7 +466,7 @@ bool sub_party(unsigned int id)
 	size_t len = 0;
 	char buf[20];
 	len = snprintf(buf, 20, "p%d", id);
-	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, buf, len))
+	if (zmq_setsockopt(party_socket, ZMQ_SUBSCRIBE, buf, len))
 	{
 		syslog(LOG_WARNING, "Party subscription failed: %s", zmq_strerror(errno));
 		return false;
