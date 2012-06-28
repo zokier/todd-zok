@@ -9,8 +9,7 @@ Talk to Willie - cheat codes
 			* etc
 		* reset databases (also, start counting player ids from 0 to speed up the database)
 				
-dailybot:
-	* current_time in dailybot
-	* last_logout time for the game -> store in database
-	* these two in the same format!
-
+bugfixes:
+	elements can go to -1 in a fight
+	design decision should be made, permadeath or no?
+		* if no permadeath, recover elements & health at player login?

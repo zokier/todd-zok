@@ -80,6 +80,13 @@ int init_pq()
 	}
 
 	PQclear(res);
+	res = PQprepare(conn, "calc_hours", "select now() - last_logout FROM player_logins WHERE id = $1;", 1, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+
+	PQclear(res);
 	res = PQprepare(conn, "new_player_stats", "insert into player_stats (id) values ($1);", 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
