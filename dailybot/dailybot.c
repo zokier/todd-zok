@@ -203,6 +203,7 @@ int calc_hour(int player_id)
 		syslog(LOG_DEBUG,_("now() - last_logout failed"));
 		}
 
+PQclear(res);
 return atoi(PQgetvalue(res,0,0)); /* return now() - last_logout */
 }
 
