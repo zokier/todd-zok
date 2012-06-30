@@ -21,7 +21,7 @@ void parse_and_print_chatmsg(char *msg)
 	}
 }
 
-bool todd_getchar(char *c)
+bool todd_getchar(unsigned char *c)
 {
 	zmq_pollitem_t items [2];
 	items[0].socket = chat_socket;
@@ -44,7 +44,7 @@ bool todd_getchar(char *c)
 			free(msg);
 		}
 	} while (!(items[1].revents & ZMQ_POLLIN));
-	char dummy;
+	unsigned char dummy;
 	if (c == NULL) c = &dummy;
 
 	/* if no events from network, return a local getch */
@@ -80,7 +80,7 @@ bool todd_getline(char **line, size_t *len)
 	size_t buf_len = 20;
 	*line = malloc(buf_len);
 	*len = 0;
-	char c;
+	unsigned char c;
 	do
 	{
 		bool rc = todd_getchar(&c);
