@@ -3,11 +3,12 @@
 
 #include "element.h"
 
-#define SKILLS_COUNT 3
+#define SKILLS_COUNT 4 // this MUST include the "Unused" skill as well
 
 
 typedef struct Skills Skills;
 struct Skills {
+	int index;
 	char *name;
 	// TODO add more stats
 	Element dmg_type;

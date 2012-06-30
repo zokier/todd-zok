@@ -1,7 +1,3 @@
-ui:
-	- input
-		- fix line input unicode
-
 Talk to Willie - cheat codes
 		* used for debugging:
 			* 999 money

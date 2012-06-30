@@ -3,7 +3,7 @@
 
 #include "element.h"
 
-#define WEAPON_COUNT 2
+#define WEAPON_COUNT 3 // this count should alse include "bare hands"
 
 typedef struct Weapons Weapons;
 struct Weapons {

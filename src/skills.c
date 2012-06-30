@@ -3,10 +3,9 @@
 #include "ui.h"
 #include "skills.h"
 
-Skills unused_skill = { "Unused",0,0,0 };
-
 Skills skills_list[SKILLS_COUNT] = {
 	{
+		0,
 		"Basic Attack",	/* name */
 		ELEM_EARTH,	/* element */
 		0,		/* damage */
@@ -14,6 +13,7 @@ Skills skills_list[SKILLS_COUNT] = {
 	},
 
 	{
+		1,
 		"Wood Attack",
 		ELEM_WOOD,
 		3,
@@ -21,12 +21,20 @@ Skills skills_list[SKILLS_COUNT] = {
 	},
 
 	{
+		2,
 		"Heavy attack",
 		ELEM_METAL,
 		5,
 		2
-	}
+	},
 
+	{	// Unused skill, should never be looped anywhere
+		999,
+		"Unused",
+		0,
+		0,
+		0		
+	}
 };
 
 int check_for_skill_slots(int skillnumber) {
@@ -41,36 +49,3 @@ int check_for_skill_slots(int skillnumber) {
 	return slot_number;
 }
 
-/********************
-Ideas for skills:
-
-skill proficiency: 
-elements!
-
-weapon proficiency:
-for every succesful skill / weapon use, you get +1 proficiency for that skill / weapon when damage is done, do rand() % 100. If number is 
-smaller than proficiency, get SUPER STRIKE, double damage etc Basically, chance for a SUPER STRIKE increases when proficiency increases
-
-iniative:
-who gets to execute attack first
-
-	attack skills
-things to consider:
-speed? ap cost? element manipulation?
-	* wait out this turn, attack triple damage next turn
-
-defensive skills
-	* raises elemental stats temporarily
-	* shifts points from 1 element to another
-	* removes enemy elemental bonus
-
-manipulating skills
-element manipulation
-fight mechanics manipulation: 
-	* enemy can't attack next turn ("stun")
-	* iniative drops, disable a skill
-	* double/half ap cost for skills
-	* randomize stuff
-
-
-********************/

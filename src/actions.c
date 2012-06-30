@@ -306,7 +306,7 @@ void ac_warena_skills()
 {
 	/* The function is exactly the same than in shop_buy, could these be combined? */
 	wprintw(game_win,"\n%s\n", _("Bren can teach you one of these skills:"));
-	int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), 0, SKILLS_COUNT);
+	int selection = ncurs_listselect(&(skills_list[0].name), sizeof(Skills), 0, SKILLS_COUNT-1);
 	if (selection >= 0)
 	{
 		int slot = check_for_skill_slots(selection);
@@ -343,7 +343,7 @@ void ac_shop_buy()
 	wattroff(game_win, A_BOLD);
 	wprintw(game_win,"\n");
 
- 	int selection = ncurs_listselect(&(weapons_list[0].name), sizeof(Weapons), (void*)&(weapons_list[0].price) - (void*)&(weapons_list[0].name), WEAPON_COUNT);
+ 	int selection = ncurs_listselect(&(weapons_list[0].name), sizeof(Weapons), (void*)&(weapons_list[0].price) - (void*)&(weapons_list[0].name), WEAPON_COUNT-1);
 	if (selection >= 0)
 	{ 	
 		/* see if player has the money for it */

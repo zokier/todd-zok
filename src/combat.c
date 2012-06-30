@@ -158,7 +158,7 @@ void use_skill(int keypress)
 	   Water causes +WOOD, -FIRE
 	   */
 
-	if (keypress <= 4 && player.skill[keypress] != &unused_skill)
+	if (keypress <= 4 && strcmp(player.skill[keypress]->name,"Unused") != 0)
 	{
 		// Player attacks
 		skill_effect(&player, &enemy, player.skill[keypress]);

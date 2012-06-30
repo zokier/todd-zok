@@ -135,11 +135,29 @@ void load_player_data()
 			{
 				player.elements[i] = atoi(PQgetvalue(res, 0, col_cursor++));
 			}
-			player.weapon = &weapons_list[atoi(PQgetvalue(res, 0, col_cursor++))];
+
+			/* id contains the weapon id. Loop through struct weapon to find the corresponding weapon */
+			int temp_id = atoi(PQgetvalue(res,0,col_cursor++));
+			int i;
+			for (i = 0; i <= WEAPON_COUNT; i++)
+				if (weapons_list[i].index == temp_id)
+					break;
+
+			player.weapon = &weapons_list[i];;
+
+			/* Do the same for skills */
 			for (int i = 0; i < 4; i++)
 			{
-				player.skill[i] = &skills_list[atoi(PQgetvalue(res, 0, col_cursor++))];
+			int temp_skill_id = atoi(PQgetvalue(res,0,col_cursor++));
+			int temp_i;
+			for (temp_i = 0; temp_i <= SKILLS_COUNT; temp_i++)
+				if (skills_list[temp_i].index == temp_skill_id)
+					break;
+
+			player.skill[i] = &skills_list[temp_i];
 			}
+
+
 			player.dungeon_lvl = atoi(PQgetvalue(res, 0, col_cursor++));
 			if (col_cursor != col_count)
 			{
@@ -172,22 +190,22 @@ void save_player_data()
 	char *elem_2 = itoa(player.elements[2]);
 	char *elem_3 = itoa(player.elements[3]);
 	char *elem_4 = itoa(player.elements[4]);
+
 	// TODO get correct indices
-	int weapon_id = player.weapon - &weapons_list[0];
-	if (weapon_id < 0 || weapon_id >= WEAPON_COUNT) weapon_id = -1;
+
+	int weapon_id = player.weapon->index;
+	int skills_id[3];
+	skills_id[0] = player.skill[0]->index;
+	skills_id[1] = player.skill[1]->index;
+	skills_id[2] = player.skill[2]->index;
+	skills_id[3] = player.skill[3]->index;
+
 	char *weapon = itoa(weapon_id);
-	int skill_id = player.skill[0] - &skills_list[0];
-	if (skill_id < 0 || skill_id >= SKILLS_COUNT) skill_id = -1;
-	char *skill_0 = itoa(skill_id);
-	skill_id = player.skill[1] - &skills_list[0];
-	if (skill_id < 0 || skill_id >= SKILLS_COUNT) skill_id = -1;
-	char *skill_1 = itoa(skill_id);
-	skill_id = player.skill[2] - &skills_list[0];
-	if (skill_id < 0 || skill_id >= SKILLS_COUNT) skill_id = -1;
-	char *skill_2 = itoa(skill_id);
-	skill_id = player.skill[3] - &skills_list[0];
-	if (skill_id < 0 || skill_id >= SKILLS_COUNT) skill_id = -1;
-	char *skill_3 = itoa(skill_id);
+	char *skill_0 = itoa(skills_id[0]);
+	char *skill_1 = itoa(skills_id[1]);
+	char *skill_2 = itoa(skills_id[2]);
+	char *skill_3 = itoa(skills_id[3]);
+
 	char *dungeon_lvl = itoa(player.dungeon_lvl); /* TODO: permadeath, this shouldn't be needed */
 	const char *params[17] = {
 		player_id,
@@ -336,7 +354,7 @@ bool get_player()
 		}
 		return false;
 	}
-	else
+	else	// get_id failed, that means it's a new player joining!
 	{
 		return create_player();
 	}

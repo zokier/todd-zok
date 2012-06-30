@@ -345,17 +345,10 @@ void ncurs_skills()
 {
 	werase(skills_win);
 	wprintw(skills_win,"%s\n",player.weapon->name);
+	
 	for (int i = 0; i < 4; i++)
 	{
-		if (player.skill[i] != NULL)
-		{
-			wprintw(skills_win, "%s\n", player.skill[i]->name);
-		}
-		else 
-		{
-			// empty skill slot
-			waddch(skills_win, '\n');
-		}
+		wprintw(skills_win, "%s\n", player.skill[i]->name);
 	}
 	wrefresh(skills_win);
 }
