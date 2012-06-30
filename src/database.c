@@ -112,6 +112,15 @@ int init_pq()
 	}
 	PQclear(res);
 
+
+	res = PQprepare(conn, "list_online_players", "select player_logins.name,player_stats.location from player_logins,player_stats WHERE player_stats.id = player_logins.id;", 0, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear(res);
+
+
 	return true;
 
 pq_cleanup:

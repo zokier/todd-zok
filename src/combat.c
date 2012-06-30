@@ -7,7 +7,7 @@
 #include "ui.h"
 #include "location.h"
 #include "locations.h"
-
+#include "database.h"
 Character enemy;
 
 extern void set_player_location(Location* loc);
@@ -61,6 +61,9 @@ int fight_check_dead()
 		player_dead = true;
 	if (player_dead)
 	{
+		/* first, set the player location to "DEAD" */
+		db_player_location(LOC_DEAD);
+		
 		if (player_dead_elements)
 			ncurs_log_sysmsg(_("%s has caused an elemental imbalance in %s"), enemy.name, player.name);
 		ncurs_log_sysmsg(_("%s has killed %s!"), enemy.name, player.name);

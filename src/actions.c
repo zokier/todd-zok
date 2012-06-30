@@ -13,6 +13,7 @@
 #include "character.h"
 #include "combat.h"
 #include "database.h"
+
 void set_player_location(Location* loc)
 {
 	player.location = loc;
@@ -148,9 +149,29 @@ void ac_shrine_heal_all()
 
 void ac_list_players()
 {
-	// TODO fetch player list
-	ncurs_modal_msg(_("The wind is howling in the empty streets of this god forsaken town. You are all alone here."));
-	set_player_location(&loc_town);
+	werase(game_win);
+	wprintw(game_win, _("Players roaming the fields:\n\n"));
+	wrefresh(game_win);
+        PGresult *res;
+        res = PQexecPrepared(conn, "list_online_players", 0, NULL, NULL, NULL, 0);
+
+	wattron(game_win, A_BOLD);
+        // TODO: error handling
+        if (PQresultStatus(res) == PGRES_TUPLES_OK)
+        {
+                int row_count = PQntuples(res);
+                for (int i = 0; i < row_count; i++) // loop through all the players
+                {
+		char *player_name = PQgetvalue(res,i,0);
+		int location = atoi(PQgetvalue(res,i,1));
+		if (location == LOC_ONLINE) // only list online players
+			wprintw(game_win, "%s\n",player_name);
+		}
+	wattroff(game_win, A_BOLD);
+	wrefresh(game_win);
+	
+ 	}
+	PQclear(res);
 }
 
 void ac_view_stats()

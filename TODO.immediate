@@ -11,5 +11,6 @@ Talk to Willie - cheat codes
 				
 bugfixes:
 	elements can go to -1 in a fight
-	design decision should be made, permadeath or no?
-		* if no permadeath, recover elements & health at player login?
+		* players don't die from elemental imbalance, but lose consciousness or something
+		* game over for the day, has to rest some hours (6? 12? 24?)
+		* elements balance themselves over time
