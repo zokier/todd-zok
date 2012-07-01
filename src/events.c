@@ -3,10 +3,12 @@
 #include <time.h> /* for random number generator */
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 
 #include "ui.h"
 #include "events.h"
 #include "locations.h"
+#include "database.h"
 
 extern void set_player_location(Location* loc);
 extern int set_player_loc_yesno();
@@ -14,6 +16,89 @@ extern int set_player_loc_yesno();
 #define PROB(x) (i < (prob_max += x))
 
 // PROB(1) means 1 out 1000. PROB(500) means 500/1000 and so on
+
+int check_corpses()
+{
+// TODO: should this have a random chance?
+
+// currently 
+//	* corpse finding is automatic
+//	* always finds the corpse first in the database, boring
+
+	// 1. SQL query for DEAD players
+        PGresult *res;
+        char *location = itoa(LOC_DEAD);
+	char *level = itoa(player.dungeon_lvl); // only check for corpses on this dungeon lvl
+	const char *params[2] = {location, level};
+
+        res = PQexecPrepared(conn, "get_dead_players", 2, params, NULL, NULL, 0);
+        if (PQresultStatus(res) == PGRES_TUPLES_OK)
+        {
+                int row_count = PQntuples(res);
+	
+		if (row_count > 0) // found a dead player
+		{
+		// take a random corpse from database
+		int corpse = rand() % row_count;
+
+		char *corpse_name = PQgetvalue(res,corpse,0);
+		int corpse_money = atoi(PQgetvalue(res,corpse,1));
+		int corpse_weapon = atoi(PQgetvalue(res,corpse,2));
+		int corpse_id = atoi(PQgetvalue(res,corpse,3));
+		// if the corpse has no money, don't do anything (because it's looted already
+		if (corpse_money > 0)
+		{
+		        werase(command_win);
+		        wrefresh(command_win);
+			wclear(game_win);
+ 
+			// TODO: there's a "stumble upon" in random events, use the same text format for added tension
+			// can't use ncurs_modal because of the setplayer
+			wprintw(game_win,_(
+			"You stumble upon a corpse.\n"
+			"It seems a fellow adventurer %s (TODO: how do you know the name) is no longer with us.\n\n"
+			"Being the lowlife scum you are, you reach out for the purse of the corpse, and find...\n"
+			),corpse_name);
+		
+			wprintw(game_win,_("Continue...\n\n"));
+			wrefresh(game_win);
+			todd_getchar(NULL);
+
+			ncurs_modal_msg(_(
+			"...%d gold.\n\n"
+			"You feel a moment of sadness when looting a corpse, but it passes.\n"
+			"\nTODO: what about the weapon? Inventory.."
+			), corpse_money);
+	
+			ncurs_log_sysmsg("%s found a corpse of %s, money %d and weapon #%d",player.name,corpse_name,corpse_money,corpse_weapon);
+			player.money += corpse_money;
+
+			// update the database for the dead player -> money = 0
+
+			// TODO: do we need this, could we use PQgetvalue(res,corpse,X) or something?
+                        char *id = itoa(corpse_id);
+                        const char *params[1] = {id};
+                        PGresult *update;
+                        update = PQexecPrepared(conn, "loot_player", 1, params, NULL, NULL, 0);
+                        if (PQresultStatus(update) != PGRES_COMMAND_OK)
+                        { 
+                                syslog(LOG_DEBUG,_("Player loot database update failed!\n"));
+                        }
+
+                        PQclear(update);
+ 
+			return 1;
+		}
+
+		}
+        }
+        PQclear(res);
+ 
+// no corpses found, return 0
+return 0;
+}
+
+
 
 
 int check_rnd_events()

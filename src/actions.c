@@ -85,7 +85,10 @@ void ac_dungeons_action()
 	{
 		player.stamina--;
 
-		if (check_rnd_events() != 1) {/* return 1 => a random event occurred, don't fight */
+		// check if you stumble upon...
+			// a player corpse
+			// a random event
+		if (check_corpses() != 1 && check_rnd_events() != 1) {
 			set_player_location(&loc_fight);
 			create_enemy();
 			ncurs_log_sysmsg(_("You encounter a %s!"), enemy.name);

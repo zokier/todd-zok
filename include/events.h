@@ -2,6 +2,7 @@
 #define EVENTS_H
 #include "globals.h"
 
+int check_corpses();
 int check_rnd_events();
 int ev_old_man();
 int ev_bag_of_gold();

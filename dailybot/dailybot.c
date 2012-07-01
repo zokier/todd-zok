@@ -150,7 +150,7 @@ increase by 2 in the room, 1 in the fields
 			if (player_stamina > STAMINA_MAX) /* don't go over STAMINA_MAX */
 				player_stamina = STAMINA_MAX;
 
-			/* TODO: database update */
+
  			char *id = itoa(player_id);
 			char *stamina = itoa(player_stamina);
  

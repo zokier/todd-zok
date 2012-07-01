@@ -58,6 +58,7 @@ int init_pq()
 		goto pq_cleanup;
 	}
 
+
 	res = PQprepare(conn, "save_player_logout_time", "update player_logins set (last_logout) = (now()) where id = $1;", 2, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
@@ -112,13 +113,30 @@ int init_pq()
 	}
 	PQclear(res);
 
-
+	// player_stats.id = player_logins.id is a hack to remove duplicates, there might be a better way
 	res = PQprepare(conn, "list_online_players", "select player_logins.name,player_stats.location from player_logins,player_stats WHERE player_stats.id = player_logins.id;", 0, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;
 	}
 	PQclear(res);
+
+	// player_stats.id = player_logins.id is a hack to remove duplicates, there might be a better way
+	// TODO: currently only steals money and weapon
+	res = PQprepare(conn, "get_dead_players", "select player_logins.name, player_stats.money,player_stats.weapon,player_stats.id from player_logins, player_stats where player_stats.location = $1 and player_stats.dungeon_level = $2 and player_logins.id = player_stats.id;", 2, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear(res);
+
+	// update the database for dead player stats after looting
+	res = PQprepare(conn, "loot_player", "update player_stats set (money)=(0) where id = $1;", 1, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+
 
 
 	return true;
