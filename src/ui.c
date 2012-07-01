@@ -498,10 +498,13 @@ void ncurs_chat()
 				ncurs_log_sysmsg(_("Message send failure"));
 			}
 			del_msg(msg);
-			/* return to basic input prompt -> press any key for game commands */
-			toggle_chat = 0;
-			ncurs_bold_input(0); 
 		}
+
+		// return to basic input prompt -> press any key for game commands
+		// this is done here because if todd_getline returns 0 it means there's an empty line 
+		// TODO.. or todd_getline has an error...
+		toggle_chat = 0;
+		ncurs_bold_input(0); 
 		free(line);
 	}
 }

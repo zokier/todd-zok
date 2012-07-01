@@ -84,6 +84,8 @@ bool todd_getchar(unsigned char *c)
 
 bool todd_getline(char **line, size_t *len)
 {
+	// curs_set displays a nice cursor for user convenience
+	curs_set(1);
 	chat_typing = 1;
 	bool ret = false;
 	size_t buf_len = 20;
@@ -102,20 +104,23 @@ bool todd_getline(char **line, size_t *len)
 		}
 		if (c == '\b') // it's a backspace, go back a character
 		{
-			int y,x;
-			// get current position of cursor to y and x
-			getyx(input_win,y,x);
-			// move the cursor left by one
-			wmove(input_win, y,x-1);
-			// blank it from screen and from buffer
-			wechochar(input_win, ' ');
-			(*line)[*len] = '\0';
-			if ((*len) != 0) // don't backspace on an empty string or the pointer will cause a segfault
+			// don't backspace on an empty string or the pointer will cause a segfault
+			if ((*len) != 0) 
+			{
+				int y,x;
+				// get current position of cursor to y and x
+				getyx(input_win,y,x);
+				// move the cursor left by one
+				wmove(input_win, y,x-1);
+				// blank it from screen and from buffer
+				wechochar(input_win, ' ');
+				(*line)[*len] = '\0';
 				(*len)--;
 
-			// by calling wechochar, the cursor moves right. move it back
-			wmove(input_win, y,x-1);
-
+				// by calling wechochar, the cursor moves right. move it back
+				wmove(input_win, y,x-1);
+				wrefresh(input_win);
+			}
 		}
 		else
 		{
@@ -133,11 +138,17 @@ bool todd_getline(char **line, size_t *len)
 	} while (c != '\r');
 	(*len)--; // strip trailing newline
 	(*line)[*len] = '\0'; // insert null terminator
+
+	curs_set(0);
+	if (*len == 0) // it's an empty string..
+		return false;
+	// else, return true
 	ret = true;
 
 cleanup:
 	werase(input_win);
 	wrefresh(input_win);
 	chat_typing = 0;
+	curs_set(0);
 	return ret;
 }
