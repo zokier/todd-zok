@@ -23,23 +23,32 @@ void parse_and_print_chatmsg(char *msg)
 
 bool todd_getchar(unsigned char *c)
 {
-	zmq_pollitem_t items [2];
+	zmq_pollitem_t items [3];
 	items[0].socket = chat_socket;
 	items[0].events = ZMQ_POLLIN;
 	items[1].socket = NULL;
 	items[1].fd = fileno(stdin);
 	items[1].events = ZMQ_POLLIN;
+	items[2].socket = party_socket;
+	items[2].events = ZMQ_POLLIN;
 	/* Poll for events indefinitely */
 	do
 	{
-		int rc = zmq_poll (items, 2, -1);
+		int rc = zmq_poll (items, 3, -1);
 		if (rc < 0)
 		{
 			return false;
 		}
 		if (items[0].revents & ZMQ_POLLIN)
 		{
-			char *msg = try_recv_chatmsg();
+			char *msg = try_recv_msg(chat_socket);
+			// TODO real prefix parsing. avoid buffer overrun
+			parse_and_print_chatmsg(msg+11); // skip partyprefix
+			free(msg);
+		}
+		if (items[2].revents & ZMQ_POLLIN)
+		{
+			char *msg = try_recv_msg(party_socket);
 			parse_and_print_chatmsg(msg);
 			free(msg);
 		}

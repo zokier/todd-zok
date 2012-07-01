@@ -57,9 +57,14 @@ void ac_dungeons()
 	{
 	wclear(game_win);
 	// multiline message
-	ncurs_modal_msg(_("As you walk the path leading to the dungeons, you come by a squirrel.\nThe squirrel throws a pine cone at\ 
-you.\n\nYou realize you know nothing about fighting, even with squirrels.\n\nThe Gatekeeper did mention Bren and his warrior\ 
-	arena.."));
+	ncurs_modal_msg(_(
+		"As you walk the path leading to the dungeons, you come by a squirrel.\n"
+		"The squirrel throws a pine cone at you.\n"
+		"\n"
+		"You realize you know nothing about fighting, even with squirrels.\n"
+		"\n"
+		"The Gatekeeper did mention Bren and his warrior arena.."
+	));
 	}
 	else
 	{
