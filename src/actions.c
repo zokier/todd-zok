@@ -33,12 +33,13 @@ int set_player_loc_yesno() {
 	int loop = 1;
 	while (loop) 
 	{
-		int keypress = getch();
+		unsigned char keypress;
+		todd_getchar(&keypress);
 		if (keypress == 'y') 
-			return keypress;
+			return 'y';
 
 		if (keypress == 'n') 
-			return keypress;		
+			return 'n';		
 	} 
 
 return 0;
@@ -387,7 +388,39 @@ void ac_shop_buy()
 
 void ac_shop_sell()
 {
-	ncurs_modal_msg("The poor man has no coins to buy anything from you.\nyou have: %s",player.weapon->name);
+	if (player.weapon->index == 999) // it's bare hands, forget it
+	{
+	ncurs_modal_msg(_("\n\nAre you really thinking of selling me your hands?\nI don't think I have any use for them."));
+	set_player_location(&loc_shop);
+	return;
+	}
+	
+	wclear(game_win);
+	// currently always offer 60% of the weapon price
+	int price = player.weapon->price * 0.60;
+	wprintw(game_win,_("The old man is willing to buy your %s for %d\n"),player.weapon->name,price);
+	wrefresh(game_win);
+	int keypress = set_player_loc_yesno();
+	
+	if (keypress == 'y') 
+	{
+		ncurs_modal_msg(_("Nice doing business with you!"));
+		player.money += price;
+		
+		/* find out the correct index for Bare hands */
+		int i;
+		for (i = 0; i <= WEAPON_COUNT; i++)
+			if (weapons_list[i].index == 999)
+				break;
+		player.weapon = &weapons_list[i]; /* bare hands */
+		ncurs_skills();
+	}
+	else // 'n'
+	{
+		ncurs_modal_msg(_("May the gods curse you for wasting my time, mutters the old man."));
+	}
+ 
+set_player_location(&loc_shop);
 }
 
 void ac_messageboard()

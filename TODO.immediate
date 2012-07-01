@@ -1,3 +1,7 @@
+output:
+	* a function to bold / stylize chat messages, like the shopkeeper // old man
+	* a uniform way of presenting sentences on the screen (since the game_win width may vary)
+
 Talk to Willie - cheat codes
 		* used for debugging:
 			* 999 money
