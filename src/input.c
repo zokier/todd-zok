@@ -42,14 +42,14 @@ bool todd_getchar(unsigned char *c)
 		if (items[0].revents & ZMQ_POLLIN)
 		{
 			char *msg = try_recv_msg(chat_socket);
-			// TODO real prefix parsing. avoid buffer overrun
-			parse_and_print_chatmsg(msg+11); // skip partyprefix
+			parse_and_print_chatmsg(msg);
 			free(msg);
 		}
 		if (items[2].revents & ZMQ_POLLIN)
 		{
 			char *msg = try_recv_msg(party_socket);
-			parse_and_print_chatmsg(msg);
+			// TODO real prefix parsing. avoid buffer overrun
+			parse_and_print_chatmsg(msg+11); // skip partyprefix
 			free(msg);
 		}
 	} while (!(items[1].revents & ZMQ_POLLIN));
