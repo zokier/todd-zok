@@ -427,7 +427,7 @@ void enter_game()
 	playing = true;
 	while (playing)
 	{
-		char cmd_char;
+		unsigned char cmd_char;
 		bool getch_res = todd_getchar(&cmd_char);
 		if (getch_res == false)
 		{
@@ -479,6 +479,11 @@ bool init_zmq()
 		return false;
 	}
 
+	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, CTRLMSG_PREFIX, sizeof(CTRLMSG_PREFIX)-1)) // strip null terminator
+	{
+		return false;
+	}
+
 	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, DEBUGMSG_PREFIX, sizeof(DEBUGMSG_PREFIX)-1)) // strip null terminator 
 	{
 		return false;
@@ -502,8 +507,8 @@ void cleanup_zmq()
 bool unsub_party(unsigned int id)
 {
 	size_t len = 0;
-	char buf[20];
-	len = snprintf(buf, 20, "p%d", id);
+	char buf[12]; // 'pXXXXXXXXXX\0' = 12 chars
+	len = snprintf(buf, 12, "p%010d", id);
 	if (zmq_setsockopt(party_socket, ZMQ_UNSUBSCRIBE, buf, len))
 	{
 		syslog(LOG_WARNING, "Party unsubscription failed: %s", zmq_strerror(errno));
@@ -515,8 +520,8 @@ bool unsub_party(unsigned int id)
 bool sub_party(unsigned int id)
 {
 	size_t len = 0;
-	char buf[20];
-	len = snprintf(buf, 20, "p%d", id);
+	char buf[12]; // 'pXXXXXXXXXX\0' = 12 chars
+	len = snprintf(buf, 12, "p%010d", id);
 	if (zmq_setsockopt(party_socket, ZMQ_SUBSCRIBE, buf, len))
 	{
 		syslog(LOG_WARNING, "Party subscription failed: %s", zmq_strerror(errno));
@@ -606,15 +611,16 @@ bool zmq_python_up()
 	int token = rand();
 	// TODO figure out correct length
 	char msg_out[40];
-	snprintf(&msg_out[0], 40, "%s:%x", MAGIC, token);
+	size_t len = snprintf(&msg_out[0], 40, "%s:%x", MAGIC, token)+1;
 	zmq_pollitem_t items [2];
 	items[0].socket = chat_socket;
 	items[0].events = ZMQ_POLLIN;
 
+		Message msg_foo = create_ctrl_msg(msg_out, len);
 	// retry three times, sometimes zmq is slow to start
 	for (int i = 0; i < 3; i++)
 	{
-		send_dbg_msg(msg_out, 40);
+		send_msg(msg_foo);
 		int rc = zmq_poll (items, 1, 1000000);
 		if (rc < 0)
 		{
@@ -627,7 +633,7 @@ bool zmq_python_up()
 			continue;
 		}
 		if (items[0].revents & ZMQ_POLLIN)
-			msg = try_recv_chatmsg();
+			msg = try_recv_msg(chat_socket);
 
 		if (msg == NULL)
 		{
@@ -636,13 +642,13 @@ bool zmq_python_up()
 		}
 		// TODO check the length of the msg
 		// maybe strtok should be used instead of +sizeof(DEBUGMSG_PREFIX)
-		if (strcmp(msg_out,msg+sizeof(DEBUGMSG_PREFIX)) != 0) /* TODO???*/
+		if (strcmp(msg_out,msg+sizeof(CTRLMSG_PREFIX)) != 0) /* TODO???*/
 		{
 			syslog(LOG_WARNING, "ERROR received %s", msg);
-			free(msg);
+			del_msg(msg_foo);
 			continue;
 		}
-		free(msg);
+		del_msg(msg_foo);
 		return true;
 	}
 	syslog(LOG_WARNING, "ZMQ chat test retry count exceeded");

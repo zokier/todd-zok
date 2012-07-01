@@ -384,7 +384,7 @@ int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t 
 	wprintw(game_win, "x) %s\n", _("Nevermind"));
 	wrefresh(game_win);
 
-	char ch;
+	unsigned char ch;
 	while (true)
 	{
 		if (!todd_getchar(&ch))
@@ -480,18 +480,28 @@ void ncurs_chat()
 	/* redraw the input line - chat toggle*/
 	ncurs_bold_input(toggle_chat);
 
-        char *line = NULL;
+	char *line = NULL;
 	size_t len = 0;
 	if (toggle_chat != 0) 
 	{
-	        if (todd_getline(&line, &len))
+		if (todd_getline(&line, &len))
+		{
+			Message msg = create_chat_msg(line, len);
+			/* a chat message was succesfully input(ted) */
+			if (toggle_chat == 1)
 			{
-				/* a chat message was succesfully input(ted) */
-				send_chat_msg(line, len);
-				/* return to basic input prompt -> press any key for game commands */
-				toggle_chat = 0;
-				ncurs_bold_input(0); 
+				// party message
+				msg = wrap_as_partymsg(msg);
 			}
+			if (!send_msg(msg))
+			{
+				ncurs_log_sysmsg(_("Message send failure"));
+			}
+			del_msg(msg);
+			/* return to basic input prompt -> press any key for game commands */
+			toggle_chat = 0;
+			ncurs_bold_input(0); 
+		}
 		free(line);
 	}
 }
