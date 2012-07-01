@@ -45,8 +45,27 @@ return 0;
 }
 void ac_dungeons()
 {
-	set_player_location(&loc_dungeons);
-	player.dungeon_lvl = 0;
+	// make sure that player has atleast 1 skill before going to the dungeons
+	// TODO: what if the player loses all the skills in combat and return to the dungeons main screen..
+
+	int emptyskills = 0;
+	for (int i = 0; i < 4; i++)	// If all skills are called "Unused", don't allow to enter dungeons
+		if (strcmp(player.skill[i]->name, "Unused") == 0)
+			emptyskills++;
+
+	if (emptyskills == 4) // all skills are unused
+	{
+	wclear(game_win);
+	// multiline message
+	ncurs_modal_msg(_("As you walk the path leading to the dungeons, you come by a squirrel.\nThe squirrel throws a pine cone at\ 
+you.\n\nYou realize you know nothing about fighting, even with squirrels.\n\nThe Gatekeeper did mention Bren and his warrior\ 
+	arena.."));
+	}
+	else
+	{
+		set_player_location(&loc_dungeons);
+		player.dungeon_lvl = 0;
+	}
 }
 
 void ac_dungeons_enter() {

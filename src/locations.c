@@ -4,7 +4,9 @@
 #include "location.h"
 
 Location loc_town = {
-	"You wander around the desolate town.\nYou begin to wonder why you even bothered coming here.",
+	"You are now standing on the main street of Barathum, the village next to the famous dungeons."
+	"\nThere's a path leading leading to the dungeons."
+	"\n\nThe adventure awaits...",
 	8,
 	{
 		{

@@ -39,7 +39,19 @@ bool get_name()
 {
 	char *name = NULL;
 	size_t name_len = 0;
-	fputs(_("What's your name, adventurer? "), stdout);
+
+	// TODO: clear the screen (ncurses?), ascii art and so on
+	fputs("\n\n\n\n\nTODO: ASCII ART HERE!\n\n\n\n\n\n",stdout);
+
+	// Introductory text
+	fputs(_("Growing up, you heard the local bards sing about ancient dungeons.\n"),stdout);
+	fputs(_("The dungeons were filled with unimaginable treasures...and monsters.\n"),stdout);
+	fputs(_("\nThat's if you believed the bards. You were now approaching a village next to the dungeons, about to find out.\n"),stdout);
+
+	fputs(_("\nAs you approach the gated village, the Gatekeeper yells at you:\n"),stdout);
+	fputs(_("HALT! Who goes there? Annouce yourself: "), stdout);
+
+	// get user input
 	ssize_t line_len = getline(&name, &name_len, stdin);
 	if (line_len < 0)
 	{
@@ -83,7 +95,12 @@ bool check_passwd()
 	bool ret = false;
 	char *passwd = NULL;
 	size_t passwd_len = 0;
-	printf(_("Welcome number %d, enter password: "), player.id);
+
+	// the gatekeeper asks for the password
+	printf(_("\nIf you're really %s you'll remember the secret code word we agreed on last time!\n"),player.name);
+	printf(_("Tell me the the secret code word and I'll let you pass: "));
+
+
 	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
 	passwd[line_len-1] = '\0'; // strip newline
 	char *player_id = itoa(player.id);
@@ -285,13 +302,29 @@ bool create_player()
 	bool ret = false;
 	if (!check_name())
 	{
+		puts(_("TODO: make this part \"realm-like\""));
 		puts(_("Invalid name. Allowed characters: A-Z, a-z, dash and space."));
 		printf(_("Minimum name length: %d characters.\n"), NAME_MIN_LENGTH);
 		return ret;
 	}
 	char *passwd = NULL;
 	size_t passwd_len = 0;
-	printf(_("Welcome new player, enter password: "));
+
+	// New player joining, let the Gatekeeper to the talking
+
+	printf(_("\nNever heard of you, %s\n"),player.name);
+	printf(_("You look like a worthless coward to me. I bet my supper that you are a no good fighter.\n"));
+	printf(_("That's right. People from all around the kingdom come here because of the dungeons. "));
+	printf(_("Some never leave, you know.\n"));
+	printf(_("If you're really serious about meeting an untimely death you should at least talk to Bren first.\n"));
+	printf(_("Bren can teach you to take care of yourself. Meet him at his arena in the village.\n"));
+
+	printf(_("\nIn case you run away to your mother and she tells you to come back and die in honor, I want to recognize you.\n"));
+	printf(_("Tell me a secret code word so I'll know you the next time you arrive: "));
+
+
+
+	// ask for password
 	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
 	passwd[line_len-1] = '\0'; // strip newline
 	// TODO ask password for a second time to avoid typos
