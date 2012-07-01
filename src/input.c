@@ -100,6 +100,23 @@ bool todd_getline(char **line, size_t *len)
 			*len = 0;
 			goto cleanup;
 		}
+		if (c == '\b') // it's a backspace, go back a character
+		{
+			int y,x;
+			// get current position of cursor to y and x
+			getyx(input_win,y,x);
+			// move the cursor left by one
+			wmove(input_win, y,x-1);
+			// blank it from screen and from buffer
+			wechochar(input_win, ' ');
+			(*line)[*len] = '\0';
+			if ((*len) != 0) // don't backspace on an empty string or the pointer will cause a segfault
+				(*len)--;
+
+			// by calling wechochar, the cursor moves right. move it back
+			wmove(input_win, y,x-1);
+
+		}
 		else
 		{
 			if (buf_len <= *len)
