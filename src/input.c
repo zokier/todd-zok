@@ -107,6 +107,12 @@ bool todd_getline(char **line, size_t *len)
 			// don't backspace on an empty string or the pointer will cause a segfault
 			if ((*len) != 0) 
 			{
+				// if it's a multibyte (scandic letters, § and so on)
+				// len -1 and len -2 have negative values
+				int multibyte = 0;
+				if ((*line)[*len - 1] < 0)
+					multibyte = 1;
+
 				int y,x;
 				// get current position of cursor to y and x
 				getyx(input_win,y,x);
@@ -116,6 +122,11 @@ bool todd_getline(char **line, size_t *len)
 				wechochar(input_win, ' ');
 				(*line)[*len] = '\0';
 				(*len)--;
+				if (multibyte) // there's two chars in buffer, not one
+				{
+				(*line)[*len] = '\0';
+				(*len)--;
+				}
 
 				// by calling wechochar, the cursor moves right. move it back
 				wmove(input_win, y,x-1);
