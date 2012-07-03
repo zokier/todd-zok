@@ -1,14 +1,12 @@
+BUGS:
+input:
+* dungeons: always return to current dungeon lvl with "run"
+
+
 output:
 	* a function to bold / stylize chat messages, like the shopkeeper // old man
 	* a uniform way of presenting sentences on the screen (since the game_win width may vary)
 
-Talk to Willie - cheat codes
-		* used for debugging:
-			* 999 money
-			* 999 elements
-			* etc
-		* reset databases (also, start counting player ids from 0 to speed up the database)
-				
 bugfixes:
 	elements can go to -1 in a fight
 		* players don't die from elemental imbalance, but lose consciousness or something

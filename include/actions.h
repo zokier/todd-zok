@@ -3,6 +3,7 @@
 
 #include "location.h"
 
+void ac_blank();
 void ac_dungeons();
 void ac_dungeons_action();
 void ac_dungeons_glow();

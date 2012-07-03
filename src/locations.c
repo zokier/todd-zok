@@ -25,7 +25,7 @@ Location loc_town = {
 			'v',
 			"",
 			"View stats",
-			&ac_view_stats
+			&ac_blank // done through todd_getchar, this just displays text
 		},
 		{
 			't',
@@ -243,7 +243,7 @@ Location loc_fight = {
 			'v',
 			"",
 			"View stats",
-			&ac_view_stats
+			&ac_blank // done through todd_getchar, this just displays text
 		},
 
 		{

@@ -18,6 +18,7 @@ void set_player_location(Location* loc)
 {
 	player.location = loc;
 	ncurs_location();
+	ncurs_commands(); // TODO: this is drawn twice. Find out where. Without this line, 'v'iew stats (global) doesn't update commands
 }
 
 /* a modified set_player_location, doesn't draw description -> doesn't empty the screen*/
@@ -305,13 +306,14 @@ void ac_tavern_info()
 	*/
 	werase(game_win);
 	ncurs_modal_msg("TODO: Implement\nNOTE THAT STATS HAVE BEEN UPDATED");
- 	player.health = 50;
-	player.elements[0] = 10;
-	player.elements[1] = 10;
-	player.elements[2] = 10;
-	player.elements[3] = 10;
-	player.elements[4] = 10;
-	player.money = 100;
+ 	player.health = player.max_health;
+	player.elements[0] = 5;
+	player.elements[1] = 5;
+	player.elements[2] = 5;
+	player.elements[3] = 5;
+	player.elements[4] = 5;
+	player.money += 100;
+	player.stamina = 100;
  
 }
 
@@ -320,6 +322,7 @@ void ac_tavern_party()
 	ncurs_log_sysmsg("Enter new partyid");
 	char *line = NULL;
 	size_t len = 0;
+	wrefresh(input_win); // this is here to move the visible cursor to input_win instead of log_win
 	if(!todd_getline(&line, &len)) return;
 	int id = atoi(line);
 	set_party(id);
@@ -542,3 +545,8 @@ void ac_quit()
 	playing = false;
 }
 
+// DO NOTHING.
+// Used for view_stats when it needs to be displayed on-screen but it's actually done in todd_getchar
+void ac_blank()
+{
+}

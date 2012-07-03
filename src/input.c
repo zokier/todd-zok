@@ -74,6 +74,23 @@ bool todd_getchar(unsigned char *c)
 				ncurs_chat(player);
 			}
 		}
+
+
+
+		if (*c == 'v') // v for View Stats
+		{
+		if (chat_typing == 0) // don't view stats when in line input mode
+		{
+			ac_view_stats();
+			wclear(command_win);
+			wrefresh(command_win);
+			// empty commands and wait for a getch
+			ncurs_modal_msg(""); // only "continue" and getch
+
+			set_player_location(player.location);
+		}
+		}
+		// no special keys pressed, input as normal
 		return true;
 	}
 	else	
