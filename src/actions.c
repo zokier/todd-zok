@@ -88,7 +88,7 @@ void ac_dungeons_action()
 		// check if you stumble upon...
 			// a player corpse
 			// a random event
-		if (check_corpses() != 1 && check_rnd_events() != 1) {
+		if (check_rnd_events() != 1) {
 			set_player_location(&loc_fight);
 			create_enemy();
 			ncurs_log_sysmsg(_("You encounter a %s!"), enemy.name);
@@ -200,6 +200,7 @@ void ac_list_players()
 	
  	}
 	PQclear(res);
+
 }
 
 void ac_view_stats()
@@ -486,6 +487,43 @@ ncurs_bold_input(999);
 	ncurs_modal_msg(_("Your message has been written.\nYou start to wonder if it was worth it."));
 }
 
+void ac_graveyard()
+{
+	set_player_location(&loc_graveyard);
+
+
+}
+
+// High score list, called graveyard in game
+void ac_graveyard_view()
+{
+	wclear(game_win);
+	wprintw(game_win,_("Here lie the following adventurers:\n\n"));
+	wattron(game_win, A_BOLD);
+	wprintw(game_win,"Name		TODO: rank high scores\n");
+	wattroff(game_win, A_BOLD);
+
+	const char *graveyard = itoa(LOC_DEAD_GRAVEYARD);
+	const char *params[1] = {graveyard};
+	PGresult *res;
+	res = PQexecPrepared(conn, "view_graveyard", 1, params, NULL, NULL, 0);
+
+        if (PQresultStatus(res) == PGRES_TUPLES_OK)
+        {
+                int row_count = PQntuples(res);
+                for (int i = 0; i < row_count; i++) // loop through all the players
+                {
+			wprintw(game_win, "%s\n",PQgetvalue(res,i,0));
+		}
+	wattroff(game_win, A_BOLD);
+	wrefresh(game_win);
+	
+ 	}
+	PQclear(res);
+
+	wrefresh(game_win);
+
+}
 void ac_return_to_town()
 {
 	set_player_location(&loc_town);

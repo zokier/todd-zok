@@ -8,6 +8,6 @@ void db_player_location(int location);
 #define LOC_OFFLINE_ROOM 1
 #define LOC_OFFLINE_FIELDS 2
 #define LOC_DEAD 3
-
+#define LOC_DEAD_GRAVEYARD 4
 
 #endif //DATABASE_H

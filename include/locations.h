@@ -13,6 +13,7 @@ extern Location loc_tavern;
 extern Location loc_tavern_bartender;
 extern Location loc_shop;
 extern Location loc_messageboard;
+extern Location loc_graveyard;
 extern Location loc_warena;
 extern Location loc_room_offline; /* used when player gets a room and quits */
 extern Location loc_yesno;

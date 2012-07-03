@@ -28,6 +28,8 @@ void ac_shop_sell();
 void ac_messageboard();
 void ac_messageboard_view();
 void ac_messageboard_write();
+void ac_graveyard();
+void ac_graveyard_view();
 void ac_return_to_town();
 void ac_quit();
 void set_player_location(Location* loc);

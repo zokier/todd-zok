@@ -119,6 +119,7 @@ increase by 2 in the room, 1 in the fields
 				}
 
 				case LOC_DEAD: // TODO: permadeath or no, what to do with dead players?
+				case LOC_DEAD_GRAVEYARD:
 				{
 					syslog(LOG_DEBUG,_("Player #%d is dead, no recovery!"), player_id);
 					break;
@@ -143,7 +144,7 @@ increase by 2 in the room, 1 in the fields
 			}
 
 		/* do the actual update */
-		if (player_location != LOC_ONLINE&&player_location != LOC_DEAD) /* don' update online//dead players */
+		if (player_location == LOC_OFFLINE_ROOM || player_location == LOC_OFFLINE_FIELDS) /* don' update online//dead players */
 			{
 			int old_stamina = player_stamina;
 			player_stamina += newstamina;

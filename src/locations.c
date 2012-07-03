@@ -7,7 +7,7 @@ Location loc_town = {
 	"You are now standing on the main street of Barathum, the village next to the famous dungeons."
 	"\nThere's a path leading leading to the dungeons."
 	"\n\nThe adventure awaits...",
-	8,
+	9,
 	{
 		{
 			'd',
@@ -50,6 +50,12 @@ Location loc_town = {
 			"",
 			"Messageboard",
 			&ac_messageboard
+		},
+		{
+			'g',
+			"",
+			"Graveyard",
+			&ac_graveyard
 		},
 		{
 			'q',
@@ -296,6 +302,7 @@ Location loc_shrine = {
 	}
 };
 
+
 Location loc_messageboard = {
 	"There is a large messageboard in the middle of the town square. It is plastered with layers of old notes. Most of them are weathered completely unintelligible. Beside the board is a small table with a pen and a stack of empty papers.",
 	3,
@@ -321,6 +328,25 @@ Location loc_messageboard = {
 	}
 };
 
+// TODO: Talk to Gravedigger Earl for quests etc
+Location loc_graveyard = {
+	"The graveyard has an air of calmness and peace.\nHere lie adventurers whose bodies have been recovered.",
+	2,
+	{
+		{
+			'v',
+			"",
+			"View the graves",
+			&ac_graveyard_view
+		},
+		{
+			'r',
+			"",
+			"Return to town",
+			&ac_return_to_town
+		}
+	}
+};
 Location loc_yesno = {
 	"", /* NULL here would mean there be dragons. Always have "" instead */
 	2,
