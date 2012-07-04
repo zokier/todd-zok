@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
+
+#include "actions.h"
 #include "element.h"
 #include "character.h"
 #include "skills.h"
@@ -59,33 +61,48 @@ int fight_check_dead()
 	}
 	if (player.health <= 0)
 		player_dead = true;
+
 	if (player_dead)
 	{
-		/* first, set the player location to "DEAD" */
-		db_player_location(LOC_DEAD);
-		
-		if (player_dead_elements)
-			ncurs_log_sysmsg(_("%s has caused an elemental imbalance in %s"), enemy.name, player.name);
-		ncurs_log_sysmsg(_("%s has killed %s!"), enemy.name, player.name);
+	
 		wclear (game_win);
-		if (player_dead_elements)
-			mvwprintw(game_win, 6, 0, _("The world around you starts to spin.\nYou sense a great imbalance inside you."));
-		else
-			mvwprintw(game_win, 6, 0, _("The world fades around you as you fall to the ground, \nbleeding."));
 
-		wattron(game_win, A_BOLD);
-		wattron(game_win, A_UNDERLINE);
-		mvwprintw(game_win, 8, 0, _("You are dead."));
-		wattroff(game_win, A_BOLD);
-		wattroff(game_win, A_UNDERLINE);
+		if (player_dead_elements) // elements below 0, don't die but faint only
+		{
+			db_player_location(LOC_FAINTED);
+			ncurs_log_sysmsg(_("%s has caused an elemental imbalance in %s"), enemy.name, player.name);
+			mvwprintw(game_win, 6, 0, _("The world around you starts to spin.\nYou sense a great imbalance inside you."));
+
+			wattron(game_win, A_BOLD);
+			wattron(game_win, A_UNDERLINE);
+			mvwprintw(game_win, 8, 0, _("You faint. TODO: \"come back in 8 hours??\""));
+			wattroff(game_win, A_BOLD);
+			wattroff(game_win, A_UNDERLINE);
+		}
+		else // PERMADEATH
+		{
+			/* first, set the player location to "DEAD" */
+			db_player_location(LOC_DEAD);
+		
+			ncurs_log_sysmsg(_("%s has killed %s!"), enemy.name, player.name);
+			mvwprintw(game_win, 6, 0, _("The world fades around you as you fall to the ground, \nbleeding."));
+			wattron(game_win, A_BOLD);
+			wattron(game_win, A_UNDERLINE);
+			mvwprintw(game_win, 8, 0, _("You are dead."));
+			wattroff(game_win, A_BOLD);
+			wattroff(game_win, A_UNDERLINE);
+		}
+
+		// common stuff to death // elemental imbalance
 		wrefresh(game_win);
 		todd_getchar(NULL);
 		playing = false;
 	}
+
 	if (enemy_dead || player_dead)
-		return 1; /* if enemy is dead, don't redraw stuff anymore */
+		return 1; /* if enemy / player is dead, don't redraw combat stuff anymore */
 	else
-		return 0;
+		return 0; // redraw combat stuff
 }
 
 void create_enemy()

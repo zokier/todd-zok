@@ -139,6 +139,12 @@ increase by 2 in the room, 1 in the fields
 					break;
 				}
 
+				case LOC_FAINTED:
+				{
+					// TODO: rules of fainting..
+					break;
+				}
+
 				default:
 					break;
 			}

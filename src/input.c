@@ -5,6 +5,8 @@
 #include <zmq.h>
 #include <ncurses.h>
 #include "globals.h"
+
+#include "actions.h"
 #include "ui.h"
 #include "networking.h"
 

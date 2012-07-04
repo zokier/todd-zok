@@ -133,7 +133,7 @@ void load_player_data()
 	if (PQresultStatus(res) == PGRES_TUPLES_OK)
 	{
 		int row_count = PQntuples(res);
-		int col_count = PQnfields(res);
+		// UNUSED variable: int col_count = PQnfields(res);
 		if (row_count > 0)
 		{
 			if (row_count > 1)
