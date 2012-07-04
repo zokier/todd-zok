@@ -67,7 +67,7 @@ Location loc_town = {
 	}
 };
 
-Location loc_dungeons = {
+Location loc_dungeons_level1 = {
 	"You follow a road that is supposed to lead to dungeons. At the end of the road you find a barred gateway with a sign:\n"
 	"\n"
 	"\t+----------------+\n"
@@ -83,7 +83,7 @@ Location loc_dungeons = {
 			'e',
 			"",
 			"Enter dungeons",
-			&ac_dungeons_enter
+			&ac_dungeons	// ac_dungeons sets the correct level (wrapper)
 		},
 
 		{
@@ -107,7 +107,7 @@ Location loc_dungeons = {
 	}
 };
 
-Location loc_dungeons_level1 = {
+Location loc_dungeons_level2 = {
 	"You enter the dungeons. There are dimly lit torches on the wall. You realize that other people have been here.\n"
 	"\nTODO: Finish the description, add something else besides look for action\n",
 	2,
@@ -122,7 +122,7 @@ Location loc_dungeons_level1 = {
 			'r',
 			"",
 			"Return to fresh air",
-			&ac_dungeons
+			&ac_return_to_town
 		}
 	}
 };

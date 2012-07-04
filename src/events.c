@@ -183,15 +183,18 @@ void ac_ev_oldman_help()
 	ncurs_modal_msg(_("Thank you kind sir! Here take this for your trouble.\n\nThe old man shoves a purse in your hands."));
 	ncurs_log_sysmsg(_("You gain 100 gold!"));
 	player.money += 100;
-	set_player_location(&loc_dungeons);
+	player.stamina -= 5;
+		if (player.stamina < 0)
+			player.stamina = 0;
+	set_player_location(&loc_town); // you end up in the town
 }
 
 void ac_ev_oldman_nohelp()
 {
 	ncurs_modal_msg(_("May the gods curse you."), "Old man"); // just for fun
 	ncurs_log_chatmsg(_("May the gods curse you."), "Old man"); // just for fun
-	player.stamina++;
-	set_player_location(&loc_dungeons);
+	player.stamina++; // this is to balance the stamina-- due to the action
+	ac_dungeons();
 }
 
 

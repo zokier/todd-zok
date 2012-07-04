@@ -9,7 +9,6 @@
 	* privmsg
 	* party
 	* partymsg/channels
-	* list online players
 	* verify reliability
 * Combat
 	* Special skills
@@ -51,8 +50,6 @@
 * Loot
 	* Creeps drop stuff to sell to vendors
 		* need skills to recover
-* Weather
-	* Daily buffs/debuffs for elements
 * Day/night cycle?
 	* What effects would it have
 	* Day length 

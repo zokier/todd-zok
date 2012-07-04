@@ -45,40 +45,62 @@ int set_player_loc_yesno() {
 
 return 0;
 }
+
+// this function takes the player to the dungeons
+// the function can be accessed in three ways:
+//	* from town to dungeons
+//	* from dungeon level to another
+//	* by pressing Run in a fight
+// Dungeon level 0 == town
 void ac_dungeons()
 {
-	// make sure that player has atleast 1 skill before going to the dungeons
-	// TODO: what if the player loses all the skills in combat and return to the dungeons main screen..
-
-	int emptyskills = 0;
-	for (int i = 0; i < 4; i++)	// If all skills are called "Unused", don't allow to enter dungeons
-		if (strcmp(player.skill[i]->name, "Unused") == 0)
-			emptyskills++;
-
-	if (emptyskills == 4) // all skills are unused
+	switch(player.dungeon_lvl)
 	{
-	wclear(game_win);
-	// multiline message
-	ncurs_modal_msg(_(
-		"As you walk the path leading to the dungeons, you come by a squirrel.\n"
-		"The squirrel throws a pine cone at you.\n"
-		"\n"
-		"You realize you know nothing about fighting, even with squirrels.\n"
-		"\n"
-		"The Gatekeeper did mention Bren and his warrior arena.."
-	));
-	}
-	else
-	{
-		set_player_location(&loc_dungeons);
-		player.dungeon_lvl = 0;
-	}
+		case 0:		// this is always from town to dungeon entrance
+		{
+			// make sure that player has atleast 1 skill before going to the dungeons
+			// TODO: what if the player loses all the skills in combat and return to the dungeons main screen..
+
+			int emptyskills = 0;
+			for (int i = 0; i < 4; i++)	// If all skills are called "Unused", don't allow to enter dungeons
+				if (strcmp(player.skill[i]->name, "Unused") == 0)
+					emptyskills++;
+
+			if (emptyskills == 4) // all skills are unused
+			{
+			wclear(game_win);
+			// multiline message
+			ncurs_modal_msg(_(
+				"As you walk the path leading to the dungeons, you come by a squirrel.\n"
+				"The squirrel throws a pine cone at you.\n"
+				"\n"
+				"You realize you know nothing about fighting, even with squirrels.\n"
+				"\n"
+				"The Gatekeeper did mention Bren and his warrior arena.."
+			));
+			}
+			else
+			{
+				player.dungeon_lvl = 1;
+				// TODO: the text should be different coming from town or coming from dungeon level 2
+				set_player_location(&loc_dungeons_level1);
+			}
+
+			break;
+		}
+		case 1: 
+		{
+			player.dungeon_lvl = 2;
+			set_player_location(&loc_dungeons_level2);
+
+			break;
+		}
+		default:
+			break;
+
+	}	
 }
 
-void ac_dungeons_enter() {
-	set_player_location(&loc_dungeons_level1);
-	player.dungeon_lvl = 1;
-}
 
 void ac_dungeons_action()
 {
@@ -527,9 +549,29 @@ void ac_graveyard_view()
 	wrefresh(game_win);
 
 }
+
+// the name is currently misleading: returns -1 dungeon levels
 void ac_return_to_town()
 {
-	set_player_location(&loc_town);
+	switch (player.dungeon_lvl)
+	{
+		case 1: // to town
+		{
+		player.dungeon_lvl = 0;
+		set_player_location(&loc_town);
+		break;
+		}
+
+		case 2: // to first dungeon level
+		{
+		player.dungeon_lvl = 1;
+		set_player_location(&loc_dungeons_level1);
+		break;
+		}
+
+		default:
+			break;
+	}
 }
 
 

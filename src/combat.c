@@ -44,7 +44,7 @@ int fight_check_dead()
 		ncurs_modal_msg(
 				_("%s is slain!\n\nYou find %d coins on the corpse, and gain %d experience\n"),
 				enemy.name, money, exp);
-		set_player_location(&loc_dungeons);
+		ac_dungeons();
 	}
 
 	/* check if player dies as well */
@@ -92,7 +92,8 @@ void create_enemy()
 {
 	/* randomly choose an enemy from enemylist, based on player dungeon level */
 	int random_enemy = rand() % ENEMY_COUNT;
-	memcpy(&enemy, &enemylist[player.dungeon_lvl][random_enemy], sizeof(enemy));
+	// NOTE THAT dungeon level 0 = town, 1 = first level and so on. Therefore, dungeon_lvl - 1;
+	memcpy(&enemy, &enemylist[player.dungeon_lvl - 1][random_enemy], sizeof(enemy));
 }
 
 

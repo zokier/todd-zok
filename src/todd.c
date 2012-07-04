@@ -175,11 +175,13 @@ void load_player_data()
 			}
 
 
-			player.dungeon_lvl = atoi(PQgetvalue(res, 0, col_cursor++));
-			if (col_cursor != col_count)
-			{
-				syslog(LOG_WARNING, "col_cursor: %d != col_count: %d", col_cursor, col_count);
-			}
+			// reset player dungeon level to 0 (town)
+			player.dungeon_lvl = 0;
+//			player.dungeon_lvl = atoi(PQgetvalue(res, 0, col_cursor++));
+//			if (col_cursor != col_count)
+//			{
+//				syslog(LOG_WARNING, "col_cursor: %d != col_count: %d", col_cursor, col_count);
+//			}
 		}
 		else
 		{

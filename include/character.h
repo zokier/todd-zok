@@ -21,7 +21,7 @@ struct Character {
 	int elements[ELEM_COUNT]; // use enum Element to access
 	Weapons *weapon;
 	Skills *skill[4];
-	int dungeon_lvl; 
+	int dungeon_lvl; // dungeon_lvl 0 == town, 1 = forest level etc
 };
 
 typedef struct Party Party;

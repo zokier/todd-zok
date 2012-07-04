@@ -4,8 +4,8 @@
 #include "location.h"
 
 extern Location loc_town;
-extern Location loc_dungeons;
 extern Location loc_dungeons_level1;
+extern Location loc_dungeons_level2;
 extern Location loc_ev_oldman;
 extern Location loc_fight;
 extern Location loc_shrine;
