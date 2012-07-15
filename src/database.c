@@ -145,6 +145,14 @@ int init_pq()
 	}
 
 
+	// get current hour (used for wuxing cycle)
+	res = PQprepare(conn, "get_hour", "select extract(hour from now());", 0, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+
+
 
 	return true;
 
