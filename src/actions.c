@@ -251,7 +251,17 @@ void ac_view_stats()
 		wprintw(game_win,"%6s %d: %10s\n", _("Skill"), i+1, player.skill[i]->name);
 	}
 	wprintw(game_win,"\n");
-	wprintw(game_win, "Party id: %d\n", player_party.id);
+
+
+	// only display party stats if the player is in a party
+	
+	if (player_party.id != 0)
+	{
+		wprintw(game_win, "Party id: %d\n", player_party.id);
+		wprintw(game_win, "Party name: %s\n", player_party.name);
+	}
+	else
+		wprintw(game_win, "Player is not in a party");
 
 	wrefresh(game_win);
 
@@ -341,6 +351,10 @@ void ac_tavern_info()
 
 void ac_tavern_party()
 {
+	// TODO: user shouldn't need to care about partyid - it should be an automagic counter
+	// instead, ask the player for the party name like done below
+	// TODO: better yet, display a list of existing parties
+	// TODO: if player chooses 0 as a partyid, viewstats displays "Not in a party" - 0 shouldn't be a valid party id
 	ncurs_log_sysmsg("Enter new partyid");
 	char *line = NULL;
 	size_t len = 0;
@@ -349,6 +363,17 @@ void ac_tavern_party()
 	int id = atoi(line);
 	set_party(id);
 	ncurs_log_sysmsg("Subscribed to %d", player_party.id);
+
+	ncurs_log_sysmsg("What would you like your party to be called?");
+	line = NULL;
+	len = 0;
+	wrefresh(input_win); // this is here to move the visible cursor to input_win instead of log_win
+	if(!todd_getline(&line, &len)) return;
+	player_party.name = line;
+	// TODO: make this a chatmsg by Willie?
+	ncurs_log_sysmsg(_("Your party shall be called %s"), player_party.name);
+
+
 }
 
 void ac_warena()
@@ -555,6 +580,8 @@ void ac_return_to_town()
 {
 	switch (player.dungeon_lvl)
 	{
+		case 0: // already in town, return from Tavern, shop and so on
+
 		case 1: // to town
 		{
 		player.dungeon_lvl = 0;

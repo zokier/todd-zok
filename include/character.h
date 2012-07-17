@@ -27,6 +27,7 @@ struct Character {
 typedef struct Party Party;
 struct Party {
 	int id;
+	char *name;
 	Character *characters[3];
 };
 

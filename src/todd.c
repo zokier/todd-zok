@@ -583,8 +583,10 @@ int main(int argc, char *argv[])
 	}
 
 	load_player_data();
-	player_party.id = rand();
-	sub_party(player_party.id);
+
+	// Don't subscribe to party at startup
+//	player_party.id = rand();
+//	sub_party(player_party.id);
 
 	init_ui();
 	enter_game();
