@@ -20,7 +20,6 @@ void ac_tavern();
 void ac_tavern_bartender();
 void ac_tavern_room();
 void ac_tavern_info();
-void ac_tavern_party();
 void ac_warena();
 void ac_warena_skills();
 void ac_shop();
@@ -33,6 +32,12 @@ void ac_graveyard();
 void ac_graveyard_view();
 void ac_return_to_town();
 void ac_quit();
+void ac_party_gather();
+void ac_party_list();
+void ac_party_join();
+
+
 void set_player_location(Location* loc);
+
 int set_player_loc_yesno();
 #endif //ACTIONS_H

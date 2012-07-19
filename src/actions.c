@@ -11,6 +11,7 @@
 #include "weapons.h"
 #include "skills.h"
 #include "character.h"
+#include "party.h"
 #include "combat.h"
 #include "database.h"
 
@@ -349,31 +350,69 @@ void ac_tavern_info()
  
 }
 
-void ac_tavern_party()
+
+// list current parties
+void ac_party_list()
 {
-	// TODO: user shouldn't need to care about partyid - it should be an automagic counter
-	// instead, ask the player for the party name like done below
-	// TODO: better yet, display a list of existing parties
-	// TODO: if player chooses 0 as a partyid, viewstats displays "Not in a party" - 0 shouldn't be a valid party id
-	ncurs_log_sysmsg("Enter new partyid");
+	werase(game_win);
+
+        PGresult *res;
+        res = PQexecPrepared(conn, "list_parties", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(res) == PGRES_TUPLES_OK)
+        {
+		int row_count = PQntuples(res);
+		if (row_count > 0) // means there's parties
+			{
+			for (int i = 0; i < row_count; i++)
+				{
+				wprintw(game_win,"#%d: %s\n", atoi(PQgetvalue(res,i,0)), PQgetvalue(res,i,1));
+				wprintw(game_win,_("Members: %s	TODO: the rest..\n\n"),PQgetvalue(res,i,2));
+				}
+			} 
+
+		else
+			wprintw(game_win, _("No parties..\n"));
+	}
+	wrefresh(game_win);
+
+}
+
+// joins an existing party
+void ac_party_join()
+{
+// TODO: see if there's room in a party
+// IF yes: join
+
+// IF no: explain to the user
+}
+
+void ac_party_gather()
+{
+
+	ncurs_log_sysmsg("What would you like your party to be called?");
 	char *line = NULL;
 	size_t len = 0;
 	wrefresh(input_win); // this is here to move the visible cursor to input_win instead of log_win
 	if(!todd_getline(&line, &len)) return;
-	int id = atoi(line);
-	set_party(id);
-	ncurs_log_sysmsg("Subscribed to %d", player_party.id);
 
-	ncurs_log_sysmsg("What would you like your party to be called?");
-	line = NULL;
-	len = 0;
-	wrefresh(input_win); // this is here to move the visible cursor to input_win instead of log_win
-	if(!todd_getline(&line, &len)) return;
 	player_party.name = line;
-	// TODO: make this a chatmsg by Willie?
-	ncurs_log_sysmsg(_("Your party shall be called %s"), player_party.name);
 
+	// insert a new party into databse, with an automatic id number and the only member being player
+	char *playerid = itoa(player.id);
+        const char *params[2] = {player_party.name, playerid};
+        PGresult *res;
+        res = PQexecPrepared(conn, "new_party", 2, params, NULL, NULL, 0);
+        if (PQresultStatus(res) == PGRES_TUPLES_OK)
+        {
+	        int partyid = atoi(PQgetvalue(res, 0, 0));
+		set_party(partyid);
+		ncurs_log_sysmsg("Subscribed to %d", player_party.id);
 
+		// TODO: make this a chatmsg by Willie?
+		ncurs_log_sysmsg(_("Your party shall be called %s"), player_party.name);
+	}
+	PQclear(res);
+	// TODO: else -> error handling
 }
 
 void ac_warena()

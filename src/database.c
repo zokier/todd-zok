@@ -45,6 +45,7 @@ int init_pq()
 	{
 		goto pq_cleanup;
 	}
+
 	PQclear(res);
 	res = PQprepare(conn, "save_player", "update player_stats set (stamina, experience, money, health, max_health, wood, fire, earth, metal, water, weapon, skill_0, skill_1, skill_2, skill_3, dungeon_level) = ($2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) where id = $1;", 17, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
@@ -136,6 +137,7 @@ int init_pq()
 		goto pq_cleanup;
 	}
 
+	PQclear(res);
 
 	// Graveyard, AKA high scores
 	res = PQprepare(conn, "view_graveyard", "select player_logins.name, player_stats.location FROM player_logins, player_stats WHERE player_stats.id = player_logins.id AND location = $1;", 1, NULL);
@@ -144,6 +146,7 @@ int init_pq()
 		goto pq_cleanup;
 	}
 
+	PQclear(res);
 
 	// get current hour (used for wuxing cycle)
 	res = PQprepare(conn, "get_hour", "select extract(hour from now());", 0, NULL);
@@ -152,8 +155,23 @@ int init_pq()
 		goto pq_cleanup;
 	}
 
+	PQclear(res);
+	// create a new party
+	res = PQprepare(conn, "new_party", "insert into parties (name, player1, player2, player3) values ($1, $2, NULL, NULL) returning parties.partyid;", 1, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
 
-
+	// list party info
+	// TODO: make this display party members 2 and 3 as well
+	res = PQprepare(conn, "list_parties", "select parties.partyid, parties.name, player_logins.name FROM parties, player_logins WHERE player_logins.id = parties.player1;", 1, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
 	return true;
 
 pq_cleanup:

@@ -24,11 +24,4 @@ struct Character {
 	int dungeon_lvl; // dungeon_lvl 0 == town, 1 = forest level etc
 };
 
-typedef struct Party Party;
-struct Party {
-	int id;
-	char *name;
-	Character *characters[3];
-};
-
 #endif //CHARACTER_H

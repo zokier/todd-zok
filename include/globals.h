@@ -6,6 +6,7 @@
 #include <libintl.h>
 #include "character.h"
 #include "input.h"
+#include "party.h"
 
 #define _(x) gettext(x)
 #define NAME_MIN_LENGTH 4
@@ -25,9 +26,11 @@ extern void *party_socket;
 extern void *zmq_context;
 extern Character player;
 extern Party player_party;
+
 extern Character enemy;
 extern PGconn *conn;
 
+extern int partyid_global;
 extern Weapons weapons_list[];
 extern Weapons weapons_enemy[];
 extern Character enemylist[2][ENEMY_COUNT];

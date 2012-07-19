@@ -3,7 +3,7 @@
 Character player;
 
 Party player_party = {
-	.id = 0,
+	.id = 0,	// NOTE that currently 0 means no party
 	.name = "",	// "" or NULL or what? must be printable in view stats
 	.characters = {
 		&player,

@@ -554,6 +554,10 @@ void set_party(unsigned int id)
 */
 int main(int argc, char *argv[])
 {
+	// TODO: set this in database
+	partyid_global = 0;
+	// END TODO
+
 	int return_code = EXIT_FAILURE;
 	openlog("ToDD", LOG_PID|LOG_PERROR, LOG_USER);
 	srand((unsigned int)time(NULL));
