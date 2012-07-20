@@ -156,6 +156,7 @@ int init_pq()
 	}
 
 	PQclear(res);
+
 	// create a new party
 	res = PQprepare(conn, "new_party", "insert into parties (name, player1, player2, player3) values ($1, $2, NULL, NULL) returning parties.partyid;", 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
@@ -164,14 +165,31 @@ int init_pq()
 	}
 	PQclear (res);
 
-	// list party info
-	// TODO: make this display party members 2 and 3 as well
-	res = PQprepare(conn, "list_parties", "select parties.partyid, parties.name, player_logins.name FROM parties, player_logins WHERE player_logins.id = parties.player1;", 1, NULL);
+	// list parties - returns player ids, use party_get_names to find out corresponding names
+	// TODO: make this a single SQL statement, if you can
+	res = PQprepare(conn, "list_parties", "select parties.partyid, parties.name, player1, player2, player3 FROM parties;", 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;
 	}
 	PQclear (res);
+
+	res = PQprepare(conn, "party_get_names", "SELECT name FROM player_logins WHERE id = ($1) UNION SELECT name FROM player_logins WHERE id = ($2) UNION SELECT name FROM player_logins WHERE id = ($3);" , 3, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
+	// update party member names
+	res = PQprepare(conn, "update_party", "update parties set (player1, player2, player3) = ($2, $3, $4) WHERE partyid = ($1) ;", 4, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
+
 	return true;
 
 pq_cleanup:

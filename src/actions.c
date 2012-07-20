@@ -355,6 +355,7 @@ void ac_tavern_info()
 void ac_party_list()
 {
 	werase(game_win);
+	wprintw(game_win, _("List of parties:\n\n"));
 
         PGresult *res;
         res = PQexecPrepared(conn, "list_parties", 0, NULL, NULL, NULL, 0);
@@ -366,7 +367,63 @@ void ac_party_list()
 			for (int i = 0; i < row_count; i++)
 				{
 				wprintw(game_win,"#%d: %s\n", atoi(PQgetvalue(res,i,0)), PQgetvalue(res,i,1));
-				wprintw(game_win,_("Members: %s	TODO: the rest..\n\n"),PQgetvalue(res,i,2));
+				wprintw(game_win,_("Members: "));
+
+				// TODO: simplify this
+				// list_parties provides us the player ids, not names..
+				// get player names with another query
+				char *player1, *player2, *player3;
+
+				// player names can be NULL in databse
+				if (PQgetisnull(res,i,2))
+					player1 = NULL;
+   				else
+					player1 = PQgetvalue(res,i,2);
+
+				if (PQgetisnull(res,i,3))
+					player2 = NULL;
+   				else
+					player2 = PQgetvalue(res,i,3);
+
+				if (PQgetisnull(res,i,4))
+					player3 = NULL;
+   				else
+					player3 = PQgetvalue(res,i,4);
+
+
+				PGresult *names;
+				const char *params[3] = {player1,player2,player3};
+				names = PQexecPrepared(conn, "party_get_names", 3, params, NULL, NULL, 0);
+
+				if (PQresultStatus(names) == PGRES_TUPLES_OK)
+					{
+					Character tempchar;
+					// if player1, player2 or player3 is NULL, we're not going to get any names..
+					if (player1 != NULL)
+						{
+							tempchar.name = PQgetvalue(names,0,0);
+							// we found a member, print the name
+							wprintw(game_win,"%s //", tempchar.name);
+						} 
+
+					if (player2 != NULL)
+						{
+							tempchar.name = PQgetvalue(names,1,0);
+							// we found a member, print the name
+							wprintw(game_win," %s //", tempchar.name);
+						} 
+
+					if (player3 != NULL)
+						{
+							tempchar.name = PQgetvalue(names,2,0);
+							// we found a member, print the name
+							wprintw(game_win," %s", tempchar.name);
+						} 
+
+					wprintw(game_win, "\n\n");
+					}
+
+					PQclear(names);
 				}
 			} 
 
@@ -380,10 +437,124 @@ void ac_party_list()
 // joins an existing party
 void ac_party_join()
 {
-// TODO: see if there's room in a party
-// IF yes: join
+// 0. print "parties that have room"
+werase(game_win);
+wprintw(game_win, _("List of parties that have room:\n"));
 
-// IF no: explain to the user
+// 1. get a list of parties (partyid, name and all members)
+// AND store it to a temporary struct
+// a temporary struct that helps us in organising stuff
+struct tempstuff
+{
+	int id;
+	char *name;
+	int correct_row; 	// corresponds to PQgetvalue(res,correct_row,0);
+	int isfull;
+	char *player1;
+	char *player2;
+	char *player3;
+	
+};
+struct tempstuff temp_struct[99];
+
+int got_space = 0; // used by listselect
+
+        PGresult *res;
+	int row_count;
+        res = PQexecPrepared(conn, "list_parties", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(res) == PGRES_TUPLES_OK)
+        {
+                row_count = PQntuples(res);
+                if (row_count > 0) // means there's parties
+		{
+			// 2. change the list to a listselect structure
+			// store the info to a temporary struct
+			for (int i = 0; i < row_count; i++)
+			{
+				// only show parties with room to join
+				// this could be done in the database, I guess
+				if (PQgetisnull(res,i,2) || PQgetisnull(res,i,3) || PQgetisnull(res,i,4)) 
+				{ // at least 1 NULL space in the party
+
+					temp_struct[got_space].isfull = 0;	// actually not utilized later in the code
+					
+					temp_struct[got_space].id = atoi(PQgetvalue(res,i,0));
+					temp_struct[got_space].name = PQgetvalue(res,i,1);
+
+					// players default to NULL
+					temp_struct[got_space].player1 = NULL;
+					temp_struct[got_space].player2 = NULL;
+					temp_struct[got_space].player3 = NULL;
+
+					if (!PQgetisnull(res,i,2))  // player1
+						temp_struct[got_space].player1 = PQgetvalue(res,i,2);
+
+					if (!PQgetisnull(res,i,3))
+						temp_struct[got_space].player2 = PQgetvalue(res,i,3);
+	
+					if (!PQgetisnull(res,i,4))
+						temp_struct[got_space].player3 = PQgetvalue(res,i,4);
+
+
+					got_space++; // advance the list used by listselect
+				}
+			}
+		}
+	}
+
+	// 3. call ncurs_listselect and make the player choose a party
+	// note that this only shows parties with space to join..
+        int selection = ncurs_listselect(&(temp_struct[0].name), sizeof(struct tempstuff), 0, got_space);
+
+        if (selection >= 0)
+        { // joins the selected party
+
+		// get the proper party id - this should always be a party with vacant space
+		// temp_struct[selection].playerX holds the player names. Go through them and add player.name to the first NULL spot
+
+		char *player1 = temp_struct[selection].player1;
+		char *player2 = temp_struct[selection].player2;
+		char *player3 = temp_struct[selection].player3;
+
+		// if you're already in the party, do nothing..
+		if (atoi(player1) == player.id|| atoi(player2) == player.id|| atoi(player3) == player.id)
+		{
+			ncurs_modal_msg(_("You're already in that party, dumbass!"));
+		}
+		else
+		{ // player is not in that party
+			// put the player to the first NULL place in parties database
+			if (player1 == NULL)
+				player1 = itoa(player.id);
+			else
+			if (player2 == NULL)
+				player2 = itoa(player.id);
+			else	// this has to be vacant, then
+				player3 = itoa(player.id);
+		
+			// player1, player2 and player3 now hold the party member names
+			// update the stuff in database
+			char *partyid = itoa(temp_struct[selection].id);
+			const char *params[4] = {partyid, player1, player2, player3};
+
+			PGresult *update_party;
+			update_party = PQexecPrepared(conn, "update_party", 4, params, NULL, NULL, 0);
+		        if (PQresultStatus(update_party) == PGRES_COMMAND_OK)
+		        {	
+				// print a message to user
+				ncurs_log_sysmsg(_("%s is  now in party %s!\n"), player.name, temp_struct[selection].name);
+				ncurs_modal_msg(_("You are now part of %s!\n"), temp_struct[selection].name);
+			} 		
+
+			PQclear(update_party);
+		} // player not in that party
+        }	// selection wasn't a proper party number
+        else	
+        {
+                ncurs_modal_msg(_("Nobody wants you, anyway.."));
+        }
+
+	PQclear(res);
 }
 
 void ac_party_gather()

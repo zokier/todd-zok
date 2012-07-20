@@ -364,6 +364,9 @@ void ncurs_skills()
  * count      - number of items */
 int ncurs_listselect(char **first_item, size_t stride, int price_offset, size_t count)
 {
+	werase(command_win);
+	wrefresh(command_win);
+
 	for (size_t i = 0; i < count; i++)
 	{
 		// pointer is cast to void and back to calculate the position of next string
