@@ -167,7 +167,7 @@ int init_pq()
 
 	// list parties - returns player ids, use party_get_names to find out corresponding names
 	// TODO: make this a single SQL statement, if you can
-	res = PQprepare(conn, "list_parties", "select parties.partyid, parties.name, player1, player2, player3 FROM parties;", 1, NULL);
+	res = PQprepare(conn, "list_parties", "select parties.partyid, parties.name, parties.player1, parties.player2, parties.player3 FROM parties;", 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;
@@ -188,6 +188,15 @@ int init_pq()
 		goto pq_cleanup;
 	}
 	PQclear (res);
+
+	// load player party data at startup
+	res = PQprepare(conn, "load_player_party", "select parties.partyid, parties.name, parties.player1, parties.player2, parties.player3 FROM parties WHERE parties.player1 = ($1) OR parties.player2 = ($1) OR parties.player3 = ($1);", 1, NULL);	
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
 
 
 	return true;

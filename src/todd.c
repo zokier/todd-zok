@@ -31,7 +31,7 @@ bool zmq_python_up();
  
 PGconn *conn;
 
-
+char g_partyname[30]; // needed if party.name is a pointer?
 /*
 	Asks the player for name
 */
@@ -554,10 +554,6 @@ void set_party(unsigned int id)
 */
 int main(int argc, char *argv[])
 {
-	// TODO: set this in database
-	partyid_global = 0;
-	// END TODO
-
 	int return_code = EXIT_FAILURE;
 	openlog("ToDD", LOG_PID|LOG_PERROR, LOG_USER);
 	srand((unsigned int)time(NULL));
@@ -588,9 +584,41 @@ int main(int argc, char *argv[])
 
 	load_player_data();
 
-	// Don't subscribe to party at startup
-//	player_party.id = rand();
-//	sub_party(player_party.id);
+	// get player party id
+        PGresult *player_partyres;
+	char *playerid = itoa(player.id);
+	const char *params[1] = {playerid};
+        player_partyres = PQexecPrepared(conn, "load_player_party", 1, params, NULL, NULL, 0);
+        if (PQresultStatus(player_partyres) == PGRES_TUPLES_OK)
+        {
+		int row_count = PQntuples(player_partyres);
+		if (row_count > 0) // there's parties
+                {
+			// due to the select statement, this should only return 1 row
+			player_party.id = atoi(PQgetvalue(player_partyres,0,0));
+
+			// TODO: if party.name is a pointer, this trick is needed
+			strncpy(g_partyname, PQgetvalue(player_partyres,0,1), sizeof(PQgetvalue(player_partyres,0,1)));
+			player_party.name = g_partyname;
+			// TODO: figure out how to do characters, should they be declared as new structs?
+//			player_party.characters = atoi(PQgetvalue(player_partyres,0,0);
+//			player_party.player2 = atoi(PQgetvalue(player_partyres,0,0);
+//			player_party.player3 = atoi(PQgetvalue(player_partyres,0,0);
+                }
+		else // there's no parties, load defaults
+		{
+			player_party.id = 0;
+			player_party.name = "No party";
+		}
+        }
+	else
+	{ // something went wrong, load defaults
+			player_party.id = 0;
+			player_party.name = "No party";
+	}
+        PQclear(player_partyres);
+ 
+	sub_party(player_party.id);
 
 	init_ui();
 	enter_game();
