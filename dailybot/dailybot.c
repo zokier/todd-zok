@@ -244,6 +244,10 @@ void resetgame()
         if (PQresultStatus(reset) != PGRES_COMMAND_OK)
                 syslog(LOG_DEBUG,_("database createschema failed"));
 
+        reset = PQexecPrepared(conn, "initdb_schemaowner", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(reset) != PGRES_COMMAND_OK)
+               syslog(LOG_DEBUG,_("database schemaowner failed"));
+
         reset = PQexecPrepared(conn, "initdb_extension_pgcrypto", 0, NULL, NULL, NULL, 0);
         if (PQresultStatus(reset) != PGRES_COMMAND_OK)
                 syslog(LOG_DEBUG,_("database pgcrypto failed"));

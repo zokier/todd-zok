@@ -34,6 +34,7 @@ int init_pq()
 
 	// dropall drops everything
 	// createschema creates the schema that was dropped by dropall
+	// schemaowner sets schema permissions (just in case)
 	// player_logins holds the login info
 	// player_stats holds the stats for players
 	// messageboard for .. messages
@@ -50,6 +51,13 @@ int init_pq()
 
 	// recreate schema dropped by dropall
 	res = PQprepare(conn, "initdb_createschema", "create schema public;" , 0, NULL);	
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
+	res = PQprepare(conn, "initdb_schemaowner", "ALTER schema public OWNER TO todd;" , 0, NULL);	
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;
