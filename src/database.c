@@ -27,6 +27,81 @@ int init_pq()
 	{
 		goto pq_cleanup;
 	}
+
+	// stuff to do when setting up the database:
+	// all functions called initdb_something
+	// NOTE: these need to be first in the file or the game functions won't find the tables
+
+	// dropall drops everything
+	// createschema creates the schema that was dropped by dropall
+	// player_logins holds the login info
+	// player_stats holds the stats for players
+	// messageboard for .. messages
+	// parties for .. parties
+	
+
+	// drop all tables by destroying the public schema
+	res = PQprepare(conn, "initdb_dropall", "drop schema if exists public cascade;" , 0, NULL);	
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
+	// recreate schema dropped by dropall
+	res = PQprepare(conn, "initdb_createschema", "create schema public;" , 0, NULL);	
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
+	// recreate pgcrypto
+	res = PQprepare(conn, "initdb_extension_pgcrypto", "create extension pgcrypto;" , 0, NULL);	
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
+	// player_logins
+	res = PQprepare(conn, "initdb_player_logins", "create table player_logins (id serial primary key , name varchar not null unique, passwd text not null,last_logout timestamp);", 0, NULL);	
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
+
+	// player_stats
+	res = PQprepare(conn, "initdb_player_stats", "create table player_stats (id integer references player_logins(id), location integer default 0, stamina integer default 100, experience integer default 0, money integer default 10, health integer default 10, max_health integer default 10, wood integer default 3, fire integer default 3, earth integer default 3, metal integer default 3, water integer default 3, weapon integer default 999, skill_0 integer default 999, skill_1 integer default 999, skill_2 integer default 999, skill_3 integer default 999, dungeon_level integer default 0);", 0, NULL);	
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
+	// messageboard
+	res = PQprepare(conn, "initdb_messageboard", "create table messageboard (id serial primary key, timestamp timestamp default now() not null, player_id integer references player_logins(id) on update cascade not null, body text not null);", 0, NULL);	
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
+	// parties
+	res = PQprepare(conn, "initdb_parties", "create table parties (partyid serial primary key, name varchar not null unique, player1 integer references player_logins(id), player2 integer references player_logins(id), player3 integer references player_logins(id));", 0, NULL);	
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
+
+	//// stuff with the game
+
+
+
 	res = PQprepare(conn, "get_login_id", "select id from player_logins where name = $1;", 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
@@ -196,7 +271,6 @@ int init_pq()
 		goto pq_cleanup;
 	}
 	PQclear (res);
-
 
 
 	return true;

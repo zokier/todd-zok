@@ -20,6 +20,7 @@ PGconn *conn;
 
 void hourly();
 void daily();
+void resetgame();
 void stamina();
 void random_daily();
 void time_dependent();
@@ -47,8 +48,11 @@ if (argc != 1) { /* there's arguments, act on them */
 		hourly();
 	if (strcmp(argv[1], "--daily") == 0)
 		daily();
-	}
 
+	if (strcmp(argv[1], "--reset") == 0)
+		resetgame();
+
+	}
 }
 
 
@@ -220,3 +224,48 @@ PQclear(res);
 return atoi(PQgetvalue(res,0,0)); /* return now() - last_logout */
 }
 
+// resets all databases - use with caution
+// basically this is used to reset the game
+void resetgame()
+{
+	syslog(LOG_DEBUG,_("Resetting ToDD..\n"));
+	// hopefully this is never ran as a cronjob, so a printf will do just fine..
+	printf(_("Resetting ToDD..\n\n\n\n\n"));
+	
+        PGresult *reset;
+        reset = PQexecPrepared(conn, "initdb_dropall", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(reset) != PGRES_COMMAND_OK)
+		{
+                syslog(LOG_DEBUG,_("database dropall failed"));
+		printf("here: %s\n",PQresultErrorMessage(reset));
+		}
+
+        reset = PQexecPrepared(conn, "initdb_createschema", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(reset) != PGRES_COMMAND_OK)
+                syslog(LOG_DEBUG,_("database createschema failed"));
+
+        reset = PQexecPrepared(conn, "initdb_extension_pgcrypto", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(reset) != PGRES_COMMAND_OK)
+                syslog(LOG_DEBUG,_("database pgcrypto failed"));
+
+        reset = PQexecPrepared(conn, "initdb_player_logins", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(reset) != PGRES_COMMAND_OK)
+                syslog(LOG_DEBUG,_("database player_logins failed"));
+
+        reset = PQexecPrepared(conn, "initdb_player_stats", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(reset) != PGRES_COMMAND_OK)
+                syslog(LOG_DEBUG,_("database player_stats failed"));
+
+        reset = PQexecPrepared(conn, "initdb_messageboard", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(reset) != PGRES_COMMAND_OK)
+                syslog(LOG_DEBUG,_("database messageboard failed"));
+
+        reset = PQexecPrepared(conn, "initdb_parties", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(reset) != PGRES_COMMAND_OK)
+                syslog(LOG_DEBUG,_("database parties failed"));
+
+	PQclear(reset);
+
+	printf(_("Finished the reset, hopefully there were no errors..\n"));
+
+}
