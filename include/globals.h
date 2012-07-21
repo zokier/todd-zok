@@ -30,6 +30,7 @@ extern Party player_party;
 extern Character enemy;
 extern PGconn *conn;
 
+extern char g_partyname[30];
 extern int partyid_global;
 extern Weapons weapons_list[];
 extern Weapons weapons_enemy[];

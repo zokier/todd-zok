@@ -35,6 +35,7 @@ void ac_quit();
 void ac_party_gather();
 void ac_party_list();
 void ac_party_join();
+void ac_party_leave();
 
 
 void set_player_location(Location* loc);

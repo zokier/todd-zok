@@ -257,7 +257,7 @@ int init_pq()
 	}
 	PQclear (res);
 
-	res = PQprepare(conn, "party_get_names", "SELECT name FROM player_logins WHERE id = ($1) UNION SELECT name FROM player_logins WHERE id = ($2) UNION SELECT name FROM player_logins WHERE id = ($3);" , 3, NULL);
+	res = PQprepare(conn, "party_get_names", "select player_logins.name from player_logins, parties where player_logins.id = any(array[parties.player1, player2, player3]) and partyid = ($1);" , 1, NULL);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
 		goto pq_cleanup;

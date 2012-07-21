@@ -372,53 +372,23 @@ void ac_party_list()
 				// TODO: simplify this
 				// list_parties provides us the player ids, not names..
 				// get player names with another query
-				char *player1, *player2, *player3;
-
-				// player names can be NULL in databse
-				if (PQgetisnull(res,i,2))
-					player1 = NULL;
-   				else
-					player1 = PQgetvalue(res,i,2);
-
-				if (PQgetisnull(res,i,3))
-					player2 = NULL;
-   				else
-					player2 = PQgetvalue(res,i,3);
-
-				if (PQgetisnull(res,i,4))
-					player3 = NULL;
-   				else
-					player3 = PQgetvalue(res,i,4);
-
 
 				PGresult *names;
-				const char *params[3] = {player1,player2,player3};
-				names = PQexecPrepared(conn, "party_get_names", 3, params, NULL, NULL, 0);
+				char *partyid = PQgetvalue(res,i,0);
+				const char *params[1] = {partyid};
+				names = PQexecPrepared(conn, "party_get_names", 1, params, NULL, NULL, 0);
 
-				if (PQresultStatus(names) == PGRES_TUPLES_OK)
+				if (PQresultStatus(names) == PGRES_TUPLES_OK) // there's party members, this should always be valid
 					{
-					Character tempchar;
-					// if player1, player2 or player3 is NULL, we're not going to get any names..
-					if (player1 != NULL)
+					int row_count = PQntuples(names);
+					for (int i = 0; i < row_count; i++)
 						{
-							tempchar.name = PQgetvalue(names,0,0);
-							// we found a member, print the name
-							wprintw(game_win,"%s //", tempchar.name);
-						} 
-
-					if (player2 != NULL)
-						{
-							tempchar.name = PQgetvalue(names,1,0);
-							// we found a member, print the name
-							wprintw(game_win," %s //", tempchar.name);
-						} 
-
-					if (player3 != NULL)
-						{
-							tempchar.name = PQgetvalue(names,2,0);
-							// we found a member, print the name
-							wprintw(game_win," %s", tempchar.name);
-						} 
+						// print out the name
+						wprintw(game_win,"%s",PQgetvalue(names,i,0)); 
+						// if you know there's going to be yet another name, print out separator
+						if (i < (row_count - 1))
+							wprintw(game_win,", ");
+						}
 
 					wprintw(game_win, "\n\n");
 					}
@@ -437,6 +407,13 @@ void ac_party_list()
 // joins an existing party
 void ac_party_join()
 {
+// First, see if you're already in a party
+if (player_party.id != 0)
+	{
+	werase(game_win);
+	ncurs_modal_msg(_("Betraying your party will be punished by death.."));
+	return;
+	}
 // 0. print "parties that have room"
 werase(game_win);
 wprintw(game_win, _("List of parties that have room:\n"));
@@ -508,7 +485,6 @@ int got_space = 0; // used by listselect
 
         if (selection >= 0)
         { // joins the selected party
-
 		// get the proper party id - this should always be a party with vacant space
 		// temp_struct[selection].playerX holds the player names. Go through them and add player.name to the first NULL spot
 
@@ -516,38 +492,29 @@ int got_space = 0; // used by listselect
 		char *player2 = temp_struct[selection].player2;
 		char *player3 = temp_struct[selection].player3;
 
-		// if you're already in the party, do nothing..
-		if (atoi(player1) == player.id|| atoi(player2) == player.id|| atoi(player3) == player.id)
-		{
-			ncurs_modal_msg(_("You're already in that party, dumbass!"));
-		}
+		// put the player to the first NULL place in parties database
+		if (player1 == NULL)
+			player1 = itoa(player.id);
 		else
-		{ // player is not in that party
-			// put the player to the first NULL place in parties database
-			if (player1 == NULL)
-				player1 = itoa(player.id);
-			else
-			if (player2 == NULL)
-				player2 = itoa(player.id);
-			else	// this has to be vacant, then
-				player3 = itoa(player.id);
+		if (player2 == NULL)
+			player2 = itoa(player.id);
+		else	// this has to be vacant, then
+			player3 = itoa(player.id);
 		
-			// player1, player2 and player3 now hold the party member names
-			// update the stuff in database
-			char *partyid = itoa(temp_struct[selection].id);
-			const char *params[4] = {partyid, player1, player2, player3};
+		int rc = update_party(temp_struct[selection].id,player1,player2,player3);
+		if (rc) // succesful database operation
+			{
+		        // print a message to user
+		        ncurs_log_sysmsg(_("%s is  now in party %s!\n"), player.name, temp_struct[selection].name);
+		        ncurs_modal_msg(_("You are now part of %s!\n"), temp_struct[selection].name);
+			player_party.id =   temp_struct[selection].id;
+			// remember, player_party.name is a pointer, it must point to a valid location
+			strncpy(g_partyname, temp_struct[selection].name, sizeof(temp_struct[selection].name));
+			player_party.name = g_partyname;
+			}
+		else
+			syslog(LOG_DEBUG,_("ERROR: update_party()"));
 
-			PGresult *update_party;
-			update_party = PQexecPrepared(conn, "update_party", 4, params, NULL, NULL, 0);
-		        if (PQresultStatus(update_party) == PGRES_COMMAND_OK)
-		        {	
-				// print a message to user
-				ncurs_log_sysmsg(_("%s is  now in party %s!\n"), player.name, temp_struct[selection].name);
-				ncurs_modal_msg(_("You are now part of %s!\n"), temp_struct[selection].name);
-			} 		
-
-			PQclear(update_party);
-		} // player not in that party
         }	// selection wasn't a proper party number
         else	
         {
@@ -585,6 +552,83 @@ void ac_party_gather()
 	PQclear(res);
 	// TODO: else -> error handling
 }
+
+void ac_party_leave()
+{
+char *player1, *player2, *player3;
+if (player_party.id == 0) 
+	{
+	ncurs_log_sysmsg(_("You're not in a party.."));
+	return;
+	}
+	// 2. loop list_parties until you come across the proper id
+        PGresult *res;
+        res = PQexecPrepared(conn, "list_parties", 0, NULL, NULL, NULL, 0);
+        if (PQresultStatus(res) == PGRES_TUPLES_OK)
+        {
+		int row_count = PQntuples(res);
+		if (row_count > 0) // means there's parties
+		{
+			for (int i = 0; i < row_count; i++)
+			{
+				int row_partyid = atoi(PQgetvalue(res,i,0));
+				if (row_partyid == player_party.id) // the database row matches player partyid
+				{
+					// player names can be NULL in databse
+					// and they need to be null when writing them back
+					if (PQgetisnull(res,i,2))
+						player1 = NULL;
+	   				else
+						player1 = PQgetvalue(res,i,2);
+	
+					if (PQgetisnull(res,i,3))
+						player2 = NULL;
+	   				else
+						player2 = PQgetvalue(res,i,3);
+
+					if (PQgetisnull(res,i,4))
+						player3 = NULL;
+	   				else
+						player3 = PQgetvalue(res,i,4);
+
+					// 3. get the party member ids, change yours to NULL, don't touch others
+					// TODO: if all are null, destroy party
+
+					// atoi(NULL) causes a segfault, avoid it! No "atoi(player3)"!
+					// Note that this is a pitfall of writing null values instead 0 in the database...
+
+					if (player1 != NULL)
+						if (atoi(player1) == player.id)
+							player1 = NULL;
+
+					if (player2 != NULL)
+						if (atoi(player2) == player.id)
+							player2 = NULL;
+
+					if (player3 != NULL)
+						if (atoi(player3) == player.id)
+							player3 = NULL;
+
+					// 4. update_party
+					int rc = update_party(player_party.id,player1,player2,player3);
+					if (rc)
+						{
+						werase(game_win);
+						ncurs_modal_msg(_("You have just left your party.\nYou will be missed by your party members, in good and in bad."));
+						ncurs_log_sysmsg(_("You have just left your party."));
+						player_party.id = 0;
+						}
+					else
+						syslog(LOG_DEBUG,_("ERROR: update_party()"));
+
+				break; // exit loop since the right party was found already
+				}
+			}
+		}
+	}	
+ 
+}
+
 
 void ac_warena()
 {
@@ -829,3 +873,7 @@ void ac_quit()
 void ac_blank()
 {
 }
+
+
+
+
