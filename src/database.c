@@ -281,6 +281,13 @@ int init_pq()
 	PQclear (res);
 
 
+	res = PQprepare(conn, "party_destroy", "DELETE FROM parties WHERE partyid = ($1);" , 1, NULL);
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	{
+		goto pq_cleanup;
+	}
+	PQclear (res);
+
 	return true;
 
 pq_cleanup:

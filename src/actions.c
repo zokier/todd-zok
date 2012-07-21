@@ -572,8 +572,10 @@ if (player_party.id == 0)
 			for (int i = 0; i < row_count; i++)
 			{
 				int row_partyid = atoi(PQgetvalue(res,i,0));
-				if (row_partyid == player_party.id) // the database row matches player partyid
+				if (row_partyid == player_party.id) // the database row matches player partyid, leave this party
 				{
+					// set the correct names for current party members
+
 					// player names can be NULL in databse
 					// and they need to be null when writing them back
 					if (PQgetisnull(res,i,2))
@@ -614,14 +616,35 @@ if (player_party.id == 0)
 					if (rc)
 						{
 						werase(game_win);
-						ncurs_modal_msg(_("You have just left your party.\nYou will be missed by your party members, in good and in bad."));
 						ncurs_log_sysmsg(_("You have just left your party."));
+
+						// check if everyone left the party, i.e. it's empty
+						// if it is, trash the party
+						if (player1 == NULL && player2 == NULL && player3 == NULL)
+							{
+							PGresult *destroyparty;
+							char *partyid = itoa(player_party.id);
+							const char *params[1] = {partyid};
+							destroyparty = PQexecPrepared(conn, "party_destroy", 1, params, NULL, NULL, 0);
+						        if (PQresultStatus(destroyparty) == PGRES_COMMAND_OK) 
+								{
+								ncurs_log_sysmsg(_("party %s is no more."), PQgetvalue(res,i,1));
+								ncurs_modal_msg(_("You leave %s as the last member."), PQgetvalue(res,i,1));
+								}	
+							else	
+								syslog(LOG_DEBUG,_("error when destroying a party!"));
+							}
+						else // coming here means the party isn't trashed, it's only you leaving
+							ncurs_modal_msg(_("You have just left your party.\nYou will be missed by your party members, in good and in bad."));
+
+		
+
 						player_party.id = 0;
 						}
 					else
 						syslog(LOG_DEBUG,_("ERROR: update_party()"));
 
-				break; // exit loop since the right party was found already
+					break; // exit loop since the right party was found already
 				}
 			}
 		}
