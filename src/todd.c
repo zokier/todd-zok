@@ -32,6 +32,9 @@ bool zmq_python_up();
 PGconn *conn;
 
 char g_partyname[30]; // needed if party.name is a pointer?
+
+void intro_ascii(); // for fun
+
 /*
 	Asks the player for name
 */
@@ -40,13 +43,10 @@ bool get_name()
 	char *name = NULL;
 	size_t name_len = 0;
 
-	// TODO: clear the screen (ncurses?), ascii art and so on
-	fputs("\n\n\n\n\nTODO: ASCII ART HERE!\n\n\n\n\n\n",stdout);
-
 	// Introductory text
 	fputs(_("Growing up, you heard the local bards sing about ancient dungeons.\n"),stdout);
 	fputs(_("The dungeons were filled with unimaginable treasures...and monsters.\n"),stdout);
-	fputs(_("\nThat's if you believed the bards. You were now approaching a village next to the dungeons, about to find out.\n"),stdout);
+	fputs(_("\nThat's if you believed the bards. You are now approaching a village next to the dungeons, about to find out.\n"),stdout);
 
 	fputs(_("\nAs you approach the gated village, the Gatekeeper yells at you:\n"),stdout);
 	fputs(_("HALT! Who goes there? Annouce yourself: "), stdout);
@@ -554,6 +554,7 @@ void set_party(unsigned int id)
 */
 int main(int argc, char *argv[])
 {
+	intro_ascii();
 	int return_code = EXIT_FAILURE;
 	openlog("ToDD", LOG_PID|LOG_PERROR, LOG_USER);
 	srand((unsigned int)time(NULL));
@@ -689,4 +690,39 @@ bool zmq_python_up()
 	}
 	syslog(LOG_WARNING, "ZMQ chat test retry count exceeded");
 	return false;
+}
+
+
+// prints out an ASCII intro for fun
+// TODO: system("clear") might not be a good idea
+// TODO: should this be done inside ncurses? Should everything be?
+void intro_ascii()
+{
+// clear window with a system call instead of "\n\n\n..." for fun
+system("clear");	
+
+// here be dragons
+
+// can't use char[24][80] or #defines easily, since the ascii art is full of \ control chars
+
+
+// read the ascii art from a file
+#define ASCII_INTRO "data/intro"
+
+// read the ascii data from a file, defining it here would be problematic because of all the control chars \ and so on
+
+FILE *introfile = fopen(ASCII_INTRO,"r");
+if (introfile == NULL)
+	return;	// no intro file found, forget it
+
+char line[80];
+while (fgets(line, sizeof(line), introfile) != NULL) // read line by line until EOF
+	printf("%s", line);
+
+fclose(introfile);
+
+
+
+printf("\n\n"); // to avoid clutter with the next text
+
 }
