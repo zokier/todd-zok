@@ -42,7 +42,8 @@ bool get_name()
 	size_t name_len = 0;
 
 	// Introductory text
-	printw(_("Growing up, you heard the local bards sing about ancient dungeons.\n"));
+	// you need the \r\n at the start because ZMQ might cause some clutter
+	printw(_("\r\nGrowing up, you heard the local bards sing about ancient dungeons.\n"));
 	printw(_("The dungeons were filled with unimaginable treasures...and monsters.\n"));
 	printw(_("\nThat's if you believed the bards. You are now approaching a village next to the dungeons, about to find out.\n"));
 
@@ -53,7 +54,7 @@ bool get_name()
 	// get user input
         if(!todd_getline(&name, &name_len,stdscr))
 		{
-		syslog(LOG_ERR, "Read error: %s (%s:%d)", strerror(errno), __FILE__, __LINE__);
+		syslog(LOG_ERR, "Read error: %s (%s:%d)\r\n", strerror(errno), __FILE__, __LINE__);
 		return false;
 		}
 
@@ -62,7 +63,7 @@ bool get_name()
 	if (strnlen(name, name_len) < name_len - 1)
 	{
 		// null bytes in name
-		syslog(LOG_ERR, "Player name contains \\0");
+		syslog(LOG_ERR, "Player name contains \\0\r\n");
 		return false;
 	}
 
@@ -102,7 +103,7 @@ bool check_passwd()
 
         if(!todd_getline(&passwd, &passwd_len,NULL))
                 {
-                syslog(LOG_ERR, "Read error: %s (%s:%d)", strerror(errno), __FILE__, __LINE__);
+                syslog(LOG_ERR, "Read error: %s (%s:%d)\r\n", strerror(errno), __FILE__, __LINE__);
                 return false;
                 }
 
@@ -141,7 +142,7 @@ void load_player_data()
 		{
 			if (row_count > 1)
 			{
-				syslog(LOG_WARNING, "Duplicate player data found. id = %d, name = %s, row count %d", player.id, player.name, row_count);
+				syslog(LOG_WARNING, "Duplicate player data found. id = %d, name = %s, row count %d\r\n", player.id, player.name, row_count);
 			}
 			// load data from first row even if there is multiple rows
 			player.location = &loc_town; // TODO location _should_ be fetched from db!
@@ -183,17 +184,17 @@ void load_player_data()
 //			player.dungeon_lvl = atoi(PQgetvalue(res, 0, col_cursor++));
 //			if (col_cursor != col_count)
 //			{
-//				syslog(LOG_WARNING, "col_cursor: %d != col_count: %d", col_cursor, col_count);
+//				syslog(LOG_WARNING, "col_cursor: %d != col_count: %d\r\n", col_cursor, col_count);
 //			}
 		}
 		else
 		{
-			syslog(LOG_WARNING, "Player data not found. Player id = %d, name = %s", player.id, player.name);
+			syslog(LOG_WARNING, "Player data not found. Player id = %d, name = %s\r\n", player.id, player.name);
 		}
 	}
 	else
 	{
-		syslog(LOG_WARNING, "Player data load failed: %s", PQresultErrorMessage(res));
+		syslog(LOG_WARNING, "Player data load failed: %s\r\n", PQresultErrorMessage(res));
 	}
 	free(player_id);
 	PQclear(res);
@@ -252,14 +253,14 @@ void save_player_data()
 	res = PQexecPrepared(conn, "save_player", 17, params, NULL, NULL, 0);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
-		syslog(LOG_WARNING, "Player data save failed: %s", PQresultErrorMessage(res));
+		syslog(LOG_WARNING, "Player data save failed: %s\r\n", PQresultErrorMessage(res));
 	}
 
 	const char *logout[1] = { player_id };
 	res = PQexecPrepared(conn, "save_player_logout_time", 1, logout, NULL, NULL, 0);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
-		syslog(LOG_WARNING, "Player data save failed: %s", PQresultErrorMessage(res));
+		syslog(LOG_WARNING, "Player data save failed: %s\r\n", PQresultErrorMessage(res));
 	}
 	free(player_id);
 	free(stamina);
@@ -353,18 +354,18 @@ bool create_player()
 			}
 			else
 			{
-				syslog(LOG_WARNING, "Player data create failed: %s", PQresultErrorMessage(res));
+				syslog(LOG_WARNING, "Player data create failed: %s\r\n", PQresultErrorMessage(res));
 			}
 			free(player_id);
 		}
 		else
 		{
-			syslog(LOG_WARNING, "Player create failed: no id returned");
+			syslog(LOG_WARNING, "Player create failed: no id returned\r\n");
 		}
 	}
 	else
 	{
-		syslog(LOG_WARNING, "Player create failed: %s", PQresultErrorMessage(res));
+		syslog(LOG_WARNING, "Player create failed: %s\r\n", PQresultErrorMessage(res));
 	}
 	PQclear(res);
 	free(passwd);
@@ -498,7 +499,7 @@ bool init_zmq()
 
 	int linger_time = 250; // pending messages linger for 250 ms if socket is closed
 	if (zmq_setsockopt(push_socket, ZMQ_LINGER, &linger_time, sizeof(linger_time)))
-		syslog(LOG_WARNING, "Can not set ZMQ_LINGER: %s", zmq_strerror(errno));
+		syslog(LOG_WARNING, "Can not set ZMQ_LINGER: %s\r\n", zmq_strerror(errno));
 
 	return true;
 }
@@ -518,7 +519,7 @@ bool unsub_party(unsigned int id)
 	len = snprintf(buf, 12, "p%010d", id);
 	if (zmq_setsockopt(party_socket, ZMQ_UNSUBSCRIBE, buf, len))
 	{
-		syslog(LOG_WARNING, "Party unsubscription failed: %s", zmq_strerror(errno));
+		syslog(LOG_WARNING, "Party unsubscription failed: %s\r\n", zmq_strerror(errno));
 		return false;
 	}
 	return true;
@@ -531,7 +532,7 @@ bool sub_party(unsigned int id)
 	len = snprintf(buf, 12, "p%010d", id);
 	if (zmq_setsockopt(party_socket, ZMQ_SUBSCRIBE, buf, len))
 	{
-		syslog(LOG_WARNING, "Party subscription failed: %s", zmq_strerror(errno));
+		syslog(LOG_WARNING, "Party subscription failed: %s\r\n", zmq_strerror(errno));
 		return false;
 	}
 	return true;
@@ -572,20 +573,20 @@ int main(int argc, char *argv[])
 
 	if (!init_zmq())
 	{
-		syslog(LOG_ERR, "ZeroMQ init failure: %s", zmq_strerror(errno));
+		syslog(LOG_ERR, "ZeroMQ init failure: %s\r\n", zmq_strerror(errno));
 		goto cleanup;
 	}
 
 	if (!zmq_python_up())
 	{
-		syslog(LOG_ERR, "Python chat server not responding!");
-		syslog(LOG_ERR, "Ensure that server is running and try again!");
+		syslog(LOG_ERR, "Python chat server not responding!\r\n");
+		syslog(LOG_ERR, "Ensure that server is running and try again!\r\n");
 		goto cleanup;
 	}
 
 	if (!get_player())
 	{
-		syslog(LOG_ERR, "Player auth failure");
+		syslog(LOG_ERR, "Player auth failure\r\n");
 		goto cleanup;
 	}
 
@@ -667,12 +668,12 @@ bool zmq_python_up()
 		int rc = zmq_poll (items, 1, 1000000);
 		if (rc < 0)
 		{
-			syslog(LOG_WARNING, "ZMQ poll failure: %s", zmq_strerror(errno));
+			syslog(LOG_WARNING, "ZMQ poll failure: %s\r\n", zmq_strerror(errno));
 			continue;
 		}
 		else if (rc != 1)
 		{
-			syslog(LOG_WARNING, "ZMQ poll failure: no events");
+			syslog(LOG_WARNING, "ZMQ poll failure: no events\r\n");
 			continue;
 		}
 		if (items[0].revents & ZMQ_POLLIN)
@@ -680,21 +681,21 @@ bool zmq_python_up()
 
 		if (msg == NULL)
 		{
-			syslog(LOG_WARNING, "ZMQ recv failure: %s", zmq_strerror(errno));
+			syslog(LOG_WARNING, "ZMQ recv failure: %s\r\n", zmq_strerror(errno));
 			continue;
 		}
 		// TODO check the length of the msg
 		// maybe strtok should be used instead of +sizeof(DEBUGMSG_PREFIX)
 		if (strcmp(msg_out,msg+sizeof(CTRLMSG_PREFIX)) != 0) /* TODO???*/
 		{
-			syslog(LOG_WARNING, "ERROR received %s", msg);
+			syslog(LOG_WARNING, "ERROR received %s\r\n", msg);
 			del_msg(msg_foo);
 			continue;
 		}
 		del_msg(msg_foo);
 		return true;
 	}
-	syslog(LOG_WARNING, "ZMQ chat test retry count exceeded");
+	syslog(LOG_WARNING, "ZMQ chat test retry count exceeded\r\n");
 	return false;
 }
 

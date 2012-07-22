@@ -39,7 +39,7 @@ struct tm broken_time;
 
 int main(int argc,char *argv[]) {
 openlog("ToDD-DAILYBOT", LOG_PID|LOG_PERROR, LOG_USER);
-syslog(LOG_DEBUG,_("Dailybot routine starting.."));
+syslog(LOG_DEBUG,_("Dailybot routine starting..\r\n"));
 
 init_pq(); /* found in src/database.c */
 
@@ -57,13 +57,13 @@ if (argc != 1) { /* there's arguments, act on them */
 
 
 void hourly() {
-syslog(LOG_DEBUG,_("Doing an hourly check.."));
+syslog(LOG_DEBUG,_("Doing an hourly check..\r\n"));
 stamina();
 time_dependent();
 }
 
 void daily() {
-syslog(LOG_DEBUG,_("Dailybot doing a daily check.."));
+syslog(LOG_DEBUG,_("Dailybot doing a daily check..\r\n"));
 random_daily();
 time_dependent();
 }
@@ -88,7 +88,7 @@ increase by 2 in the room, 1 in the fields
 	if (PQresultStatus(res) == PGRES_TUPLES_OK)
 	{
                 int row_count = PQntuples(res);
-		syslog(LOG_DEBUG,_("%d players found for stamina update"),row_count);
+		syslog(LOG_DEBUG,_("%d players found for stamina update\r\n"),row_count);
 		for (int i = 0; i < row_count; i++) /* loop through all the players */
 		{
 		int player_id = atoi(PQgetvalue(res,i,0));
@@ -118,14 +118,14 @@ increase by 2 in the room, 1 in the fields
 			{
 				case LOC_ONLINE:
 				{
-					syslog(LOG_DEBUG,_("Player #%d is online, no recovery!"), player_id);
+					syslog(LOG_DEBUG,_("Player #%d is online, no recovery!\r\n"), player_id);
 					break;
 				}
 
 				case LOC_DEAD: // TODO: permadeath or no, what to do with dead players?
 				case LOC_DEAD_GRAVEYARD:
 				{
-					syslog(LOG_DEBUG,_("Player #%d is dead, no recovery!"), player_id);
+					syslog(LOG_DEBUG,_("Player #%d is dead, no recovery!\r\n"), player_id);
 					break;
 				}
 
@@ -170,15 +170,15 @@ increase by 2 in the room, 1 in the fields
 			update = PQexecPrepared(conn, "update_stamina", 2, params, NULL, NULL, 0);
 			if (PQresultStatus(update) != PGRES_COMMAND_OK)
 			{ /* TODO: since it's a cronjob nobody will ever see this error message..*/
-				syslog(LOG_DEBUG,_("Dailybot database update failed!\n"));
+				syslog(LOG_DEBUG,_("Dailybot database update failed!\r\n"));
 			}
 
 		        PQclear(update);
-			syslog(LOG_DEBUG,_("Player #%d stamina updated from %d to %d\n"),player_id, old_stamina, player_stamina);
+			syslog(LOG_DEBUG,_("Player #%d stamina updated from %d to %d\r\n"),player_id, old_stamina, player_stamina);
 			}
 		} /* don't update, since stamina is at max already */
 		else
-			syslog(LOG_DEBUG,_("Player #%d stamina is already at STAMINA_MAX (%d)\n"),player_id,STAMINA_MAX);
+			syslog(LOG_DEBUG,_("Player #%d stamina is already at STAMINA_MAX (%d)\r\n"),player_id,STAMINA_MAX);
 		}
 	}
         PQclear(res);
@@ -217,7 +217,7 @@ int calc_hour(int player_id)
 	res = PQexecPrepared(conn, "calc_hours", 1, params, NULL, NULL, 0);
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 		{ /* TODO: since it's a cronjob nobody will ever see this error message..*/
-		syslog(LOG_DEBUG,_("now() - last_logout failed"));
+		syslog(LOG_DEBUG,_("now() - last_logout failed\r\n"));
 		}
 
 PQclear(res);
@@ -228,7 +228,7 @@ return atoi(PQgetvalue(res,0,0)); /* return now() - last_logout */
 // basically this is used to reset the game
 void resetgame()
 {
-	syslog(LOG_DEBUG,_("Resetting ToDD..\n"));
+	syslog(LOG_DEBUG,_("Resetting ToDD..\r\n"));
 	// hopefully this is never ran as a cronjob, so a printf will do just fine..
 	printf(_("Resetting ToDD..\n\n\n\n\n"));
 	
@@ -236,40 +236,40 @@ void resetgame()
         reset = PQexecPrepared(conn, "initdb_dropall", 0, NULL, NULL, NULL, 0);
         if (PQresultStatus(reset) != PGRES_COMMAND_OK)
 		{
-                syslog(LOG_DEBUG,_("database dropall failed"));
+                syslog(LOG_DEBUG,_("database dropall failed\r\n"));
 		printf("here: %s\n",PQresultErrorMessage(reset));
 		}
 
         reset = PQexecPrepared(conn, "initdb_createschema", 0, NULL, NULL, NULL, 0);
         if (PQresultStatus(reset) != PGRES_COMMAND_OK)
-                syslog(LOG_DEBUG,_("database createschema failed"));
+                syslog(LOG_DEBUG,_("database createschema failed\r\n"));
 
         reset = PQexecPrepared(conn, "initdb_schemaowner", 0, NULL, NULL, NULL, 0);
         if (PQresultStatus(reset) != PGRES_COMMAND_OK)
-               syslog(LOG_DEBUG,_("database schemaowner failed"));
+               syslog(LOG_DEBUG,_("database schemaowner failed\r\n"));
 
         reset = PQexecPrepared(conn, "initdb_extension_pgcrypto", 0, NULL, NULL, NULL, 0);
         if (PQresultStatus(reset) != PGRES_COMMAND_OK)
-                syslog(LOG_DEBUG,_("database pgcrypto failed"));
+                syslog(LOG_DEBUG,_("database pgcrypto failed\r\n"));
 
         reset = PQexecPrepared(conn, "initdb_player_logins", 0, NULL, NULL, NULL, 0);
         if (PQresultStatus(reset) != PGRES_COMMAND_OK)
-                syslog(LOG_DEBUG,_("database player_logins failed"));
+                syslog(LOG_DEBUG,_("database player_logins failed\r\n"));
 
         reset = PQexecPrepared(conn, "initdb_player_stats", 0, NULL, NULL, NULL, 0);
         if (PQresultStatus(reset) != PGRES_COMMAND_OK)
-                syslog(LOG_DEBUG,_("database player_stats failed"));
+                syslog(LOG_DEBUG,_("database player_stats failed\r\n"));
 
         reset = PQexecPrepared(conn, "initdb_messageboard", 0, NULL, NULL, NULL, 0);
         if (PQresultStatus(reset) != PGRES_COMMAND_OK)
-                syslog(LOG_DEBUG,_("database messageboard failed"));
+                syslog(LOG_DEBUG,_("database messageboard failed\r\n"));
 
         reset = PQexecPrepared(conn, "initdb_parties", 0, NULL, NULL, NULL, 0);
         if (PQresultStatus(reset) != PGRES_COMMAND_OK)
-                syslog(LOG_DEBUG,_("database parties failed"));
+                syslog(LOG_DEBUG,_("database parties failed\r\n"));
 
 	PQclear(reset);
 
-	printf(_("Finished the reset, hopefully there were no errors..\n"));
+	printf(_("Finished the reset, hopefully there were no errors..\r\n"));
 
 }
