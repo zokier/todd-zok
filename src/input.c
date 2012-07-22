@@ -65,7 +65,10 @@ bool todd_getchar(unsigned char *c)
 	if (rc == 1)
 	{
 		if (*c == '\t')
-		{ 
+		{
+			// this is a dirty hack; input_win is only NULL when logging in
+			// when logging in, don't toggle chat_typing (would cause random *** to appear when writing your username
+			if (input_win != NULL)	
 			if (chat_typing == 0) /* if not typing yet, goto chat toggle */
 			{
 				ncurs_chat(player);
@@ -117,12 +120,28 @@ bool todd_getline(char **line, size_t *len, WINDOW *echowindow)
 	do
 	{
 		bool rc = todd_getchar(&c);
-		if (!rc || c == '\t')	// TODO: what is player presses this when logging in?
+		if (!rc || c == '\t')	
 		{
-			free(*line);
-			*line = NULL;
-			*len = 0;
-			goto cleanup;
+		// pressing TAB (\t) when in input mode is supposed to toggle chat
+		//
+		// however, pressing TAB when logging in (typing name or password)
+		// would cause the program to quit
+		// -> don't accept TAB when logging in
+
+		// echowindow == input_win either when 
+		//	todd_getline is called with input_win
+		// OR   they are both NULL (when logging in)
+		//	therefore, those two cases can't be true at the same time
+		if (echowindow == input_win && input_win != NULL)
+			{		
+				free(*line);
+				*line = NULL;
+				*len = 0;
+				goto cleanup;
+	
+			}
+		continue;	// don't accept TAB unless in input_win, just skip it
+
 		}
 		if (c == '\b') // it's a backspace, go back a character
 		{
