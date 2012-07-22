@@ -139,9 +139,11 @@ void load_player_data(Character *load_plr)
 			load_plr->location = &loc_town; // TODO location _should_ be fetched from db!
 			int col_cursor = 0;
 			
-			// since character.name is a pointer there's no way to store the value permanently
-			// TODO: in effect doing this will make the name pointer point to a garbage location after we leave this function
-			load_plr->name = PQgetvalue(res,0,col_cursor++);
+			// TODO figure out correct length
+			// both for malloc and copy (use memcpy instead of strncpy)
+			// TODO free this somewhere?
+			load_plr->name = malloc(NAME_MAX_LENGTH);
+			strncpy(load_plr->name, PQgetvalue(res,0,col_cursor++), NAME_MAX_LENGTH);
 
 
 			load_plr->stamina = atoi(PQgetvalue(res, 0, col_cursor++));
