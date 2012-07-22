@@ -118,37 +118,40 @@ bool check_passwd()
 	return ret;
 }
 
-void load_player_data()
+void load_player_data(Character *load_plr)
 {
 
-	/* first, set the player location to "ONLINE" */
-	db_player_location(LOC_ONLINE); 
-
         PGresult *res;
-	char *player_id = itoa(player.id);
+	char *player_id = itoa(load_plr->id);
 	const char *params[1] = {player_id};
 	res = PQexecPrepared(conn, "load_player", 1, params, NULL, NULL, 0);
 	if (PQresultStatus(res) == PGRES_TUPLES_OK)
 	{
 		int row_count = PQntuples(res);
-		// UNUSED variable: int col_count = PQnfields(res);
+		int col_count = PQnfields(res);
 		if (row_count > 0)
 		{
 			if (row_count > 1)
 			{
-				syslog(LOG_WARNING, "Duplicate player data found. id = %d, name = %s, row count %d\r\n", player.id, player.name, row_count);
+				syslog(LOG_WARNING, "Duplicate player data found. id = %d, name = %s, row count %d\r\n", load_plr->id, load_plr->name, row_count);
 			}
 			// load data from first row even if there is multiple rows
-			player.location = &loc_town; // TODO location _should_ be fetched from db!
+			load_plr->location = &loc_town; // TODO location _should_ be fetched from db!
 			int col_cursor = 0;
-			player.stamina = atoi(PQgetvalue(res, 0, col_cursor++));
-			player.experience = atoi(PQgetvalue(res, 0, col_cursor++));
-			player.money = atoi(PQgetvalue(res, 0, col_cursor++));
-			player.health = atoi(PQgetvalue(res, 0, col_cursor++));
-			player.max_health = atoi(PQgetvalue(res, 0, col_cursor++));
+			
+			// since character.name is a pointer there's no way to store the value permanently
+			// TODO: in effect doing this will make the name pointer point to a garbage location after we leave this function
+			load_plr->name = PQgetvalue(res,0,col_cursor++);
+
+
+			load_plr->stamina = atoi(PQgetvalue(res, 0, col_cursor++));
+			load_plr->experience = atoi(PQgetvalue(res, 0, col_cursor++));
+			load_plr->money = atoi(PQgetvalue(res, 0, col_cursor++));
+			load_plr->health = atoi(PQgetvalue(res, 0, col_cursor++));
+			load_plr->max_health = atoi(PQgetvalue(res, 0, col_cursor++));
 			for (int i = 0; i < ELEM_COUNT; i++)
 			{
-				player.elements[i] = atoi(PQgetvalue(res, 0, col_cursor++));
+				load_plr->elements[i] = atoi(PQgetvalue(res, 0, col_cursor++));
 			}
 
 			/* id contains the weapon id. Loop through struct weapon to find the corresponding weapon */
@@ -158,7 +161,7 @@ void load_player_data()
 				if (weapons_list[i].index == temp_id)
 					break;
 
-			player.weapon = &weapons_list[i];;
+			load_plr->weapon = &weapons_list[i];;
 
 			/* Do the same for skills */
 			for (int i = 0; i < 4; i++)
@@ -169,21 +172,19 @@ void load_player_data()
 				if (skills_list[temp_i].index == temp_skill_id)
 					break;
 
-			player.skill[i] = &skills_list[temp_i];
+			load_plr->skill[i] = &skills_list[temp_i];
 			}
 
 
-			// reset player dungeon level to 0 (town)
-			player.dungeon_lvl = 0;
-//			player.dungeon_lvl = atoi(PQgetvalue(res, 0, col_cursor++));
-//			if (col_cursor != col_count)
-//			{
-//				syslog(LOG_WARNING, "col_cursor: %d != col_count: %d\r\n", col_cursor, col_count);
-//			}
+			load_plr->dungeon_lvl = atoi(PQgetvalue(res, 0, col_cursor++));
+			if (col_cursor != col_count)
+			{
+				syslog(LOG_WARNING, "col_cursor: %d != col_count: %d\r\n", col_cursor, col_count);
+			}
 		}
 		else
 		{
-			syslog(LOG_WARNING, "Player data not found. Player id = %d, name = %s\r\n", player.id, player.name);
+			syslog(LOG_WARNING, "Player data not found. Player id = %d, name = %s\r\n", load_plr->id, load_plr->name);
 		}
 	}
 	else
@@ -326,8 +327,15 @@ bool create_player()
 
 
 	// ask for password
-	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
-	passwd[line_len-1] = '\0'; // strip newline
+	if(!todd_getline(&passwd, &passwd_len,NULL))
+		{
+		syslog(LOG_ERR, "Read error: %s (%s:%d)\r\n", strerror(errno), __FILE__, __LINE__);
+	 	return false;
+		}
+
+
+// not needed since the move to todd_getline instead of getline
+//	passwd[line_len-1] = '\0'; // strip newline
 	// TODO ask password for a second time to avoid typos
 	const char *params[2] = {player.name, passwd};
 	PGresult *res;
@@ -479,7 +487,15 @@ int main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	load_player_data();
+	/* set the player location to "ONLINE" */
+	db_player_location(LOC_ONLINE); 
+
+	load_player_data(&player);
+
+	// load_player_data can be run for party members on the run, so..
+	// reset player dungeon level to 0 (town) since we're logging in
+	player.dungeon_lvl = 0;
+
 
 	// get player party id
         PGresult *player_partyres;
@@ -497,10 +513,14 @@ int main(int argc, char *argv[])
 			// TODO: if party.name is a pointer, this trick is needed
 			strncpy(g_partyname, PQgetvalue(player_partyres,0,1), sizeof(PQgetvalue(player_partyres,0,1)));
 			player_party.name = g_partyname;
-			// TODO: figure out how to do characters, should they be declared as new structs?
-//			player_party.characters = atoi(PQgetvalue(player_partyres,0,0);
-//			player_party.player2 = atoi(PQgetvalue(player_partyres,0,0);
-//			player_party.player3 = atoi(PQgetvalue(player_partyres,0,0);
+
+			// load party member id's, then use load_player_data for them
+
+			// TODO: this assumes that player is always first in the list, not true
+
+			partymember1.id = atoi(PQgetvalue(player_partyres,0,3));
+			partymember2.id = atoi(PQgetvalue(player_partyres,0,4));
+
                 }
 		else // there's no parties, load defaults
 		{
@@ -514,11 +534,24 @@ int main(int argc, char *argv[])
 			player_party.name = "No party";
 	}
         PQclear(player_partyres);
- 
+
+	// subscribe to party chat channel 
 	sub_party(player_party.id);
 
+	// load the party member details to Character partymember1 and 2
+	// ..only if you have partymembers
+	if (partymember1.id != 0)
+		load_player_data(&partymember1);
+
+	if (partymember2.id != 0)
+		load_player_data(&partymember2);
+
+
+	// load the actual game
 	init_ui();
 	enter_game();
+	
+	// on exit, save player data
 	save_player_data();
 
 	return_code = EXIT_SUCCESS; // returned from game, success

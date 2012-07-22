@@ -69,14 +69,16 @@ bool todd_getchar(unsigned char *c)
 			// this is a dirty hack; input_win is only NULL when logging in
 			// when logging in, don't toggle chat_typing (would cause random *** to appear when writing your username
 			if (input_win != NULL)	
-			if (chat_typing == 0) /* if not typing yet, goto chat toggle */
 			{
-				ncurs_chat(player);
-			}
-			else
-			{
-				chat_typing = 0; /* if typing already, cancel it */
-				ncurs_chat(player);
+				if (chat_typing == 0) /* if not typing yet, goto chat toggle */
+				{
+					ncurs_chat(player);
+				}
+				else
+				{
+					chat_typing = 0; /* if typing already, cancel it */
+					ncurs_chat(player);
+				}
 			}
 		}
 

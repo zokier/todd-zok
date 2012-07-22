@@ -26,6 +26,8 @@ extern void *party_socket;
 extern void *zmq_context;
 extern Character player;
 extern Party player_party;
+extern Character partymember1;
+extern Character partymember2;
 
 extern Character enemy;
 extern PGconn *conn;

@@ -258,8 +258,25 @@ void ac_view_stats()
 	
 	if (player_party.id != 0)
 	{
-		wprintw(game_win, "Party id: %d\n", player_party.id);
-		wprintw(game_win, "Party name: %s\n", player_party.name);
+		wprintw(game_win, _("Party id: %d\n"), player_party.id);
+		wprintw(game_win, _("Party name: %s\n"), player_party.name);
+		wprintw(game_win, _("Party members: "));
+
+		// how many members?
+		wprintw(game_win, "%s",player.name);
+		
+		if (partymember1.id != 0)
+			{
+			wprintw(game_win, ", ");
+			wprintw(game_win, "%s",partymember1.name);
+			}	
+
+		if (partymember2.id != 0)
+			{
+			wprintw(game_win, ", ");
+			wprintw(game_win, "%s",partymember2.name);
+			}	
+		
 	}
 	else
 		wprintw(game_win, "Player is not in a party");
@@ -366,42 +383,40 @@ void ac_party_list()
 			{
 			for (int i = 0; i < row_count; i++)
 				{
-				wprintw(game_win,"#%d: %s\n", atoi(PQgetvalue(res,i,0)), PQgetvalue(res,i,1));
-				wprintw(game_win,_("Members: "));
+					int partyid = atoi(PQgetvalue(res,i,0));
+					wprintw(game_win,"#%d: %s\n", partyid, PQgetvalue(res,i,1));
+					wprintw(game_win,_("Members: "));
 
-				// TODO: simplify this
-				// list_parties provides us the player ids, not names..
-				// get player names with another query
+					// TODO: simplify this
+					// list_parties provides us the player ids, not names..
+					// get player names with another query
 
-				PGresult *names;
-				char *partyid = PQgetvalue(res,i,0);
-				const char *params[1] = {partyid};
-				names = PQexecPrepared(conn, "party_get_names", 1, params, NULL, NULL, 0);
+					PGresult *names;
+					char *party_id = itoa(partyid);
+					const char *params[1] = {party_id};
+					names = PQexecPrepared(conn, "party_get_names", 1, params, NULL, NULL, 0);
 
-				if (PQresultStatus(names) == PGRES_TUPLES_OK) // there's party members, this should always be valid
-					{
-					int row_count = PQntuples(names);
-					for (int i = 0; i < row_count; i++)
-						{
-						// print out the name
-						wprintw(game_win,"%s",PQgetvalue(names,i,0)); 
-						// if you know there's going to be yet another name, print out separator
-						if (i < (row_count - 1))
-							wprintw(game_win,", ");
-						}
+					if (PQresultStatus(names) == PGRES_TUPLES_OK) // there's party members, this should always be valid
+			                {
+						int members = PQntuples(names);
+						if (members > 0)
+							for (int i = 0; i < members; i++)
+								{
+								wprintw(game_win, "%s", PQgetvalue(names,i,0));
+								if (i < (members - 1))
+									wprintw(game_win, ", ");
 
-					wprintw(game_win, "\n\n");
-					}
+								}
 
-					PQclear(names);
-				}
-			} 
-
+	                                }
+			                PQclear(names);
+	                        }
+			}
 		else
 			wprintw(game_win, _("No parties..\n"));
 	}
 	wrefresh(game_win);
-
+	PQclear(res);
 }
 
 // joins an existing party
@@ -896,7 +911,5 @@ void ac_quit()
 void ac_blank()
 {
 }
-
-
 
 

@@ -64,3 +64,4 @@ void set_party(unsigned int id)
 	player_party.id = id;
 }
 
+
