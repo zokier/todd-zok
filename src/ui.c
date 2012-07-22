@@ -553,9 +553,9 @@ if (introfile != NULL) // if the file is not found, don't display it (would segf
 	}
 
 // display credits in 
-wprintw(stdscr,_("==================================================\n"));
-wprintw(stdscr,_("World created by the Creator God Zokier & jaacoppi\n"));
-wprintw(stdscr,_("==================================================\n"));
+wprintw(stdscr,_("===================================================\n"));
+wprintw(stdscr,_("World created by the Creator Gods Zokier & jaacoppi\n"));
+wprintw(stdscr,_("===================================================\n"));
 
 wrefresh(stdscr);
 }
