@@ -543,17 +543,19 @@ wclear(stdscr);
 // read the ascii data from a file, defining it here would be problematic because of all the control chars \ and so on
 
 FILE *introfile = fopen(ASCII_INTRO,"r");
-if (introfile == NULL)
-	return;	// no intro file found, forget it
+if (introfile != NULL) // if the file is not found, don't display it (would segfault)
+	{
+	char line[80];
+	while (fgets(line, sizeof(line), introfile) != NULL) // read line by line until EOF
+		wprintw(stdscr, "%s", line);
 
-char line[80];
-while (fgets(line, sizeof(line), introfile) != NULL) // read line by line until EOF
-	wprintw(stdscr, "%s", line);
+	fclose(introfile);
+	}
 
-fclose(introfile);
+// display credits in 
+wprintw(stdscr,_("==================================================\n"));
+wprintw(stdscr,_("World created by the Creator God Zokier & jaacoppi\n"));
+wprintw(stdscr,_("==================================================\n"));
 
-
-
-wprintw(stdscr,"\n\n"); // to avoid clutter with the next text
 wrefresh(stdscr);
 }
