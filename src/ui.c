@@ -29,7 +29,8 @@ int y_size, x_size; /* used for bolding titles, must be global */
 int fight_statw_width;
 int gamew_logw_sep; 
 
-void init_ui()
+// inits ncurses so we can use wclear() and so on
+void init_ncurs()
 {
 	// locale needs to be initialized for ncurses
 	// "" sets "native" locale
@@ -83,6 +84,14 @@ void init_ui()
 	wprintw(stdscr, "color");
 	attroff(COLOR_PAIR(1));
 	*/
+
+
+
+}
+
+// inits and draws the actual game screen
+void init_ui()
+{
 
 	/* initialization of windows */
 	/* naming reference:
@@ -487,7 +496,7 @@ void ncurs_chat()
 	size_t len = 0;
 	if (toggle_chat != 0) 
 	{
-		if (todd_getline(&line, &len))
+		if (todd_getline(&line, &len, input_win))
 		{
 			Message msg = create_chat_msg(line, len);
 			/* a chat message was succesfully input(ted) */
@@ -516,4 +525,35 @@ void ncurs_chat()
 void logw_inputw_sep()
 {
 	mvwhline(background_win, y_size-3, gamew_logw_sep+1, ACS_HLINE, x_size-(gamew_logw_sep+2));
+}
+
+
+
+// ascii intro
+void intro_ascii()
+{
+// clear screen. Note that only stdscr is initialized at this point
+wclear(stdscr);
+// can't use char[24][80] or #defines easily, since the ascii art is full of \ control chars
+
+
+// read the ascii art from a file
+#define ASCII_INTRO "data/intro"
+
+// read the ascii data from a file, defining it here would be problematic because of all the control chars \ and so on
+
+FILE *introfile = fopen(ASCII_INTRO,"r");
+if (introfile == NULL)
+	return;	// no intro file found, forget it
+
+char line[80];
+while (fgets(line, sizeof(line), introfile) != NULL) // read line by line until EOF
+	wprintw(stdscr, "%s", line);
+
+fclose(introfile);
+
+
+
+wprintw(stdscr,"\n\n"); // to avoid clutter with the next text
+wrefresh(stdscr);
 }

@@ -33,8 +33,6 @@ PGconn *conn;
 
 char g_partyname[30]; // needed if party.name is a pointer?
 
-void intro_ascii(); // for fun
-
 /*
 	Asks the player for name
 */
@@ -44,22 +42,23 @@ bool get_name()
 	size_t name_len = 0;
 
 	// Introductory text
-	fputs(_("Growing up, you heard the local bards sing about ancient dungeons.\n"),stdout);
-	fputs(_("The dungeons were filled with unimaginable treasures...and monsters.\n"),stdout);
-	fputs(_("\nThat's if you believed the bards. You are now approaching a village next to the dungeons, about to find out.\n"),stdout);
+	printw(_("Growing up, you heard the local bards sing about ancient dungeons.\n"));
+	printw(_("The dungeons were filled with unimaginable treasures...and monsters.\n"));
+	printw(_("\nThat's if you believed the bards. You are now approaching a village next to the dungeons, about to find out.\n"));
 
-	fputs(_("\nAs you approach the gated village, the Gatekeeper yells at you:\n"),stdout);
-	fputs(_("HALT! Who goes there? Annouce yourself: "), stdout);
+	printw(_("\nAs you approach the gated village, the Gatekeeper yells at you:\n"));
+	printw(_("HALT! Who goes there? Annouce yourself: "));
+	wrefresh(stdscr);
 
 	// get user input
-	ssize_t line_len = getline(&name, &name_len, stdin);
-	if (line_len < 0)
-	{
+        if(!todd_getline(&name, &name_len,stdscr))
+		{
 		syslog(LOG_ERR, "Read error: %s (%s:%d)", strerror(errno), __FILE__, __LINE__);
 		return false;
-	}
-	name_len = line_len;
-	name[name_len - 1] = 0; // strip trailing newline
+		}
+
+// not needed since the move to todd_getline instead of getline
+//	name[name_len - 1] = 0; // strip trailing newline
 	if (strnlen(name, name_len) < name_len - 1)
 	{
 		// null bytes in name
@@ -97,12 +96,16 @@ bool check_passwd()
 	size_t passwd_len = 0;
 
 	// the gatekeeper asks for the password
-	printf(_("\nIf you're really %s you'll remember the secret code word we agreed on last time!\n"),player.name);
-	printf(_("Tell me the the secret code word and I'll let you pass: "));
+	wprintw(stdscr,_("\nIf you're really %s you'll remember the secret code word we agreed on last time!\n"),player.name);
+	wprintw(stdscr, _("Tell me the the secret code word and I'll let you pass: "));
+	wrefresh(stdscr);
 
+        if(!todd_getline(&passwd, &passwd_len,NULL))
+                {
+                syslog(LOG_ERR, "Read error: %s (%s:%d)", strerror(errno), __FILE__, __LINE__);
+                return false;
+                }
 
-	ssize_t line_len = getline(&passwd, &passwd_len, stdin);
-	passwd[line_len-1] = '\0'; // strip newline
 	char *player_id = itoa(player.id);
 	const char *params[2] = {player_id, passwd};
 	PGresult *res;
@@ -304,9 +307,10 @@ bool create_player()
 	bool ret = false;
 	if (!check_name())
 	{
-		puts(_("TODO: make this part \"realm-like\""));
-		puts(_("Invalid name. Allowed characters: A-Z, a-z, dash and space."));
-		printf(_("Minimum name length: %d characters.\n"), NAME_MIN_LENGTH);
+		printw(_("TODO: make this part \"realm-like\""));
+		printw(_("Invalid name. Allowed characters: A-Z, a-z, dash and space."));
+		printw(_("Minimum name length: %d characters.\n"), NAME_MIN_LENGTH);
+		wrefresh(stdscr);
 		return ret;
 	}
 	char *passwd = NULL;
@@ -314,16 +318,16 @@ bool create_player()
 
 	// New player joining, let the Gatekeeper to the talking
 
-	printf(_("\nNever heard of you, %s\n"),player.name);
-	printf(_("You look like a worthless coward to me. I bet my supper that you are a no good fighter.\n"));
-	printf(_("That's right. People from all around the kingdom come here because of the dungeons. "));
-	printf(_("Some never leave, you know.\n"));
-	printf(_("If you're really serious about meeting an untimely death you should at least talk to Bren first.\n"));
-	printf(_("Bren can teach you to take care of yourself. Meet him at his arena in the village.\n"));
+	printw(_("\nNever heard of you, %s\n"),player.name);
+	printw(_("You look like a worthless coward to me. I bet my supper that you are a no good fighter.\n"));
+	printw(_("That's right. People from all around the kingdom come here because of the dungeons. "));
+	printw(_("Some never leave, you know.\n"));
+	printw(_("If you're really serious about meeting an untimely death you should at least talk to Bren first.\n"));
+	printw(_("Bren can teach you to take care of yourself. Meet him at his arena in the village.\n"));
 
-	printf(_("\nIn case you run away to your mother and she tells you to come back and die in honor, I want to recognize you.\n"));
-	printf(_("Tell me a secret code word so I'll know you the next time you arrive: "));
-
+	printw(_("\nIn case you run away to your mother and she tells you to come back and die in honor, I want to recognize you.\n"));
+	printw(_("Tell me a secret code word so I'll know you the next time you arrive: "));
+	wrefresh(stdscr);
 
 
 	// ask for password
@@ -385,7 +389,8 @@ bool get_player()
 			{
 				return true;
 			}
-			puts(_("Incorrect password."));
+			wprintw(stdscr,_("\nIncorrect password.\n"));
+			wrefresh(stdscr);
 		}
 		return false;
 	}
@@ -554,6 +559,7 @@ void set_party(unsigned int id)
 */
 int main(int argc, char *argv[])
 {
+	init_ncurs();	// needed for all the printing, so must be done first
 	intro_ascii();
 	int return_code = EXIT_FAILURE;
 	openlog("ToDD", LOG_PID|LOG_PERROR, LOG_USER);
@@ -693,36 +699,3 @@ bool zmq_python_up()
 }
 
 
-// prints out an ASCII intro for fun
-// TODO: system("clear") might not be a good idea
-// TODO: should this be done inside ncurses? Should everything be?
-void intro_ascii()
-{
-// clear window with a system call instead of "\n\n\n..." for fun
-system("clear");	
-
-// here be dragons
-
-// can't use char[24][80] or #defines easily, since the ascii art is full of \ control chars
-
-
-// read the ascii art from a file
-#define ASCII_INTRO "data/intro"
-
-// read the ascii data from a file, defining it here would be problematic because of all the control chars \ and so on
-
-FILE *introfile = fopen(ASCII_INTRO,"r");
-if (introfile == NULL)
-	return;	// no intro file found, forget it
-
-char line[80];
-while (fgets(line, sizeof(line), introfile) != NULL) // read line by line until EOF
-	printf("%s", line);
-
-fclose(introfile);
-
-
-
-printf("\n\n"); // to avoid clutter with the next text
-
-}

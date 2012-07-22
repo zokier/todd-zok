@@ -3,6 +3,8 @@
 
 #include "character.h"
 
+void init_ncurs();
+void intro_ascii(); // for fun
 void init_ui();
 void ncurs_chat();
 void ncurs_location();

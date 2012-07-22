@@ -101,7 +101,10 @@ bool todd_getchar(unsigned char *c)
 	}
 }
 
-bool todd_getline(char **line, size_t *len)
+
+// WINDOW *echowindow points to the window that processes the input
+// basically it's input_win during the game and stdscr before the game screen is loaded
+bool todd_getline(char **line, size_t *len, WINDOW *echowindow)
 {
 	// curs_set displays a nice cursor for user convenience
 	curs_set(1);
@@ -114,7 +117,7 @@ bool todd_getline(char **line, size_t *len)
 	do
 	{
 		bool rc = todd_getchar(&c);
-		if (!rc || c == '\t')
+		if (!rc || c == '\t')	// TODO: what is player presses this when logging in?
 		{
 			free(*line);
 			*line = NULL;
@@ -123,6 +126,15 @@ bool todd_getline(char **line, size_t *len)
 		}
 		if (c == '\b') // it's a backspace, go back a character
 		{
+			// if echowindow is NULL it means we're asking for the password
+			// in this case, make backspace work
+			int password = 0;
+			if (echowindow == NULL)
+				{
+				password = 1;
+				echowindow = stdscr;
+				}
+
 			// don't backspace on an empty string or the pointer will cause a segfault
 			if ((*len) != 0) 
 			{
@@ -134,11 +146,11 @@ bool todd_getline(char **line, size_t *len)
 
 				int y,x;
 				// get current position of cursor to y and x
-				getyx(input_win,y,x);
+				getyx(echowindow,y,x);
 				// move the cursor left by one
-				wmove(input_win, y,x-1);
+				wmove(echowindow, y,x-1);
 				// blank it from screen and from buffer
-				wechochar(input_win, ' ');
+				wechochar(echowindow, ' ');
 				(*line)[*len] = '\0';
 				(*len)--;
 				if (multibyte) // there's two chars in buffer, not one
@@ -148,11 +160,15 @@ bool todd_getline(char **line, size_t *len)
 				}
 
 				// by calling wechochar, the cursor moves right. move it back
-				wmove(input_win, y,x-1);
-				wrefresh(input_win);
+				wmove(echowindow, y,x-1);
+				wrefresh(echowindow);
+
+			// if this was in the password field, change echowindow back to original value
+			if (password)
+				echowindow = NULL;
 			}
 		}
-		else
+		else	// it's just a normal character
 		{
 			if (buf_len <= *len)
 			{
@@ -162,23 +178,38 @@ bool todd_getline(char **line, size_t *len)
 
 			(*line)[*len] = c;
 			(*len)++;
-			wechochar(input_win, c);
+			// echo the character, except when echowindow is NULL echo a * to stdscr
+			// this is a hack: echowindow is NULL only when asking for a password
+			// also, don't echo a \r
+			if (echowindow == NULL && c != '\r')
+				wechochar(stdscr, '*');
+			else
+			if (c != '\r')	// without this, todd_getline would eat the "Halt! who goes there" -message 
+					// when asking for player name
+				wechochar(echowindow, c);
 		}
 
 	} while (c != '\r');
+
 	(*len)--; // strip trailing newline
 	(*line)[*len] = '\0'; // insert null terminator
 
 	curs_set(0);
+
 	if (*len == 0) // it's an empty string..
 		return false;
 	// else, return true
 	ret = true;
 
 cleanup:
-	werase(input_win);
-	wrefresh(input_win);
+	if (echowindow == input_win)
+		{
+		werase(echowindow);
+		wrefresh(echowindow);
+		}
+
 	chat_typing = 0;
 	curs_set(0);
+
 	return ret;
 }

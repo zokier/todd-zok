@@ -531,7 +531,7 @@ void ac_party_gather()
 	char *line = NULL;
 	size_t len = 0;
 	wrefresh(input_win); // this is here to move the visible cursor to input_win instead of log_win
-	if(!todd_getline(&line, &len)) return;
+	if(!todd_getline(&line, &len, input_win)) return;
 
 	player_party.name = line;
 
