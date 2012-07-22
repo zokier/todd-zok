@@ -10,6 +10,10 @@
 #define DEBUGMSG_PREFIX "debug"
 #define CTRLMSG_PREFIX "ctrl"
 
+bool init_zmq();
+void cleanup_zmq();
+bool zmq_python_up();
+
 /* currently unused stuff
 typedef enum Msg_dest Msg_dest;
 enum Msg_dest

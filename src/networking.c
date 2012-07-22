@@ -85,3 +85,133 @@ char *try_recv_msg(void *sock)
     string [size] = 0;
     return (string);
 }
+
+
+// ugly globals go here
+void *push_socket = NULL;
+void *chat_socket = NULL;
+void *party_socket = NULL;
+void *zmq_context = NULL;
+bool zmq_python_up();
+ 
+
+/*
+	Initializes ZeroMQ context and sockets
+*/
+bool init_zmq()
+{
+	if (!(zmq_context = zmq_init(1)))
+	{
+		return false;
+	}
+	if (!(push_socket = zmq_socket(zmq_context, ZMQ_PUSH)))
+	{
+		return false;
+	}
+	if (zmq_connect(push_socket, "tcp://localhost:5558"))
+	{
+		return false;
+	}
+	if (!(chat_socket = zmq_socket(zmq_context, ZMQ_SUB)))
+	{
+		return false;
+	}
+	if (zmq_connect(chat_socket, "tcp://localhost:5559"))
+	{
+		return false;
+	}
+	if (!(party_socket = zmq_socket(zmq_context, ZMQ_SUB)))
+	{
+		return false;
+	}
+	if (zmq_connect(party_socket, "tcp://localhost:5559"))
+	{
+		return false;
+	}
+
+	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, CHATMSG_PREFIX, sizeof(CHATMSG_PREFIX)-1)) // strip null terminator
+	{
+		return false;
+	}
+
+	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, CTRLMSG_PREFIX, sizeof(CTRLMSG_PREFIX)-1)) // strip null terminator
+	{
+		return false;
+	}
+
+	if (zmq_setsockopt(chat_socket, ZMQ_SUBSCRIBE, DEBUGMSG_PREFIX, sizeof(DEBUGMSG_PREFIX)-1)) // strip null terminator 
+	{
+		return false;
+	}
+
+	int linger_time = 250; // pending messages linger for 250 ms if socket is closed
+	if (zmq_setsockopt(push_socket, ZMQ_LINGER, &linger_time, sizeof(linger_time)))
+		syslog(LOG_WARNING, "Can not set ZMQ_LINGER: %s\r\n", zmq_strerror(errno));
+
+	return true;
+}
+
+void cleanup_zmq()
+{
+	zmq_close(chat_socket);
+	zmq_close(push_socket);
+	zmq_close(party_socket);
+	zmq_term(zmq_context);
+}
+
+
+/* Function checks if python chat server is running. It must be! */
+bool zmq_python_up()
+{
+	/* send a magic line, if you don't receive it, python server doesn't work correctly */
+	#define MAGIC "ToDD-MAGIC321"
+
+	char *msg = NULL;
+	int token = rand();
+	// TODO figure out correct length
+	char msg_out[40];
+	size_t len = snprintf(&msg_out[0], 40, "%s:%x", MAGIC, token)+1;
+	zmq_pollitem_t items [2];
+	items[0].socket = chat_socket;
+	items[0].events = ZMQ_POLLIN;
+
+		Message msg_foo = create_ctrl_msg(msg_out, len);
+	// retry three times, sometimes zmq is slow to start
+	for (int i = 0; i < 3; i++)
+	{
+		send_msg(msg_foo);
+		int rc = zmq_poll (items, 1, 1000000);
+		if (rc < 0)
+		{
+			syslog(LOG_WARNING, "ZMQ poll failure: %s\r\n", zmq_strerror(errno));
+			continue;
+		}
+		else if (rc != 1)
+		{
+			syslog(LOG_WARNING, "ZMQ poll failure: no events\r\n");
+			continue;
+		}
+		if (items[0].revents & ZMQ_POLLIN)
+			msg = try_recv_msg(chat_socket);
+
+		if (msg == NULL)
+		{
+			syslog(LOG_WARNING, "ZMQ recv failure: %s\r\n", zmq_strerror(errno));
+			continue;
+		}
+		// TODO check the length of the msg
+		// maybe strtok should be used instead of +sizeof(DEBUGMSG_PREFIX)
+		if (strcmp(msg_out,msg+sizeof(CTRLMSG_PREFIX)) != 0) /* TODO???*/
+		{
+			syslog(LOG_WARNING, "ERROR received %s\r\n", msg);
+			del_msg(msg_foo);
+			continue;
+		}
+		del_msg(msg_foo);
+		return true;
+	}
+	syslog(LOG_WARNING, "ZMQ chat test retry count exceeded\r\n");
+	return false;
+}
+
+

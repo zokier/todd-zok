@@ -1,3 +1,6 @@
+#include <zmq.h>
+#include <syslog.h>
+
 #include "globals.h"
 
 // update party members as given in parameters. Return 1 if succesful, calling function handles printing
@@ -16,5 +19,48 @@ int update_party(int party_id, char *player1, char *player2, char* player3)
 
 PQclear(update_party);
 return 0;
+}
+
+bool unsub_party(unsigned int id)
+{
+	size_t len = 0;
+	char buf[12]; // 'pXXXXXXXXXX\0' = 12 chars
+	len = snprintf(buf, 12, "p%010d", id);
+	if (zmq_setsockopt(party_socket, ZMQ_UNSUBSCRIBE, buf, len))
+	{
+		syslog(LOG_WARNING, "Party unsubscription failed: %s\r\n", zmq_strerror(errno));
+		return false;
+	}
+	return true;
+}
+
+bool sub_party(unsigned int id)
+{
+	size_t len = 0;
+	char buf[12]; // 'pXXXXXXXXXX\0' = 12 chars
+	len = snprintf(buf, 12, "p%010d", id);
+	if (zmq_setsockopt(party_socket, ZMQ_SUBSCRIBE, buf, len))
+	{
+		syslog(LOG_WARNING, "Party subscription failed: %s\r\n", zmq_strerror(errno));
+		return false;
+	}
+	return true;
+}
+
+
+/*
+ * Unsubscribe from current party in party socket and subscribe to new party id
+ */
+void set_party(unsigned int id)
+{
+	if (!unsub_party(player_party.id))
+	{
+		return;
+	}
+	if (!sub_party(id))
+	{
+		return;
+	}
+	player_party.id = id;
 }
 
